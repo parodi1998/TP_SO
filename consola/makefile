@@ -12,7 +12,7 @@ SHARED = $(shell find ../shared/obj/*.o)
 LINK = -lpthread -lcommons -lm
 CFLAGS = -c
 
-build: makefolder $(OBJ)
+build: makefolder makeshared $(OBJ)
 	$(CC) -o $(OUTFILE) main.c $(OBJ) $(SHARED) $(LINK)
 
 valgrind: build
