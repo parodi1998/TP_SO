@@ -17,6 +17,17 @@ int main(int argc, char** argv){
         log_warning(logger,"Direccion archivo de pseudocodigo: %s", argv[2]);
     }
 
+    char* config_path = argv[1];
+    char* pseudocodigo_path = argv[2];
+
+    // Leer archivo de configuracion
+    config_consola = malloc(sizeof(t_config_consola));
+    if(!cargar_config(config_consola, config_path)) {
+        log_error(logger,"No se pudo abrir el archivo de configuracion consola.config");
+        terminar_programa();
+        return EXIT_FAILURE;
+    }
+
     terminar_programa();
 
     return EXIT_SUCCESS;

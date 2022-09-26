@@ -14,9 +14,10 @@
 #define CONFIG_FILE "consola.config"
 
 typedef struct {
-    char* ip;
-    char* puerto;
-    char* nombre;
+    char* ip_kernel;
+    char* puerto_kernel;
+    char* segmentos;
+    char* tiempo_pantalla;
 } t_config_consola;
 
 t_log* logger;

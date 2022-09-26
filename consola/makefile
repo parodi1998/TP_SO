@@ -16,7 +16,7 @@ build: makefolder $(OBJ)
 	$(CC) -o $(OUTFILE) main.c $(OBJ) $(SHARED) $(LINK)
 
 valgrind: build
-	valgrind --leak-check=full --show-leak-kinds=all --log-file=valgrind.log ./$(OUTFILE)
+	valgrind --leak-check=full --show-leak-kinds=all --log-file=valgrind.log ./$(OUTFILE) consola.config pseudocodigo.txt
 
 debug: CFLAGS := $(CFLAGS) -g
 debug: makeshared_debug build

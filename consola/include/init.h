@@ -5,7 +5,7 @@
 
 void iniciar_programa();
 void iniciar_logger();
-bool cargar_config(t_config_consola* config_consola);
+bool cargar_config(t_config_consola* config_consola, char* path);
 
 void terminar_programa();
 
