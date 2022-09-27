@@ -9,12 +9,50 @@ char * concatenar(char* palabra1, char* palabra2)
 	return palabraFinal;
 }
 
+Struct cpu_config{
+  int entrada;
+  char* reemplazo;
+  int retardo;
+  char* ip_memoria;
+  int puerto_memoria;
+  int puerto_escucha_dispatch;
+  int puerto_escucha_interrupt;
+  
+} cpu_config;
+
+cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
+	cpu_config* configuracion_Cpu = malloc(sizeof(cpu_Config));
+	
+	configuracion_Cpu->entrada = malloc(sizeof(int));
+	configuracion_Cpu->entrada = config_get_int_value(rutaConfiguracion, "ENTRADAS_TLB");
+	
+	configuracion_Cpu->reemplazo = malloc(sizeof(int));
+	configuracion_Cpu->reemplazo = config_get_string_value(rutaConfiguracion, "REEMPLAZO_TLB");
+	
+	configuracion_Cpu->retardo = malloc(sizeof(int));
+	configuracion_Cpu->retardo = config_get_int_value(rutaConfiguracion, "RETARDO_INSTRUCCION");
+	
+	configuracion_Cpu->ip_memoria = malloc(sizeof(int));
+	configuracion_Cpu->ip_memoria = config_get_string_value(rutaConfiguracion, "IP_MEMORIA");
+	
+	configuracion_Cpu->puerto_memoria = malloc(sizeof(int));
+	configuracion_Cpu->puerto_memoria = config_get_int_value(rutaConfiguracion, "PUERTO_MEMORIA");
+	
+	configuracion_Cpu->puerto_escucha_dispatch = malloc(sizeof(int));
+	configuracion_Cpu->puerto_escucha_dispatch = config_get_int_value(rutaConfiguracion, "PUERTO_ESCUCHA_DISPATCH");
+	
+	configuracion_Cpu->puerto_escucha_interrupt = malloc(sizeof(int));
+	configuracion_Cpu->puerto_escucha_interrupt = config_get_int_value(rutaConfiguracion, "PUERTO_ESCUCHA_INTERRUPT");
+	
+	return configuracion_Cpu;
+}
+
 int start(void)
 {
-	/*---------------------------------------------------PARTE 2-------------------------------------------------------------*/
+	
 	int conexion;
-	char* ip;
-	char* puerto;
+	cpu_config* configuracion_Cpu;
+	
 	char* valor;
 	t_log* logger;
 	t_config* config;
@@ -22,27 +60,16 @@ int start(void)
 	/* ---------------- LOGGING ---------------- */
 	logger = iniciar_logger();
 
-	// Usando el logger creado previamente
-	// Escribi: "Hola! Soy un log"
-
 	log_info(logger, "Se inició el logger");
 
 //	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
 
 	config = iniciar_config();
 	log_info(logger, "Se cargó la configuración");
-	// Usando el config creado previamente, leemos los valores del config y los 
-	// dejamos en las variables 'ip', 'puerto' y 'valor'
-	ip = config_get_string_value(config, "IP");
-	log_info(logger, "Se cargó la IP con valor: %s", ip);
-	puerto = config_get_string_value(config, "PUERTO");
-	log_info(logger, "Se cargó el puerto con el valor: %s", puerto);
-	// Loggeamos el valor de config
+	configuracion_Cpu = cargarConfiguracion(config);
+	log_info(logger, "Se cargó la configuración: \n ENTRADAS_TLB: %d; \n REEMPLAZO_TLB: %s; \n RETARDO_INSTRUCCION: &d; \n IP MEMORIA: %s; PUERTO MEMORIA: %d \n PUERTO_ESCUCHA_DISPATCH: &d; \n PUERTO_ESCUCHA_INTERRUPT: %d", configuracion_Cpu->entrada, configuracion_Cpu->reemplazo, configuracion_Cpu->retardo, configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria, configuracion_Cpu->puerto_escucha_dispatch, configuracion_Cpu->puerto_escucha_interrupt);
 
 
-	/* ---------------- LEER DE CONSOLA ---------------- */
-
-	leer_consola(logger);
 
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
 
