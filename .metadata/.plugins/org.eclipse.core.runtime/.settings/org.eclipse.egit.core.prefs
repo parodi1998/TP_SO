@@ -1,4 +1,5 @@
 GitRepositoriesView.GitDirectories=/home/utnso/git/tp-2022-2c-Los_OlvidadOS/.git\:
 GitRepositoriesView.GitDirectories.relative=.git\:
 RepositorySearchDialogSearchPath=/home/utnso/git
+core_save_credentials_in_secure_store=false
 eclipse.preferences.version=1

@@ -1,0 +1,98 @@
+!SESSION 2022-09-27 04:16:16.242 -----------------------------------------------
+eclipse.buildId=4.23.0.I20220308-0310
+java.version=17.0.2
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en
+Framework arguments:  -product org.eclipse.epp.package.cpp.product
+Command-line arguments:  -os linux -ws gtk -arch x86_64 -product org.eclipse.epp.package.cpp.product
+
+!ENTRY org.eclipse.equinox.security 4 0 2022-09-27 04:22:29.383
+!MESSAGE Secure storage was unable to retrieve the master password from the password storage. If secure storage was created using a different user account, you'll have to switch back to that account. Alternatively, you can use the password recovery, or delete and re-create secure storage. 
+!STACK 0
+java.lang.SecurityException: Unable to find password
+	at org.eclipse.equinox.internal.security.linux.LinuxPasswordProvider.getMasterPassword(LinuxPasswordProvider.java:157)
+	at org.eclipse.equinox.internal.security.linux.LinuxPasswordProvider.getPassword(LinuxPasswordProvider.java:191)
+	at org.eclipse.equinox.internal.security.storage.PasswordProviderModuleExt.getPassword(PasswordProviderModuleExt.java:44)
+	at org.eclipse.equinox.internal.security.storage.SecurePreferencesRoot.getModulePassword(SecurePreferencesRoot.java:269)
+	at org.eclipse.equinox.internal.security.storage.SecurePreferencesRoot.getPassword(SecurePreferencesRoot.java:230)
+	at org.eclipse.equinox.internal.security.storage.SecurePreferences.get(SecurePreferences.java:267)
+	at org.eclipse.equinox.internal.security.storage.SecurePreferencesWrapper.get(SecurePreferencesWrapper.java:123)
+	at org.eclipse.egit.core.internal.credentials.EGitSecureStore.getCredentials(EGitSecureStore.java:89)
+	at org.eclipse.egit.core.internal.EGitSshdSessionFactory$EGitFilePasswordProvider.getPassword(EGitSshdSessionFactory.java:201)
+	at org.eclipse.jgit.transport.sshd.IdentityPasswordProvider.getPassphrase(IdentityPasswordProvider.java:134)
+	at org.eclipse.jgit.internal.transport.sshd.PasswordProviderWrapper.getPassword(PasswordProviderWrapper.java:80)
+	at org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser.extractKeyPairs(OpenSSHKeyPairResourceParser.java:155)
+	at org.apache.sshd.common.config.keys.loader.AbstractKeyPairResourceParser.extractKeyPairs(AbstractKeyPairResourceParser.java:198)
+	at org.apache.sshd.common.config.keys.loader.AbstractKeyPairResourceParser.extractKeyPairs(AbstractKeyPairResourceParser.java:167)
+	at org.apache.sshd.common.config.keys.loader.AbstractKeyPairResourceParser.loadKeyPairs(AbstractKeyPairResourceParser.java:117)
+	at org.apache.sshd.common.config.keys.loader.KeyPairResourceParser$2.loadKeyPairs(KeyPairResourceParser.java:166)
+	at org.apache.sshd.common.config.keys.loader.KeyPairResourceLoader.loadKeyPairs(KeyPairResourceLoader.java:157)
+	at org.apache.sshd.common.config.keys.loader.KeyPairResourceLoader.loadKeyPairs(KeyPairResourceLoader.java:148)
+	at org.apache.sshd.common.config.keys.loader.KeyPairResourceLoader.loadKeyPairs(KeyPairResourceLoader.java:139)
+	at org.apache.sshd.common.config.keys.loader.KeyPairResourceLoader.loadKeyPairs(KeyPairResourceLoader.java:130)
+	at org.apache.sshd.common.util.security.SecurityUtils.loadKeyPairIdentities(SecurityUtils.java:522)
+	at org.eclipse.jgit.internal.transport.sshd.CachingKeyPairProvider.loadKey(CachingKeyPairProvider.java:114)
+	at org.eclipse.jgit.internal.transport.sshd.CachingKeyPairProvider.loadKey(CachingKeyPairProvider.java:89)
+	at org.eclipse.jgit.internal.transport.sshd.CachingKeyPairProvider$CancellingKeyPairIterator.hasNext(CachingKeyPairProvider.java:169)
+	at org.eclipse.jgit.internal.transport.sshd.JGitSshClient$CombinedKeyIdentityProvider$1.hasNext(JGitSshClient.java:442)
+	at org.apache.sshd.common.keyprovider.MultiKeyIdentityIterator.hasNext(MultiKeyIdentityIterator.java:86)
+	at org.apache.sshd.client.auth.pubkey.UserAuthPublicKeyIterator$1$1.hasNext(UserAuthPublicKeyIterator.java:119)
+	at org.apache.sshd.common.util.helper.LazyIterablesConcatenator$1.hasNext(LazyIterablesConcatenator.java:68)
+	at org.apache.sshd.common.util.GenericUtils.selectNextMatchingValue(GenericUtils.java:849)
+	at org.apache.sshd.common.util.helper.LazyMatchingTypeIterator.hasNext(LazyMatchingTypeIterator.java:62)
+	at org.apache.sshd.client.auth.pubkey.UserAuthPublicKeyIterator.hasNext(UserAuthPublicKeyIterator.java:199)
+	at org.apache.sshd.client.auth.pubkey.UserAuthPublicKey.resolveAttemptedPublicKeyIdentity(UserAuthPublicKey.java:233)
+	at org.eclipse.jgit.internal.transport.sshd.JGitPublicKeyAuthentication.getNextKey(JGitPublicKeyAuthentication.java:140)
+	at org.eclipse.jgit.internal.transport.sshd.JGitPublicKeyAuthentication.resolveAttemptedPublicKeyIdentity(JGitPublicKeyAuthentication.java:129)
+	at org.apache.sshd.client.auth.pubkey.UserAuthPublicKey.sendAuthDataRequest(UserAuthPublicKey.java:151)
+	at org.apache.sshd.client.auth.AbstractUserAuth.process(AbstractUserAuth.java:71)
+	at org.apache.sshd.client.session.ClientUserAuthService.tryNext(ClientUserAuthService.java:317)
+	at org.apache.sshd.client.session.ClientUserAuthService.processUserAuth(ClientUserAuthService.java:288)
+	at org.apache.sshd.client.session.ClientUserAuthService.process(ClientUserAuthService.java:225)
+	at org.apache.sshd.common.session.helpers.AbstractSession.doHandleMessage(AbstractSession.java:526)
+	at org.apache.sshd.common.session.helpers.AbstractSession.handleMessage(AbstractSession.java:452)
+	at org.apache.sshd.common.session.helpers.AbstractSession.decode(AbstractSession.java:1524)
+	at org.apache.sshd.common.session.helpers.AbstractSession.messageReceived(AbstractSession.java:412)
+	at org.eclipse.jgit.internal.transport.sshd.JGitClientSession.messageReceived(JGitClientSession.java:197)
+	at org.apache.sshd.common.session.helpers.AbstractSessionIoHandler.messageReceived(AbstractSessionIoHandler.java:64)
+	at org.apache.sshd.common.io.nio2.Nio2Session.handleReadCycleCompletion(Nio2Session.java:359)
+	at org.apache.sshd.common.io.nio2.Nio2Session$1.onCompleted(Nio2Session.java:336)
+	at org.apache.sshd.common.io.nio2.Nio2Session$1.onCompleted(Nio2Session.java:333)
+	at org.apache.sshd.common.io.nio2.Nio2CompletionHandler.lambda$completed$0(Nio2CompletionHandler.java:38)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.apache.sshd.common.io.nio2.Nio2CompletionHandler.completed(Nio2CompletionHandler.java:37)
+	at java.base/sun.nio.ch.Invoker.invokeUnchecked(Invoker.java:129)
+	at java.base/sun.nio.ch.Invoker$2.run(Invoker.java:221)
+	at java.base/sun.nio.ch.AsynchronousChannelGroupImpl$1.run(AsynchronousChannelGroupImpl.java:113)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+
+!ENTRY org.eclipse.egit.core 4 0 2022-09-27 04:22:40.761
+!MESSAGE An exception occurred during push on URI git@github.com:sisoputnfrba/tp-2022-2c-Los_OlvidadOS.git: git@github.com:sisoputnfrba/tp-2022-2c-Los_OlvidadOS.git: DefaultAuthFuture[ssh-connection]: Failed to get operation result within specified timeout: 120000
+!STACK 0
+org.eclipse.jgit.errors.TransportException: git@github.com:sisoputnfrba/tp-2022-2c-Los_OlvidadOS.git: DefaultAuthFuture[ssh-connection]: Failed to get operation result within specified timeout: 120000
+	at org.eclipse.jgit.transport.sshd.SshdSessionFactory.getSession(SshdSessionFactory.java:264)
+	at org.eclipse.jgit.transport.sshd.SshdSessionFactory.getSession(SshdSessionFactory.java:1)
+	at org.eclipse.jgit.transport.SshTransport.getSession(SshTransport.java:107)
+	at org.eclipse.jgit.transport.TransportGitSsh$SshPushConnection.<init>(TransportGitSsh.java:358)
+	at org.eclipse.jgit.transport.TransportGitSsh.openPush(TransportGitSsh.java:159)
+	at org.eclipse.jgit.transport.PushProcess.execute(PushProcess.java:138)
+	at org.eclipse.jgit.transport.Transport.push(Transport.java:1385)
+	at org.eclipse.egit.core.op.PushOperation.run(PushOperation.java:254)
+	at org.eclipse.egit.ui.internal.push.PushJob.performJob(PushJob.java:86)
+	at org.eclipse.egit.ui.internal.jobs.RepositoryJob.run(RepositoryJob.java:59)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: org.apache.sshd.common.SshException: DefaultAuthFuture[ssh-connection]: Failed to get operation result within specified timeout: 120000
+	at org.apache.sshd.common.future.AbstractSshFuture.formatExceptionMessage(AbstractSshFuture.java:185)
+	at org.apache.sshd.common.future.AbstractSshFuture.verifyResult(AbstractSshFuture.java:111)
+	at org.apache.sshd.client.future.DefaultAuthFuture.verify(DefaultAuthFuture.java:39)
+	at org.apache.sshd.client.future.DefaultAuthFuture.verify(DefaultAuthFuture.java:32)
+	at org.apache.sshd.common.future.VerifiableFuture.verify(VerifiableFuture.java:68)
+	at org.eclipse.jgit.transport.sshd.SshdSession.connect(SshdSession.java:168)
+	at org.eclipse.jgit.transport.sshd.SshdSession.connect(SshdSession.java:99)
+	at org.eclipse.jgit.transport.sshd.SshdSessionFactory.getSession(SshdSessionFactory.java:251)
+	... 10 more
+
+!ENTRY org.eclipse.egit.ui 4 0 2022-09-27 04:22:40.787
+!MESSAGE Can't connect to any repository: git@github.com:sisoputnfrba/tp-2022-2c-Los_OlvidadOS.git (git@github.com:sisoputnfrba/tp-2022-2c-Los_OlvidadOS.git: DefaultAuthFuture[ssh-connection]: Failed to get operation result within specified timeout: 120000)
