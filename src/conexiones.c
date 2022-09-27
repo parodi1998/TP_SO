@@ -68,8 +68,6 @@ int start(void)
 
 	terminar_programa(conexion, logger, config);
 
-	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
-	// Proximamente
 	return 0;
 }
 
@@ -77,7 +75,7 @@ t_log* iniciar_logger(void)
 {
 	t_log* nuevo_logger;
 
-	if ((nuevo_logger = log_create("tp0.log", "TP0", 1, LOG_LEVEL_INFO)) == NULL)
+	if ((nuevo_logger = log_create("cpu.log", "CPU", 1, LOG_LEVEL_INFO)) == NULL)
 	{
 		printf("Error al crear logger\n");
 		exit(1);
@@ -90,7 +88,7 @@ t_config* iniciar_config(void)
 	t_config* nuevo_config;
 	char *current_dir = getcwd(NULL, 0);
 	char* path = getcwd(NULL, 0);
-	path = concatenar(path, "/Tp0.config");
+	path = concatenar(path, "Cpu.config");
 
 	if ((nuevo_config = config_create(path)) == NULL)
 	{
@@ -102,18 +100,6 @@ t_config* iniciar_config(void)
 
 
 
-void paquete(int conexion)
-{
-	// Ahora toca lo divertido!
-	char* leido;
-	t_paquete* paquete;
-
-	// Leemos y esta vez agregamos las lineas al paquete
-
-
-	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
-	
-}
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
 {
