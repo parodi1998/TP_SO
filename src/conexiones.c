@@ -9,17 +9,6 @@ char * concatenar(char* palabra1, char* palabra2)
 	return palabraFinal;
 }
 
-Struct cpu_config{
-  int entrada;
-  char* reemplazo;
-  int retardo;
-  char* ip_memoria;
-  int puerto_memoria;
-  int puerto_escucha_dispatch;
-  int puerto_escucha_interrupt;
-  
-} cpu_config;
-
 cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
 	cpu_config* configuracion_Cpu = malloc(sizeof(cpu_Config));
 	
