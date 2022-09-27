@@ -19,7 +19,7 @@ Struct cpu_config{
   int puerto_escucha_dispatch;
   int puerto_escucha_interrupt;
   
-} cpu_config
+} cpu_config;
 
 t_log* iniciar_logger(void);
 t_config* iniciar_config(void);
