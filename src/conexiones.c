@@ -39,7 +39,7 @@ cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
 int start(void)
 {
 	
-	int conexion;
+	int conexion_Memoria;
 	cpu_config* configuracion_Cpu;
 	
 	char* valor;
@@ -58,14 +58,8 @@ int start(void)
 	configuracion_Cpu = cargarConfiguracion(config);
 	log_info(logger, "Se cargó la configuración: \n ENTRADAS_TLB: %d; \n REEMPLAZO_TLB: %s; \n RETARDO_INSTRUCCION: &d; \n IP MEMORIA: %s; PUERTO MEMORIA: %d \n PUERTO_ESCUCHA_DISPATCH: &d; \n PUERTO_ESCUCHA_INTERRUPT: %d", configuracion_Cpu->entrada, configuracion_Cpu->reemplazo, configuracion_Cpu->retardo, configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria, configuracion_Cpu->puerto_escucha_dispatch, configuracion_Cpu->puerto_escucha_interrupt);
 
-
-
-	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
-
-	// ADVERTENCIA: Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo para poder conectarnos a él
-
-	// Creamos una conexión hacia el servidor
-	conexion = crear_conexion(ip, puerto);
+	//Conectar a memoria
+	conexion_Memoria = crear_conexion(configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 
