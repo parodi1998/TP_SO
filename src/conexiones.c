@@ -1,5 +1,4 @@
 #include "conexiones.h"
-.h"
 
 char * concatenar(char* palabra1, char* palabra2)
 {
