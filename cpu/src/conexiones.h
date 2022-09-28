@@ -10,16 +10,7 @@
 
 #include "utils.h"
 
-Struct cpu_config{
-  int entrada;
-  char* reemplazo;
-  int retardo;
-  char* ip_memoria;
-  int puerto_memoria;
-  int puerto_escucha_dispatch;
-  int puerto_escucha_interrupt;
-  
-} cpu_config;
+
 
 t_log* iniciar_logger(void);
 t_config* iniciar_config(void);
@@ -27,6 +18,6 @@ void leer_consola(t_log*);
 void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
 int start(void);
-cpu_config* cargarConfiguracion(t_config*)
+cpu_config* cargarConfiguracion(t_config*);
 
 #endif /* CLIENT_H_ */

@@ -29,9 +29,20 @@ typedef struct
 } t_paquete;
 
 
+typedef struct cpu_config{
+  int entrada;
+  char* reemplazo;
+  int retardo;
+  char* ip_memoria;
+  int puerto_memoria;
+  int puerto_escucha_dispatch;
+  int puerto_escucha_interrupt;
+
+}cpu_config ;
+
 
 int crear_conexion(char* ip, char* puerto);
-void enviar_mensaje(char* mensaje, int socket_cliente);
+void enviar_mensaje(char* mensaje, int socket_cliente,op_code codigo_operacion);
 t_paquete* crear_paquete(void);
 t_paquete* crear_super_paquete(void);
 void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio);

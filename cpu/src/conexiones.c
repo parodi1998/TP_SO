@@ -1,5 +1,7 @@
 #include "conexiones.h"
 
+
+
 char * concatenar(char* palabra1, char* palabra2)
 {
 	 char *palabraFinal = string_new();
@@ -9,7 +11,7 @@ char * concatenar(char* palabra1, char* palabra2)
 }
 
 cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
-	cpu_config* configuracion_Cpu = malloc(sizeof(cpu_Config));
+	cpu_config* configuracion_Cpu = malloc(sizeof(cpu_config));
 	
 	configuracion_Cpu->entrada = malloc(sizeof(int));
 	configuracion_Cpu->entrada = config_get_int_value(rutaConfiguracion, "ENTRADAS_TLB");
@@ -60,12 +62,9 @@ int start(void)
 	//Conectar a memoria
 	conexion_Memoria = crear_conexion(configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
 
-	// Enviamos al servidor el valor de CLAVE como mensaje
 
-	// Armamos y enviamos el paquete
-	paquete(conexion);
 
-	terminar_programa(conexion, logger, config);
+	terminar_programa(conexion_Memoria, logger, config);
 
 	return 0;
 }
@@ -102,8 +101,7 @@ t_config* iniciar_config(void)
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
 {
-	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
-	  con las funciones de las commons y del TP mencionadas en el enunciado */
+
 	if (logger != NULL)
 	{
 		log_destroy(logger);

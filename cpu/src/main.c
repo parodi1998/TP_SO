@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include<conexiones.h>
+#include <conexiones.h>
 
 int main(void) {
 	puts("ENCENDIDO");
