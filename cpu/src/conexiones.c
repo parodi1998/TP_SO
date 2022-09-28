@@ -1,6 +1,7 @@
 #include "conexiones.h"
 
-
+int kernel = 1;
+sem_t* comunicacion_kernel;
 
 char * concatenar(char* palabra1, char* palabra2)
 {
@@ -37,9 +38,23 @@ cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
 	return configuracion_Cpu;
 }
 
-int start(void)
+//Acá recibe instrucciones del Kernel
+void recibir_Instrucciones_Kernel (cpu_config* configuracion_Cpu)
 {
-	
+	int conexion_Kernel;
+
+	while(&kernel == 1)
+	{
+		sem_wait(&comunicacion_kernel);
+
+	}
+
+}
+
+
+void start(void)
+{
+
 	int conexion_Memoria;
 	cpu_config* configuracion_Cpu;
 	
@@ -59,14 +74,21 @@ int start(void)
 	configuracion_Cpu = cargarConfiguracion(config);
 	log_info(logger, "Se cargó la configuración: \n ENTRADAS_TLB: %d; \n REEMPLAZO_TLB: %s; \n RETARDO_INSTRUCCION: &d; \n IP MEMORIA: %s; PUERTO MEMORIA: %d \n PUERTO_ESCUCHA_DISPATCH: &d; \n PUERTO_ESCUCHA_INTERRUPT: %d", configuracion_Cpu->entrada, configuracion_Cpu->reemplazo, configuracion_Cpu->retardo, configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria, configuracion_Cpu->puerto_escucha_dispatch, configuracion_Cpu->puerto_escucha_interrupt);
 
-	//Conectar a memoria
+	//Conectar a Kernel
+
+	sem_init(comunicacion_kernel, 1, 0);
+	pthread_t * hilo_instrucciones_kernel;
+    pthread_create(hilo_instrucciones_kernel, NULL, recibir_Instrucciones_Kernel, &configuracion_Cpu);
+
+
+	//Conectar a Memoria
 	conexion_Memoria = crear_conexion(configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
+
 
 
 
 	terminar_programa(conexion_Memoria, logger, config);
 
-	return 0;
 }
 
 t_log* iniciar_logger(void)
@@ -86,7 +108,7 @@ t_config* iniciar_config(void)
 	t_config* nuevo_config;
 	char *current_dir = getcwd(NULL, 0);
 	char* path = getcwd(NULL, 0);
-	path = concatenar(path, "Cpu.config");
+	path = concatenar(path, "/cpu.config");
 
 	if ((nuevo_config = config_create(path)) == NULL)
 	{

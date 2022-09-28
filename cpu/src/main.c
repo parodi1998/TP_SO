@@ -14,6 +14,6 @@
 
 int main(void) {
 	puts("ENCENDIDO");
-	int comienza = start();
+	start();
 	return EXIT_SUCCESS;
 }
