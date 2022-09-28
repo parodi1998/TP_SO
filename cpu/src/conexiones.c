@@ -39,23 +39,65 @@ cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
 }
 
 //Acá recibe instrucciones del Kernel
-void recibir_Instrucciones_Kernel (cpu_config* configuracion_Cpu)
-{
-	int conexion_Kernel;
-
-	while(&kernel == 1)
+//void recibir_Instrucciones_Kernel (int conexion_Kernel_Dispatch)
+//{
+	//char* mensajeRecibido = NULL;
+	
+//	while(&kernel == 1)
+//	{	
+	//mensajeRecibido	= recibirMensaje(conexion_Kernel_Dispatch);
+	//if (mensajeRecibido != NULL)
 	{
-		sem_wait(&comunicacion_kernel);
-
+		//PROCESAR INSTRUCCIONES
+	//	printf('Instrucciones Recibidas');
+	//	//		sem_wait(&comunicacion_kernel_dispatch);
 	}
+	//else
+	//usleep(1000);
 
-}
+	//SE ACLARA QUE SE CODEÓ PARA QUE RECIBA UNA SERIE DE INSTRUCCIONES POR VEZ. SE PUEDE UTILIZAR UN PROCESO DE HILOS Y COLAS PARA QUE RECIBA MÁS.
 
+
+//	}
+
+//}
+
+//Acá recibe interrupciones del Kernel
+//void recibir_Interrupciones_Kernel (int conexion_Kernel_Interrupt)
+//{
+	
+//	while(&kernel == 1)
+//	{
+//	//mensajeRecibido	= recibirMensaje(conexion_Kernel_Interrupt);
+	//if (mensajeRecibido != NULL)
+	{
+		//PROCESAR INTERRUPCIONES
+	//	printf('Interrupción');
+		///SI ES NECESARIO, ABORTA->
+		//&kernel = 0;
+	}
+	//else
+	//usleep(1000);
+//	}
+
+//}
+
+//Acá recibe la informacion de la Memoria
+//void recibir_Memoria (int conexion_Memoria)
+//{
+//	while (1==1)
+//	{
+//		sem_wait(&comunicacion_memoria);
+//	}
+//}
 
 void start(void)
 {
 
 	int conexion_Memoria;
+	int conexion_Kernel_Dispatch;
+	int conexion_Kernel_Interrupt;
+	
 	cpu_config* configuracion_Cpu;
 	
 	char* valor;
@@ -74,18 +116,25 @@ void start(void)
 	configuracion_Cpu = cargarConfiguracion(config);
 	log_info(logger, "Se cargó la configuración: \n ENTRADAS_TLB: %d; \n REEMPLAZO_TLB: %s; \n RETARDO_INSTRUCCION: &d; \n IP MEMORIA: %s; PUERTO MEMORIA: %d \n PUERTO_ESCUCHA_DISPATCH: &d; \n PUERTO_ESCUCHA_INTERRUPT: %d", configuracion_Cpu->entrada, configuracion_Cpu->reemplazo, configuracion_Cpu->retardo, configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria, configuracion_Cpu->puerto_escucha_dispatch, configuracion_Cpu->puerto_escucha_interrupt);
 
-	//Conectar a Kernel
+	//CONECTAR AL KERNEL
+	//conexion_Kernel_Dispatch = crearConexion(IP, configuracion_Cpu->puerto_escucha_dispatch);
+	//sem_init(comunicacion_kernel_dispatch, 1, 0);
+	//pthread_t * hilo_instrucciones_kernel;
+    	//pthread_create(hilo_instrucciones_kernel, NULL, recibir_Instrucciones_Kernel, &conexion_Kernel_Dispatch);
+	
+	//conexion_Kernel_Interrupt = crearConexion(IP, configuracion_Cpu->puerto_escucha_interrupt);
+	//sem_init(comunicacion_kernel_interrupt, 1, 0);
+	//pthread_t * hilo_interrupciones_kernel;
+    	//pthread_create(hilo_interrupciones_kernel, NULL, recibir_Interrupciones_Kernel, &conexion_Kernel_Interrupt);
 
-	sem_init(comunicacion_kernel, 1, 0);
-	pthread_t * hilo_instrucciones_kernel;
-    pthread_create(hilo_instrucciones_kernel, NULL, recibir_Instrucciones_Kernel, &configuracion_Cpu);
 
-
-	//Conectar a Memoria
+	//CONECTAR A MEMORIA
 	conexion_Memoria = crear_conexion(configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
+	//sem_init(comunicacion_memoria, 1, 0);
+	//pthread_t * hilo_memoria;
+    	//pthread_create(hilo_memoria, NULL, comunicacion_memoria, &conexion_Memoria);
 
-
-
+	//pthreadjoin(comunicacion_kernel_interrupt, Kernel);
 
 	terminar_programa(conexion_Memoria, logger, config);
 
