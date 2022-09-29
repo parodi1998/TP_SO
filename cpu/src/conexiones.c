@@ -47,11 +47,11 @@ cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
 //	{	
 	//mensajeRecibido	= recibirMensaje(conexion_Kernel_Dispatch);
 	//if (mensajeRecibido != NULL)
-	{
+	//{
 		//PROCESAR INSTRUCCIONES
 	//	printf('Instrucciones Recibidas');
 	//	//		sem_wait(&comunicacion_kernel_dispatch);
-	}
+	//}
 	//else
 	//usleep(1000);
 
@@ -70,12 +70,12 @@ cpu_config* cargarConfiguracion(t_config* rutaConfiguracion){
 //	{
 //	//mensajeRecibido	= recibirMensaje(conexion_Kernel_Interrupt);
 	//if (mensajeRecibido != NULL)
-	{
+	//{
 		//PROCESAR INTERRUPCIONES
 	//	printf('Interrupción');
 		///SI ES NECESARIO, ABORTA->
 		//&kernel = 0;
-	}
+	//}
 	//else
 	//usleep(1000);
 //	}
