@@ -20,6 +20,7 @@
 typedef struct {
 	int32_t id;
 	int32_t pid;
+	int32_t segment;
 	int32_t frame;
 	bool present;
 	bool used;
@@ -46,6 +47,12 @@ typedef struct {
 	bool is_free;
 }t_frame_swap;
 
+typedef struct{
+	int32_t result;
+	bool page_fault;
+	int32_t frame;
+}t_translation_response;
+
 void init_global_variables(void);
 
 void initialize_memory(void);
@@ -67,8 +74,7 @@ int32_t clock_normal(t_list* pages);
 void send_swap(t_page* pid);
 int32_t execute_swapping(uint32_t pid);
 uint32_t get_free_frame(uint32_t pid);
-void load_page_to_memory(t_page* page);
-//void* read_value_in_pid(uint32_t pid, uint32_t logical_address, uint32_t size);
+bool load_page_to_memory(t_page* page);
 
 int32_t suspend_process(uint32_t pid,uint32_t segment);
 int32_t restore_process(uint32_t pid,uint32_t segment);
@@ -78,8 +84,7 @@ int32_t finalize_process(uint32_t pid,uint32_t segment);
 void create_swap_file();
 
 void end_memory_module();
-int32_t translate_logical_address(uint32_t pid ,uint32_t segment,uint32_t page);
-int32_t get_frame_by_id_page_second_level(uint32_t id_page_second_level);
+t_translation_response* translate_logical_address(uint32_t pid ,uint32_t segment,uint32_t page);
 t_frame_swap* get_free_frame_from_swap();
 
 t_frame_swap* find_frame_swap(uint32_t index);

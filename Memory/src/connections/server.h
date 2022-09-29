@@ -23,11 +23,16 @@
 typedef enum
 {
 	INICIAR_PROCESO,
+	TRADUCIR,
 	ESCRIBIR,
 	LEER,
 	SUSPENDER_PROCESO,
 	RESTAURAR_PROCESO,
 	FINALIZAR_PROCESO,
+	TRADUCCION_EXITOSA,
+	PAGE_FAULT,
+	OK,
+	ERROR,
 	MENSAJE
 }op_code;
 
@@ -54,15 +59,16 @@ int recibir_operacion(int);
 void process_request(int cod_op, int cliente_fd);
 void serve_client(int *socket);
 void* serializar_paquete(t_paquete* paquete, int bytes);
-void devolver_mensaje(void* payload, int size, int socket_cliente);
+void devolver_mensaje(void* payload, int size, int socket_cliente,int op_code);
 
 
 char* process_numeric_response(int32_t response);
-void* procesar_mensaje_iniciar_proceso(char* string,int* size);
-void* procesar_restaurar_proceso(char* string,int* size);
-void* procesar_finalizar_proceso(char* string,int* size);
-void* procesar_suspender_proceso(char* string,int* size);
-void* procesar_mensaje_escribir(char* string,int* size);
-void* procesar_mensaje_leer(char* string,int* size);
+void* procesar_mensaje_iniciar_proceso(char* string,int* size, int* op_code);
+void* procesar_restaurar_proceso(char* string,int* size, int* op_code);
+void* procesar_finalizar_proceso(char* string,int* size, int* op_code);
+void* procesar_suspender_proceso(char* string,int* size, int* op_code);
+void* procesar_mensaje_escribir(char* string,int* size, int* op_code);
+void* procesar_mensaje_leer(char* string,int* size, int* op_code);
+void* procesar_traducir_direccion(char* string,int* size, int* op_code);
 
 #endif /* CONNECTIONS_SERVER_H_ */

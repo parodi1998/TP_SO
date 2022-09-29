@@ -64,30 +64,34 @@ void serve_client(int* socket)
 
 void process_request(int cod_op, int cliente_fd) {
 	int size;
+	int op_code_response;
 	void* msg;
 	void* response;
 	msg = recibir_mensaje(cliente_fd, &size);
 		switch (cod_op) {
 		case INICIAR_PROCESO:
-			response = procesar_mensaje_iniciar_proceso(msg,&size);
+			response = procesar_mensaje_iniciar_proceso(msg,&size,&op_code_response);
+			break;
+		case TRADUCIR:
+			response = procesar_traducir_direccion(msg,&size,&op_code_response);
 			break;
 		case ESCRIBIR:
-			response = procesar_mensaje_escribir(msg,&size);
+			response = procesar_mensaje_escribir(msg,&size,&op_code_response);
 			break;
 		case LEER:
-			response = procesar_mensaje_leer(msg,&size);
+			response = procesar_mensaje_leer(msg,&size,&op_code_response);
 			break;
 		case SUSPENDER_PROCESO:
-			response = procesar_suspender_proceso(msg,&size);
+			response = procesar_suspender_proceso(msg,&size,&op_code_response);
 			break;
 		case RESTAURAR_PROCESO:
-			response = procesar_restaurar_proceso(msg,&size);
+			response = procesar_restaurar_proceso(msg,&size,&op_code_response);
 			break;
 		case FINALIZAR_PROCESO:
-			response = procesar_finalizar_proceso(msg,&size);
+			response = procesar_finalizar_proceso(msg,&size,&op_code_response);
 			break;
 		}
-		devolver_mensaje(response,size, cliente_fd);
+		devolver_mensaje(response,size, cliente_fd,op_code_response);
 		free(msg);
 }
 
@@ -114,11 +118,11 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 	return magic;
 }
 
-void devolver_mensaje(void* payload, int size, int socket_cliente)
+void devolver_mensaje(void* payload, int size, int socket_cliente,int op_code)
 {
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
-	paquete->codigo_operacion = MENSAJE;
+	paquete->codigo_operacion = op_code;
 	paquete->buffer = malloc(sizeof(t_buffer));
 	paquete->buffer->size = size;
 	paquete->buffer->stream = malloc(size);
@@ -136,83 +140,103 @@ void devolver_mensaje(void* payload, int size, int socket_cliente)
 	free(paquete);
 }
 
-void* procesar_mensaje_iniciar_proceso(char* string,int* size_response){
-	//<PID>|<SEGMENT>|<SIZE>
+void* procesar_mensaje_iniciar_proceso(char* string,int* size_response,int* op_code){
+	//ENTRADA <PID>|<SEGMENT>|<SIZE>
+	//SALIDA <NUMERIC>
 	char** array = string_split(string,"|");
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
 	uint32_t size = (volatile uint32_t) atoi( array[2]);
 
 	int32_t response = initialize_process(pid,segment,size);
-	char* message = process_numeric_response(response);
-	*size_response = string_length(message);
+	char* message = string_itoa(response);
+
+	*size_response = sizeof(response);
+	*op_code = INICIAR_PROCESO;
+
 	return (void*)message;
 }
 
-
-char* process_numeric_response(int32_t response){
-	if(response == SUCCESS){
-		return "Successful Operation";
-	}
-	if(response == FAILURE){
-		return "Operation Failure";
-	}
-	return string_itoa(response);
-}
-
-void* procesar_mensaje_leer(char* string,int* size_response){
-	//<ADDRESS>|<SIZE>
+void* procesar_mensaje_leer(char* string,int* size_response,int* op_code){
+	//ENTRADA: <ADDRESS>|<SIZE>
+	//SALIDA:<CONTENIDO>
 	char** array = string_split(string,"|");
 	uint32_t address = (volatile uint32_t) atoi( array[0]);
 	uint32_t size = (volatile uint32_t) atoi( array[1]);
 	*size_response = size;
+	*op_code = LEER;
 	return read_value_in_memory(address,size);
 }
 
-void* procesar_mensaje_escribir(char* string,int* size_response){
-	//<ADDRESS>|<SIZE>|<VALUE>
+void* procesar_mensaje_escribir(char* string,int* size_response,int* op_code){
+	//ENTRADA:<ADDRESS>|<SIZE>|<VALUE>
+	//SALIDA: "OK"
 	char** array = string_split(string,"|");
 	uint32_t address = (volatile uint32_t) atoi( array[0]);
 	uint32_t size = (volatile uint32_t) atoi( array[1]);
-	void* value =(void*) array[2];
-	save_value_in_memory(address,value,size);
-	char* message = process_numeric_response(SUCCESS);
-	*size_response = string_length(message);
-	return (void*)message;
+
+	save_value_in_memory(address,(void*) array[2],size);
+	*op_code = OK;
+	*size_response = string_length("OK");
+	return (void*)"OK";
 
 }
 
-void* procesar_suspender_proceso(char* string,int* size){
-	//<PID>|<SEGMENT>
+void* procesar_suspender_proceso(char* string,int* size,int* op_code){
+	//ENTRADA:<PID>|<SEGMENT>
+	//SALIDA:<OK>
 	char** array = string_split(string,"|");
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
-	int32_t response = suspend_process(pid,segment);
-	char* message = process_numeric_response(response);
-	*size = string_length(message);
-	return (void*)message;
+	suspend_process(pid,segment);
+
+	*size = string_length("OK");
+	*op_code = OK;
+	return (void*)"OK";
 }
 
 
-void* procesar_finalizar_proceso(char* string,int* size){
-	//<PID>|<SEGMENT>
+void* procesar_finalizar_proceso(char* string,int* size,int* op_code){
+	//ENTRADA:<PID>|<SEGMENT>
+	//SALIDA:<OK>
 	char** array = string_split(string,"|");
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
-	int32_t response = finalize_process(pid,segment);
-	char* message = process_numeric_response(response);
-	*size = string_length(message);
-	return (void*)message;
+	finalize_process(pid,segment);
+	*size = string_length("OK");
+	*op_code = OK;
+	return (void*)"OK";
 }
 
 
-void* procesar_restaurar_proceso(char* string,int* size){
-	//<PID>|<SEGMENT>
+void* procesar_restaurar_proceso(char* string,int* size,int* op_code){
+	//ENTRADA: <PID>|<SEGMENT>
+	//SALIDA: <OK>
 	char** array = string_split(string,"|");
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
-	int32_t response = restore_process(pid,segment);
-	char* message = process_numeric_response(response);
-	*size = string_length(message);
-	return (void*)message;
+	restore_process(pid,segment);
+	*size = string_length("OK");
+	*op_code = OK;
+	return (void*)"OK";
+}
+
+void* procesar_traducir_direccion(char* string,int* size, int* op_code){
+	//ENTRADA: <PID>|<SEGMENT>|<PAGE>
+	//SALIDA: <HUBO_PAGE_FAULT>|<FRAME>
+	char** array = string_split(string,"|");
+	uint32_t pid = (volatile uint32_t) atoi( array[0]);
+	uint32_t segment = (volatile uint32_t) atoi( array[1]);
+	uint32_t page = (volatile uint32_t) atoi( array[2]);
+
+	t_translation_response* response = translate_logical_address(pid, segment,page);
+
+	*op_code = response->result;
+
+	char* response_string = string_from_format("%d|%d",response->page_fault,response->frame);
+
+	free(response);
+	*size = sizeof(response_string);
+
+	return response_string;
 }
