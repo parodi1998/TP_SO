@@ -143,12 +143,9 @@ void init_structs_and_lists() {
 
 int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	//verifico si ya se ocuparon la cantidad maxima admitida de procesos en memoria
-	int number_of_pages_to_create = ceil(
-			(double) size / (double) page_size_getter());
+	int number_of_pages_to_create = ceil((double) size / (double) page_size_getter());
 
-	log_info(LOGGER,
-			"Se encontro espacio libre en la tabla de 1er nivel para el PID %d",
-			pid);
+	log_info(LOGGER,"Se encontro espacio libre para el PID %d, SEGMENTO %d",pid,segment_ID);
 
 	bool is_free_and_unasigned(t_frame* frame) {
 		return frame->is_free && frame->pid == -1;
@@ -157,9 +154,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	t_list* free_frames_MP = list_filter(FRAMES, (void*) is_free_and_unasigned);
 	if (list_size(free_frames_MP) < frames_per_table_getter()) {
 
-		log_info(LOGGER,
-				"Error: se supero el nivel de multiprogramacion, no hay frames libes en MP para el PID %d, Segmento: %d",
-				pid, segment_ID);
+		log_info(LOGGER,"Error: se supero el nivel de multiprogramacion, no hay frames libes en MP para el PID %d, Segmento: %d",pid, segment_ID);
 		list_destroy(free_frames_MP);
 		return FAILURE;
 	}
@@ -170,7 +165,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	}
 	pthread_mutex_unlock(&mutex_frames);
 	list_destroy(free_frames_MP);
-	log_info(LOGGER, "Se reservaron frames para el PID %d", pid);
+	log_info(LOGGER, "Se reservaron frames para el PID %d, SEGMENTO: %d", pid,segment_ID);
 	//creacion de tabla de paginas
 
 	table_page* new_table = malloc(sizeof(table_page));
@@ -194,8 +189,8 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 		page->segment = segment_ID;
 		page->id = i;
 		page->frame = -1;
-		page->modified = true;
-		page->locked = true;
+		page->modified = false;
+		page->locked = false;
 		page->present = false;
 		page->used = true;
 		page->pos_swap = -1;
@@ -208,7 +203,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	free(buffer_process);
 
 	//retornamos el id de la pagina de primer nivel
-	log_info(LOGGER, "Se crea la tabla de paginas ID: %d  al PID: %d",new_table->ID, pid);
+	log_info(LOGGER, "Se crea la tabla de paginas ID: %d  al PID: %d, SEGMENTO %d",new_table->ID, pid,segment_ID);
 
 	book_frames(pid);
 
@@ -217,7 +212,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 }
 
 int32_t suspend_process(uint32_t pid, uint32_t segment) {
-	log_info(LOGGER, "Se suspende el proceso %d , segmento &d...", pid,segment);
+	log_info(LOGGER, "Se suspende el proceso %d , segmento %d...", pid,segment);
 	table_page* table = find_table_with_pid(pid, segment);
 	t_page* page;
 	t_frame* frame;
@@ -245,8 +240,7 @@ int32_t suspend_process(uint32_t pid, uint32_t segment) {
 }
 
 int32_t finalize_process(uint32_t pid, uint32_t segment) {
-	log_info(LOGGER, "Comienza la finalizacion del proceso %d, segmento &d ..",
-			pid, segment);
+	log_info(LOGGER, "Comienza la finalizacion del proceso %d, segmento %d ..",pid, segment);
 	table_page* table = find_table_with_pid(pid, segment);
 	t_page* page;
 	t_frame* frame;
@@ -273,42 +267,13 @@ int32_t finalize_process(uint32_t pid, uint32_t segment) {
 				pthread_mutex_unlock(&mutex_frames_swap);
 			}
 
-			log_info(LOGGER, "[Proceso %d, Segmento &d]Se libera frame nro %d",pid, segment, page->id, frame->id);
+			log_info(LOGGER, "[Proceso %d, Segmento %d]Se libera frame nro %d",pid, segment, page->id, frame->id);
 		}
 	}
 	delete_swap_file(pid);
 
 	log_info(LOGGER, "Se finalizo el proceso %d segmento %d con exito", pid,segment);
 
-	return SUCCESS;
-}
-
-int32_t restore_process(uint32_t pid, uint32_t segment) {
-	//verifico si ya se ocuparon la cantidad maxima admitida de procesos en memoria
-	log_info(LOGGER, "Se reestablece el proceso suspendido nro %d, segmento %d",
-			pid, segment);
-	table_page* table = find_table_with_pid(pid, segment);
-	t_page* page;
-	bool is_free_and_unasigned(t_frame* frame) {
-		return frame->is_free && frame->pid == -1;
-	}
-	pthread_mutex_lock(&mutex_frames);
-	t_list* free_frames_MP = list_filter(FRAMES, (void*) is_free_and_unasigned);
-	if (list_size(free_frames_MP) < frames_per_table_getter()) {
-		log_info(LOGGER,
-				"Error: se supero el nivel de multiprogramacion, no hay frames libes en MP para el PID %d",
-				pid);
-		list_destroy(free_frames_MP);
-		return FAILURE;
-	}
-	//Reservamos los frames al PID
-	for (int i = 0; i < frames_per_table_getter(); i++) {
-		t_frame* frame_libre = list_get(free_frames_MP, i);
-		frame_libre->pid = pid;
-	}
-	pthread_mutex_unlock(&mutex_frames);
-	list_destroy(free_frames_MP);
-	log_info("Se reestablecio el PID %d con exito", pid);
 	return SUCCESS;
 }
 
@@ -517,7 +482,7 @@ void send_swap(t_page* page) {
 	t_frame_swap* frame_swap = get_free_frame_from_swap();
 	page->pos_swap = frame_swap->pos;
 	frame_swap->is_free = false;
-
+	page->frame = -1;
 	save_content_in_swap_file(page->frame * page_size_getter(),page_size_getter(), frame_swap->pos * page_size_getter());
 
 }
@@ -534,19 +499,20 @@ bool load_page_to_memory(t_page* page) {//RETORNA TRUE SI HUBO PAGE_FAULT, FALSE
 	if (list_size(process_free_frames) > 0) {
 		t_frame* frame = list_get(process_free_frames, 0);
 		pos_frame = frame->id;
+		frame->is_free = false;
 		log_info(LOGGER,"Se encontro frame libre para la pagina %d -- PID %d -- FRAME: %d",page->id, page->pid, frame->id);
 	} else {
 		pagefault = true;
 		log_info(LOGGER,"PAGE FAULT! La pag %i del proceso %i, segmento %d no se encuentra en memoria",page->id, page->pid, page->segment);
 		pos_frame = execute_swapping(page->pid);
-		log_info(LOGGER, "Cargando la pagina %d de swap a memoria, PID %d",page->id, page->pid);
-		load_file_into_memory(pos_frame * page_size_getter(),page_size_getter(), page->pos_swap * page_size_getter());
 	}
 	list_destroy(process_free_frames);
 
 	page->present = true;
 	page->modified = false;
 	page->frame = pos_frame;
+
+
 	return pagefault;
 }
 
@@ -585,7 +551,7 @@ t_frame_swap* find_frame_swap(uint32_t index) {
 	return list_get(FRAMES_SWAP, index);
 }
 
-t_translation_response* translate_logical_address(uint32_t pid, uint32_t segment,uint32_t index_page) {
+t_translation_response* translate_logical_address(uint32_t pid, uint32_t segment,uint32_t index_page,uint32_t is_writting) {
 
 	t_translation_response* response = malloc(sizeof(t_translation_response));
 	response->frame = -1;
@@ -608,6 +574,10 @@ t_translation_response* translate_logical_address(uint32_t pid, uint32_t segment
 
 	response->result= SUCCESS;
 	response->frame = page->frame;
+
+	if(is_writting){
+		page->modified = true;
+	}
 
 	return response;
 }

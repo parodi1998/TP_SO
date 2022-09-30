@@ -27,13 +27,11 @@ typedef enum
 	ESCRIBIR,
 	LEER,
 	SUSPENDER_PROCESO,
-	RESTAURAR_PROCESO,
 	FINALIZAR_PROCESO,
 	TRADUCCION_EXITOSA,
 	PAGE_FAULT,
 	OK,
-	ERROR,
-	MENSAJE
+	ERROR
 }op_code;
 
 typedef struct
@@ -64,7 +62,6 @@ void devolver_mensaje(void* payload, int size, int socket_cliente,int op_code);
 
 char* process_numeric_response(int32_t response);
 void* procesar_mensaje_iniciar_proceso(char* string,int* size, int* op_code);
-void* procesar_restaurar_proceso(char* string,int* size, int* op_code);
 void* procesar_finalizar_proceso(char* string,int* size, int* op_code);
 void* procesar_suspender_proceso(char* string,int* size, int* op_code);
 void* procesar_mensaje_escribir(char* string,int* size, int* op_code);

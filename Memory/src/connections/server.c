@@ -84,9 +84,6 @@ void process_request(int cod_op, int cliente_fd) {
 		case SUSPENDER_PROCESO:
 			response = procesar_suspender_proceso(msg,&size,&op_code_response);
 			break;
-		case RESTAURAR_PROCESO:
-			response = procesar_restaurar_proceso(msg,&size,&op_code_response);
-			break;
 		case FINALIZAR_PROCESO:
 			response = procesar_finalizar_proceso(msg,&size,&op_code_response);
 			break;
@@ -208,28 +205,16 @@ void* procesar_finalizar_proceso(char* string,int* size,int* op_code){
 	return (void*)"OK";
 }
 
-
-void* procesar_restaurar_proceso(char* string,int* size,int* op_code){
-	//ENTRADA: <PID>|<SEGMENT>
-	//SALIDA: <OK>
-	char** array = string_split(string,"|");
-	uint32_t pid = (volatile uint32_t) atoi( array[0]);
-	uint32_t segment = (volatile uint32_t) atoi( array[1]);
-	restore_process(pid,segment);
-	*size = string_length("OK");
-	*op_code = OK;
-	return (void*)"OK";
-}
-
 void* procesar_traducir_direccion(char* string,int* size, int* op_code){
-	//ENTRADA: <PID>|<SEGMENT>|<PAGE>
+	//ENTRADA: <PID>|<SEGMENT>|<PAGE>|<ES ESCRITURA>
 	//SALIDA: <HUBO_PAGE_FAULT>|<FRAME>
 	char** array = string_split(string,"|");
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
 	uint32_t page = (volatile uint32_t) atoi( array[2]);
+	uint32_t is_writting = (volatile uint32_t) atoi( array[3]);
 
-	t_translation_response* response = translate_logical_address(pid, segment,page);
+	t_translation_response* response = translate_logical_address(pid, segment,page,is_writting);
 
 	*op_code = response->result;
 
