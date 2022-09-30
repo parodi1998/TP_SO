@@ -13,7 +13,7 @@ LINK = -lpthread -lcommons -lm
 CFLAGS = -c
 
 build: makefolder makeshared $(OBJ)
-	$(CC) -o $(OUTFILE) main.c $(OBJ) $(SHARED) $(LINK)
+	$(CC) -o $(OUTFILE) consola.c $(OBJ) $(SHARED) $(LINK)
 
 valgrind: build
 	valgrind --leak-check=full --show-leak-kinds=all --log-file=valgrind.log ./$(OUTFILE) consola.config pseudocodigo.txt

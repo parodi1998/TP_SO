@@ -7,6 +7,8 @@
 #include <commons/config.h>
 #include <commons/string.h>
 #include <commons/collections/list.h>
+#include "../../shared/include/sockets.h"
+#include "../../shared/include/protocolo.h"
 
 #define LOGGER_FILE "kernel.log"
 #define LOGGER_NAME "KERNEL"
@@ -19,7 +21,9 @@ typedef struct {
     char* ip_cpu;
     char* puerto_cpu_dispatch;
     char* puerto_cpu_interrupt;
+    char* ip_escucha;
     char* puerto_escucha;
+    char* nombre_escucha;
     char* algoritmo_planificacion;
     char* grado_max_multiprogramacion;
     char* dispositivos_IO;

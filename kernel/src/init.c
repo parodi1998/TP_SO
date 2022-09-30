@@ -13,7 +13,9 @@ static bool cargar_config(t_config_kernel* config_kernel) {
         config_kernel->ip_cpu = string_new();
         config_kernel->puerto_cpu_dispatch = string_new();
         config_kernel->puerto_cpu_interrupt = string_new();
+        config_kernel->ip_escucha = string_new();
         config_kernel->puerto_escucha = string_new();
+        config_kernel->nombre_escucha = string_new();
         config_kernel->algoritmo_planificacion = string_new();
         config_kernel->grado_max_multiprogramacion = string_new();
         config_kernel->dispositivos_IO = string_new();
@@ -24,7 +26,9 @@ static bool cargar_config(t_config_kernel* config_kernel) {
         string_append(&config_kernel->ip_cpu, config_get_string_value(config, "IP_CPU"));
         string_append(&config_kernel->puerto_cpu_dispatch, config_get_string_value(config, "PUERTO_CPU_DISPATCH"));
         string_append(&config_kernel->puerto_cpu_interrupt, config_get_string_value(config, "PUERTO_CPU_INTERRUPT"));
+        string_append(&config_kernel->ip_escucha, config_get_string_value(config, "IP_ESCUCHA"));
         string_append(&config_kernel->puerto_escucha, config_get_string_value(config, "PUERTO_ESCUCHA"));
+        string_append(&config_kernel->nombre_escucha, config_get_string_value(config, "NOMBRE_ESCUCHA"));
         string_append(&config_kernel->algoritmo_planificacion, config_get_string_value(config, "ALGORITMO_PLANIFICACION"));
         string_append(&config_kernel->grado_max_multiprogramacion, config_get_string_value(config, "GRADO_MAX_MULTIPROGRAMACION"));
         string_append(&config_kernel->dispositivos_IO, config_get_string_value(config, "DISPOSITIVOS_IO"));

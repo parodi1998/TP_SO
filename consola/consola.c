@@ -1,4 +1,4 @@
-#include "include/main.h"
+#include "include/consola.h"
 
 int main(int argc, char** argv){
 
@@ -28,6 +28,17 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
+    // conectarse al kernel y enviar informacion
+    int fd = 0;
+    if(!conectar_a_kernel(&fd, config_consola)) {
+        log_error(logger,"No se pudo generar la conexion al kernel");
+        terminar_programa();
+        return EXIT_FAILURE;
+    }
+
+    enviar_mensaje("mensaje de prueba", fd);
+
+    liberar_conexion(&fd);
     terminar_programa();
 
     return EXIT_SUCCESS;

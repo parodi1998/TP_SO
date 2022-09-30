@@ -7,11 +7,11 @@
 #include <commons/config.h>
 #include <commons/string.h>
 #include <commons/collections/list.h>
+#include "../../shared/include/sockets.h"
+#include "../../shared/include/protocolo.h"
 
 #define LOGGER_FILE "consola.log"
 #define LOGGER_NAME "CONSOLA"
-
-#define CONFIG_FILE "consola.config"
 
 typedef struct {
     char* ip_kernel;
