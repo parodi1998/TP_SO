@@ -1,14 +1,11 @@
 #include "../include/init.h"
 
-void iniciar_programa() {
-    iniciar_logger();
-}
-
-void iniciar_logger() {
+static bool iniciar_logger() {
     logger = log_create(LOGGER_FILE,LOGGER_NAME,true,LOG_LEVEL_DEBUG);
+    return logger != NULL;
 }
 
-bool cargar_config(t_config_kernel* config_kernel) {
+static bool cargar_config(t_config_kernel* config_kernel) {
     t_config* config = config_create(CONFIG_FILE);
     if(config != NULL) {
         config_kernel->ip_memoria = string_new();
@@ -38,6 +35,26 @@ bool cargar_config(t_config_kernel* config_kernel) {
     } else {
         return false;
     }
+}
+
+static bool iniciar_config() {
+    config_kernel = malloc(sizeof(t_config_kernel));
+    if(!cargar_config(config_kernel)) {
+        log_error(logger,"No se pudo abrir el archivo de configuracion kernel.config");
+        return false;
+    }
+    return true;
+}
+
+bool iniciar_programa() {
+    if(!iniciar_logger()) {
+        return false;
+    } else {
+        if(!iniciar_config()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 void terminar_programa() {

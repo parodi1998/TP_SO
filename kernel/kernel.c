@@ -2,14 +2,9 @@
 
 int main(int argc, char** argv){
 
-    iniciar_programa();
-
-    // Leer archivo de configuracion
-    config_kernel = malloc(sizeof(t_config_kernel));
-    if(!cargar_config(config_kernel)) {
-        log_error(logger,"No se pudo abrir el archivo de configuracion kernel.config");
+    if(!iniciar_programa()) {
         terminar_programa();
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
 
     terminar_programa();

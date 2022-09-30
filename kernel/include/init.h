@@ -3,10 +3,7 @@
 
 #include "commons.h"
 
-void iniciar_programa();
-void iniciar_logger();
-bool cargar_config(t_config_kernel* config_kernel);
-
+bool iniciar_programa();
 void terminar_programa();
 
 #endif
