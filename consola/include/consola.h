@@ -3,5 +3,6 @@
 
 #include "init.h"
 #include "conexion.h"
+#include "archivo.h"
 
 #endif

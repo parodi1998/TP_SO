@@ -28,6 +28,21 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
+    // Leer archivo
+    t_list* instrucciones;
+
+    FILE* programa_con_instrucciones;
+    programa_con_instrucciones = fopen(pseudocodigo_path,"r");
+    if (programa_con_instrucciones == NULL) {
+        log_error(logger, "No se pudo abrir el archivo del path %s",pseudocodigo_path);
+        terminar_programa();
+        return EXIT_FAILURE;
+    }
+ 	else {
+        instrucciones = cargar_instrucciones_de_archivo(programa_con_instrucciones);
+    }
+    fclose(programa_con_instrucciones);
+
     // conectarse al kernel y enviar informacion
     int fd = 0;
     if(!conectar_a_kernel(&fd, config_consola)) {
