@@ -9,4 +9,7 @@
 			<item value="/home/utnso/git/tp-2022-2c-Los_OlvidadOS"/>
 		</list>
 	</section>
+	<section name="org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea">
+		<item key="OUTSIDE_LOCATION" value="/home/utnso/git/tp-2022-2c-Los_OlvidadOS/src"/>
+	</section>
 </section>

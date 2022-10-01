@@ -16,10 +16,11 @@
 
 t_log* iniciar_logger(void);
 t_config* iniciar_config(void);
-void leer_consola(t_log*);
+void leer_consola();
 void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
-void start(void);
-cpu_config* cargarConfiguracion(t_config*);
+int start(int arg);
+cpu_config* cargarConfiguracion(t_config*, t_log*);
+int crearConexionAuxiliar(char* ip, int puerto, t_log* logger);
 
 #endif /* CLIENT_H_ */
