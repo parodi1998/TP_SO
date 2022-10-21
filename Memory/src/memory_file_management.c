@@ -322,10 +322,10 @@ uint32_t get_free_frame(uint32_t pid) {
 	list_destroy(free_frame_process);
 	pthread_mutex_unlock(&mutex_frames);
 
-	return execute_swapping(pid);
+	return execute_swapping(pid)->frame  ;
 }
 
-int32_t execute_swapping(uint32_t pid) {
+t_page* execute_swapping(uint32_t pid) {
 
 	int pos_victim;
 	t_list* pages;
@@ -389,7 +389,7 @@ int32_t execute_swapping(uint32_t pid) {
 
 	list_destroy(pages);
 
-	return victim->frame;
+	return victim;
 }
 
 t_list* get_free_frames_from_process(uint32_t pid) {
@@ -499,18 +499,17 @@ bool load_page_to_memory(t_page* page) {//RETORNA TRUE SI HUBO PAGE_FAULT, FALSE
 	if (list_size(process_free_frames) > 0) {
 		t_frame* frame = list_get(process_free_frames, 0);
 		pos_frame = frame->id;
+		page->frame = pos_frame;
 		frame->is_free = false;
 		log_info(LOGGER,"Se encontro frame libre para la pagina %d -- PID %d -- FRAME: %d",page->id, page->pid, frame->id);
+		page->present = true;
 	} else {
 		pagefault = true;
 		log_info(LOGGER,"PAGE FAULT! La pag %i del proceso %i, segmento %d no se encuentra en memoria",page->id, page->pid, page->segment);
-		pos_frame = execute_swapping(page->pid);
+		page->present = false;
 	}
 	list_destroy(process_free_frames);
-
-	page->present = true;
 	page->modified = false;
-	page->frame = pos_frame;
 
 
 	return pagefault;
@@ -626,5 +625,18 @@ t_list* get_free_frames() {
 	}
 
 	return list_filter(FRAMES, (void*) is_free);
+}
+
+void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
+	table_page* table = find_table_with_pid(pid,segment);
+	t_page* page = list_get(table->pages,page_number);
+
+
+
+	t_page* page_victim = execute_swapping(pid);
+	int32_t frame = page_victim->frame;
+
+	log_info(LOGGER,"REEMPLAZO - PID: <%d> - Marco: <%d> - Page Out: <%d>|<%d> - Page In: <%d>|<%d>",pid,frame,page_victim->segment,page_victim->id,segment,page_number);
+
 }
 

@@ -72,7 +72,7 @@ t_list* get_free_frames_from_process(uint32_t pid);
 int32_t clock_M(t_list* pages);
 int32_t clock_normal(t_list* pages);
 void send_swap(t_page* pid);
-int32_t execute_swapping(uint32_t pid);
+t_page* execute_swapping(uint32_t pid);
 uint32_t get_free_frame(uint32_t pid);
 bool load_page_to_memory(t_page* page);
 
@@ -91,4 +91,5 @@ t_frame_swap* find_frame_swap(uint32_t index);
 t_list* find_all_pages_from_process(uint32_t pid);
 t_list* get_free_frames();
 void book_frames(uint32_t pid);
+void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number);
 #endif //KISS_MEMORY_FILE_MANAGEMENT_H

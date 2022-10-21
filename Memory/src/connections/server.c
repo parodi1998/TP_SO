@@ -81,6 +81,9 @@ void process_request(int cod_op, int cliente_fd) {
 		case LEER:
 			response = procesar_mensaje_leer(msg,&size,&op_code_response);
 			break;
+		case SWAP_PAGE:
+			response = procesar_swapping(msg,&size,&op_code_response);
+			break;
 		case SUSPENDER_PROCESO:
 			response = procesar_suspender_proceso(msg,&size,&op_code_response);
 			break;
@@ -224,4 +227,18 @@ void* procesar_traducir_direccion(char* string,int* size, int* op_code){
 	*size = sizeof(response_string);
 
 	return response_string;
+}
+
+void* procesar_swapping(char* string, int* size,int* op_code){
+	//ENTRADA: <PID>|<SEGMENTO>|<PAGINA>
+	//SALIDA: OK
+	char** array = string_split(string,"|");
+		uint32_t pid = (volatile uint32_t) atoi( array[0]);
+		uint32_t segment = (volatile uint32_t) atoi( array[1]);
+		uint32_t page_number = (volatile uint32_t) atoi( array[2]);
+		swap_page(pid, segment,page_number);
+		*size = string_length("OK");
+		*op_code = OK;
+		return (void*)"OK";
+
 }
