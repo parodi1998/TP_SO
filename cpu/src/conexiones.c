@@ -1,4 +1,5 @@
 #include "conexiones.h"
+
 #include<commons/collections/list.h>
 
 int kernel = 1;
@@ -166,6 +167,8 @@ int start(int arg)
 	int conexion_Memoria;
 	int conexion_Kernel_Dispatch;
 	int conexion_Kernel_Interrupt;
+//	lista_operaciones* lista;
+//	lista = todas_operaciones(void);
 	
 	cpu_config* configuracion_Cpu;
 	
@@ -209,31 +212,34 @@ int start(int arg)
 	char* mensajeRecibido;
 
 
-
+int regreso;
 
 	//leer_consola();
 	//enviar a memoria
-		conexion_Memoria = iniciar_servidor2(logger, "cpu-memoria", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
-		log_info(logger, "Conexion creada");
-		int espera;
-		espera = esperar_cliente2(logger, "cpu-memoria", conexion_Memoria);
-		enviar_mensaje2(mensajeEnviar, espera);
-		liberar_conexion2(conexion_Memoria);
+	if (arg == 1)
+	{
+		int cliente = generarCliente(4, configuracion_Cpu->ip_memoria, "8002");
+		regreso = cliente;
+	}
+	else
+	{
+		int server = conexion_Server(4, "8002");
+		regreso = server;
+	}
+
 		//recibir de memoria
-		int socket_ClienteMemoria = crear_conexion2(logger, "memoria-cpu", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
-		 recibir_mensaje2(logger, socket_ClienteMemoria);
-		 liberar_conexion2(socket_ClienteMemoria);
+
 
 		 //enviar a kernel
-		 		int conexion_kernel = iniciar_servidor2(logger, "cpu-kernel", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
-		 		log_info(logger, "Conexion creada");
-		 		int esperaKernel = esperar_cliente2(logger, "cpu-kernel", conexion_Memoria);
-		 		enviar_mensaje2(mensajeEnviar, espera);
-		 		liberar_conexion2(conexion_kernel);
+		// 		int conexion_kernel = iniciar_servidor2(logger, "cpu-kernel", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
+	//	 		log_info(logger, "Conexion creada");
+	//	 		int esperaKernel = esperar_cliente2(logger, "cpu-kernel", conexion_Memoria);
+	//	 		enviar_mensaje2(mensajeEnviar, espera);
+	//	 		liberar_conexion2(conexion_kernel);
 		 		//recibir de memoria
-		 		int socket_ClienteKernel = crear_conexion2(logger, "kernel-cpu", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
-		 		 recibir_mensaje2(logger, socket_ClienteKernel);
-		 		liberar_conexion2(socket_ClienteKernel);
+	//	 		int socket_ClienteKernel = crear_conexion2(logger, "kernel-cpu", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
+	//	 		 recibir_mensaje2(logger, socket_ClienteKernel);
+	//	 		liberar_conexion2(socket_ClienteKernel);
 
 
 	log_info(logger, "OK");
@@ -247,7 +253,7 @@ int start(int arg)
 
 	//terminar_programa(conexion_Memoria, logger, config);
 	log_destroy(logger); //BORRAR LUEGO
-	return 0;
+	return regreso;
 }
 
 t_log* iniciar_logger(void)

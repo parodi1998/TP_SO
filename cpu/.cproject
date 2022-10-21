@@ -52,6 +52,9 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.136499551.1862984809" name="client.c" rcbsApplicability="disable" resourcePath="src/client.c" toolsToInvoke="cdt.managedbuild.tool.gnu.cross.c.compiler.1943503479.275715345">
+						<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1943503479.275715345" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.1943503479"/>
+					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

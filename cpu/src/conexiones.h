@@ -1,5 +1,5 @@
-#ifndef CLIENT_H_
-#define CLIENT_H_
+#ifndef CONEXIONES_H_
+#define CONEXIONES_H_
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -9,8 +9,11 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<semaphore.h>
+#include "server.h"
+#include "client.h"
 
 #include "utils.h"
+#include "instrucciones.h"
 
 
 
@@ -23,4 +26,4 @@ int start(int arg);
 cpu_config* cargarConfiguracion(t_config*, t_log*);
 int crearConexionAuxiliar(char* ip, int puerto, t_log* logger);
 
-#endif /* CLIENT_H_ */
+#endif /* CONEXIONES_H_ */
