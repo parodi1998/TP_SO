@@ -8,14 +8,15 @@
 
 int generarCliente (int argc, char * ip_in, char* puerto_in)
 {
+	printf("Estoy generando Cliente");
 if (argc > 2)
 {
 char* ip;
 int fd, numbytes, puerto;
 char buf[100];
 //puerto = atoi(argv[2]);
-//puerto = atoi(puerto_in);
-puerto = 8002;
+puerto = atoi(puerto_in);
+//puerto = 8002;
 //ip=argv[1];
 ip = ip_in;
 
@@ -50,7 +51,8 @@ struct addrinfo hints, *servinfo;
 
 //server.sin_family = AF_INET;
 server.sin_family = 1;
-server.sin_port = htons(puerto);
+//server.sin_port = htons(puerto);
+server.sin_port = htons(puerto_in);
 server.sin_addr = *((struct in_addr *)he->h_addr);
 bzero(&(server.sin_zero),8);
 int longitud_del_cliente;
@@ -59,8 +61,9 @@ longitud_del_cliente = sizeof(server);
 
 //PONER ACÁ NUEVAMENTE
 // Crea un socket con la informacion recibida (del primero, suficiente)
-  int socket_cliente = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
+  int socket_cliente = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+  printf("Sokcet: %d", socket_cliente);
   // Fallo en crear el socket
   if(socket_cliente == -1) {
     printf("Error a");
@@ -69,8 +72,25 @@ longitud_del_cliente = sizeof(server);
 
   // Error conectando
   if(connect(socket_cliente, servinfo->ai_addr, servinfo->ai_addrlen) == -1) {
-	  printf("connect() error\n");
+//	  printf("connect() error\n");
       //freeaddrinfo(servinfo);
+
+	  printf("Veamos qué valor acepta");
+	  for (int ij = 0; ij < 10000; ij++)
+	  {
+		  printf("/n Probando, %d /n", ij);
+		  if(connect(ij, servinfo->ai_addr, servinfo->ai_addrlen) > -1)
+		  {
+			  printf("  Socket Encontrado: %d", ij);
+
+		  }
+		  else
+		  {
+			  printf("/n Lo siento, no es: &d, ", ij);
+		  }
+		  close(ij);
+	  }
+
   }
 //HASTA ACÁ NUEVAMENTE
 

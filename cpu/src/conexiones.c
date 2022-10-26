@@ -218,11 +218,13 @@ int regreso;
 	//enviar a memoria
 	if (arg == 1)
 	{
+		//HANDSHAKE CON MEMORIA
 		int cliente = generarCliente(4, configuracion_Cpu->ip_memoria, "8002");
 		regreso = cliente;
 	}
 	else
 	{
+		//RECIBIR SEÑAL DE KERNEL
 		int server = conexion_Server(4, "8002");
 		regreso = server;
 	}

@@ -9,6 +9,11 @@
 
 int i = 2;
 
+int ax = 0;
+int bx = 0;
+int cx = 0;
+int dx = 0;
+
 void* funcion_hilo(void* p){
   // Print value received as argument:
   printf("Value recevied as argument in starting routine: ");
@@ -22,7 +27,7 @@ void* funcion_hilo(void* p){
 void* seguir_instrucciones(void){
 
 	while (1==1){
-
+		//realizar_instrucciones;
 	}
 }
 
@@ -78,10 +83,10 @@ int buscarValorOperacion (char* operacion_charm, lista_operaciones* lista){
 
 instruccion decodificar(char* instruccion_en_bruto){
 	instruccion instruct;
-	char * operacion_char = tomar(instruccion_en_bruto, 0);
-	instruct.operacion = buscarValorOperacion(operacion_char);
-	instruct.operando_1 = tomar(instruccion_en_bruto, 1);
-	instruct.operando_2 = tomar(instruccion_en_bruto, 2);
+	//char * operacion_char = tomar(instruccion_en_bruto, 0);
+	//instruct.operacion = buscarValorOperacion(operacion_char);
+	//instruct.operando_1 = tomar(instruccion_en_bruto, 1);
+	//instruct.operando_2 = tomar(instruccion_en_bruto, 2);
 
 
 	return instruct;
@@ -91,7 +96,7 @@ int ejecutar(instruccion instruct){
 	int error = 0;
 	switch(instruct.operacion){
 	case SET:
-		in_set(instruct);
+		//in_set(instruct);
 		break;
 	case ADD:
 		ins_add(instruct);
@@ -122,7 +127,7 @@ void ins_set(instruccion instruct){
 
 void ins_add(instruccion instruct){
 	int valor =	((int)instruct.operando_1) + ((int)instruct.operando_2);
-	ins_set(instruct.operando_1, valor);
+	//ins_set(instruct.operando_1, valor);
 }
 
 void ins_mov_in(instruccion instruct){
