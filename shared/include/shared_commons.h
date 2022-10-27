@@ -17,6 +17,7 @@
 
 typedef enum {
     MENSAJE,
+	INSTRUCCIONES,
     PAQUETE,
     DEBUG = 100,
 } op_code;

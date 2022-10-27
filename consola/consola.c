@@ -50,7 +50,14 @@ int main(int argc, char** argv){
         terminar_programa();
         return EXIT_FAILURE;
     }
-
+/*
+    if(!send_instrucciones(fd, instrucciones)) {
+        log_error(logger,"No se pudo enviar las instrucciones a kernel");
+        liberar_conexion(&fd);
+        terminar_programa();
+        return EXIT_FAILURE;
+    }
+*/
     enviar_mensaje("mensaje de prueba", fd);
 
     liberar_conexion(&fd);

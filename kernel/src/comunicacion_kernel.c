@@ -10,7 +10,6 @@ static void procesar_conexion(void* void_args) {
     op_code codigo;
 
     //t_pcb* pcb;
-    //t_list* instrucciones;
 
     while (cliente_fd != -1) {
 
