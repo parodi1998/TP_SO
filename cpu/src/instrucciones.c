@@ -8,11 +8,10 @@
 #include "instrucciones.h"
 
 int i = 2;
+int tiempo_demora;
+int interrumpido = 0;
+registros contexto;
 
-int ax = 0;
-int bx = 0;
-int cx = 0;
-int dx = 0;
 
 void* funcion_hilo(void* p){
   // Print value received as argument:
@@ -24,11 +23,16 @@ void* funcion_hilo(void* p){
 }
 
 
-void* seguir_instrucciones(void){
+void* seguir_instrucciones(pcb pcb_kernel){
+	int devolucion = OPTIMO;
+	int siguiente_instruccion;
+	contexto = &(pcb_kernel.reg_general);
+	do {
+		devolucion = ciclo_instrucciones(&pcb_kernel);
 
-	while (1==1){
-		//realizar_instrucciones;
-	}
+	} while (devolucion == OPTIMO);
+
+
 }
 
   //pthread_t id;
@@ -43,11 +47,27 @@ void* seguir_instrucciones(void){
 
 
 
-char* fetch(int numero_instruccion)
+char* fetch(pcb pcb_en_cuestion)
 {
 	char *instruccion_en_bruto;
-	//solicitar instruccion
-	//recibir instruccion
+
+	int nro_instruccion = pcb_en_cuestion.program_counter;
+	Lista_Instrucciones lista = pcb_en_cuestion.instrucciones;
+	int continuar = 1;
+
+	do{
+
+		if (lista.id != nro_instruccion){
+			lista = lista.lista_siguiente;
+		}
+		else{
+			instruccion_en_bruto = lista.instruccion;
+			continuar = 0;
+		}
+
+	} while (continuar == 1);
+
+
 	return instruccion_en_bruto;
 }
 
@@ -80,54 +100,87 @@ int buscarValorOperacion (char* operacion_charm, lista_operaciones* lista){
 	return numero;
 }
 
+int esABCD(char* valor, int apunta){
+	int cierto;
+	switch(valor) {
+	  case "AX":
+	    cierto = 1;
+	    apunta = &(contexto.ax);
+	    break;
+	  case "BX":
+	    cierto = 1;
+	    apunta = &(contexto.bx);
+	    break;
+	  case "CX":
+		cierto = 1;
+		apunta = &(contexto.cx);
+		    break;
+	  case "DX":
+		cierto = 1;
+		apunta = &(contexto.dx);
+		    break;
+	  default:
+		    cierto = 0;
+	}
+	return cierto;
+}
+
+int llamaMemoria(operando operacion){
+	//1 si tiene que llamar a memoria
+	int llama = 0;
+	//es un valor?
+	if (esABCD(operacion.nombre, &(operacion.apunta)) == 0){
+		if ((int)operacion.nombre >= 0){
+			llama = 1;
+			operacion.apunta = (int)(operacion.nombre);
+		}
+	}
+
+	return llama;
+}
+
+void accederMemoria(operando op){
+	//CAMBIAR LUEGO
+	op.apunta = contexto.ax;
+}
+
 
 instruccion decodificar(char* instruccion_en_bruto){
-	instruccion instruct;
-	//char * operacion_char = tomar(instruccion_en_bruto, 0);
-	//instruct.operacion = buscarValorOperacion(operacion_char);
-	//instruct.operando_1 = tomar(instruccion_en_bruto, 1);
-	//instruct.operando_2 = tomar(instruccion_en_bruto, 2);
+	instruccion instruct = malloc(sizeof(instruccion));
+	char** palabras_instrucciones string_split(instruccion_en_bruto, ' ');
+	char * operacion_char = palabras_instrucciones[0];
+	int largo = lenght(palabras_instrucciones);
+	instruct.operacion = buscarValorOperacion(operacion_char);
+	instruct.operando_1.nombre = palabras_instrucciones[1];
+	instruct.operando_2.nombre = palabras_instrucciones[2];
 
+	int accede_Memoria = 0;
+
+	if  (llamaMemoria(&(instruct.operando_1)) == 1){
+		accede_Memoria = 1;
+		accederMemoria(&(instruct.operando_1));
+	}
+
+	if  (llamaMemoria(&(instruct.operando_2)) == 1){
+			accede_Memoria = 1;
+			accederMemoria(&(instruct.operando_2));
+		}
+
+	if (accede_Memoria == 0){
+		sleep(tiempo_demora);
+	}
 
 	return instruct;
 }
 
-int ejecutar(instruccion instruct){
-	int error = 0;
-	switch(instruct.operacion){
-	case SET:
-		//in_set(instruct);
-		break;
-	case ADD:
-		ins_add(instruct);
-		break;
-	case MOV_IN:
-		ins_mov_in(instruct);
-		break;
-	default:
-		printf("Error");
-		error = 1;
-	}
-	return error;
+int ins_set(instruccion instruct){
+	instruct.operando_1.apunta = instruct.operando_2.apunta;
+	return OPTIMO;
 }
 
-void do_set(char * direccion, int valor){
-	//grabar valor en direccion
-}
-
-int traer_Dato(char *direccion){
-	int dato;  // = buscar direccion
-	return dato;
-}
-
-void ins_set(instruccion instruct){
-	int valor = (int)instruct.operando_2;
-	do_set(instruct.operando_1, valor);
-}
-
-void ins_add(instruccion instruct){
-	int valor =	((int)instruct.operando_1) + ((int)instruct.operando_2);
-	//ins_set(instruct.operando_1, valor);
+int ins_add(instruccion instruct){
+	instruct.operando_1.apunta += instruct.operando_2.apunta;
+	return OPTIMO;
 }
 
 void ins_mov_in(instruccion instruct){
@@ -139,28 +192,68 @@ void ins_mov_in(instruccion instruct){
 
 //}
 
-//void ins_io(instruccion instruct){
-	//I/O
-//}
+int ins_io(instruccion instruct){
+	return BLOQUEO;
+}
 
-//void ins_exit(instruccion instruct){
-	//EXIT
-//}
+int  ins_exit(instruccion instruct){
+	return FINALIZADO;
+}
+
+int ejecutar(instruccion instruct){
+	int estado = OPTIMO;
+	switch(instruct.operacion){
+	case SET:
+		estado = in_set(&instruct);
+		break;
+	case ADD:
+		estado = ins_add(&instruct);
+		break;
+	case IO:
+		estado = ins_io(&instruct);
+		break;
+	case EXIT:
+		estado = ins_exit(&instruct);
+		break;
+	default:
+		printf("Error");
+		estado = INTERRUPCION;
+	}
+	return estado;
+}
 
 
 
 
-int realizar_instrucciones(int numero_instruccion)
+
+int check_interrupt(int devuelve){
+
+	//desactivar semáforo ckeck_kernel
+	if (interrumpido > 0){
+		devuelve = INTERRUPCION;
+	}
+	//activar semáforo check_kernel
+	return devuelve;
+}
+
+
+int ciclo_instrucciones(pcb pcb_kernel)
 {
+	int devuelve = OPTIMO;
 	//fetch
-	char *instruccion_en_bruto = fetch(numero_instruccion);
+	char *instruccion_en_bruto = fetch(pcb_kernel);
 
 	//decodificar
 	instruccion instruct = decodificar(instruccion_en_bruto);
 
 	//ejecutar
-	int error = ejecutar(instruct);
+	devuelve = ejecutar(&instruct);
 
+	//check interrupt
+	devuelve = check_interrupt(devuelve);
 
-	return error;
+	//actualizar ciclo
+	pcb_kernel.program_counter = pcb_kernel.program_counter + 1;
+
+	return devuelve;
 }
