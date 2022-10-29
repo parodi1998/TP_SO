@@ -16,6 +16,8 @@
 int main(void) {
 	puts("ENCENDIDOS");
 
-	int valor = start(1);
+	//int valor = start(2);
+	int valor = 0;
+	start_prueba();
 	return valor;
 }

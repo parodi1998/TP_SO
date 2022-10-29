@@ -214,20 +214,22 @@ int start(int arg)
 
 int regreso;
 
+
+
 	//leer_consola();
 	//enviar a memoria
-	if (arg == 1)
-	{
+	//if (arg == 1)
+//	{
 		//HANDSHAKE CON MEMORIA
-		int cliente = generarCliente(4, configuracion_Cpu->ip_memoria, "8002");
-		regreso = cliente;
-	}
-	else
-	{
+//		int cliente = generarCliente(4, configuracion_Cpu->ip_memoria, "8002");
+//		regreso = cliente;
+//	}
+//	else
+//	{
 		//RECIBIR SEÑAL DE KERNEL
-		int server = conexion_Server(4, "8002");
-		regreso = server;
-	}
+//		int server = conexion_Server(4, "8002");
+//		regreso = server;
+//	}
 
 		//recibir de memoria
 
