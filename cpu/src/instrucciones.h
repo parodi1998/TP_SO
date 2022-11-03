@@ -39,7 +39,7 @@ enum tipo_devolucion{
 
 typedef struct operando{
 	char* nombre;
-	int apunta;
+	int* apunta;
 } operando;
 
 typedef struct registros{
@@ -81,21 +81,34 @@ typedef struct instruccion{
 	operando operando_2;
 } instruccion;
 
+typedef struct pcb_con_estado{
+	pcb suPcb;
+	int estado_pcb;
+	char* dispositivo_interrumpido;
+	int unidades_dispositivo_interrumpido;
+} pcb_con_estado;
+
 void* funcion_hilo(void*);
 void* seguir_instrucciones(pcb*);
 char* fetch(pcb*);
-lista_operaciones* todas_operaciones(void);
-int buscarValorOperacion (char*);
-int esABCD(char*, int*);
-int llamaMemoria(operando*);
-void accederMemoria(operando*);
-instruccion decodificar(char*);
-int ejecutar(instruccion*);
-int ins_set(instruccion*);
-int ins_add(instruccion*);
+void* todas_operaciones(void);
+
+
+int decodificaOperando(operando*);
+//void accederMemoria(operando*);
+void accederMemoria(int*);
+//int llamaMemoria(int*, char*);
+int* operandoBusca(char*);
+//instruccion decodificar(char*);
+void decodificar(char*);
+//int ejecutar(instruccion*);
+int ejecutar(void);
+//int ins_set(instruccion*);
+int ins_set(void);
+int ins_add(void);
 void ins_mov_in(instruccion);
-int ins_io(instruccion*);
-int  ins_exit(instruccion*);
+int ins_io(void);
+int  ins_exit(void);
 int check_interrupt(int);
 int ciclo_instrucciones(pcb*);
 

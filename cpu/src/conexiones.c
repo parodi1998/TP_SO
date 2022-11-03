@@ -3,6 +3,7 @@
 #include<commons/collections/list.h>
 
 int kernel = 1;
+int interrumpir = 0;
 sem_t* comunicacion_kernel;
 
 char * concatenar(char* palabra1, char* palabra2)
@@ -161,6 +162,17 @@ cpu_config* cargarConfiguracion(t_config* rutaConfiguracion, t_log* logger){
 //	}
 //}
 
+void esperarInterrupcion(){
+	while(interrumpir == 0){
+
+		if (0==1)
+		{
+			interrumpe();
+			interrumpir = 1;
+		}
+	}
+}
+
 int start(int arg)
 {
 
@@ -169,7 +181,7 @@ int start(int arg)
 	int conexion_Kernel_Interrupt;
 //	lista_operaciones* lista;
 //	lista = todas_operaciones(void);
-	
+
 	cpu_config* configuracion_Cpu;
 	
 	char* valor;
@@ -213,6 +225,92 @@ int start(int arg)
 
 
 int regreso;
+pthread_t thread1, thread2;
+      int  iret1, iret2;
+
+   /* Create independent threads each of which will execute function */
+
+    //FUNCION DE PRUEBA
+  //  int start_prueba(void){
+    	int cero = 0;
+
+    	Lista_Instrucciones lista1;
+
+    	lista1.id = 1;
+    	lista1.instruccion = "SET AX 100";
+
+    	Lista_Instrucciones lista2;
+
+    	lista2.id = 2;
+    	lista2.instruccion = "SET AX 50";
+    	lista1.lista_siguiente = &lista2;
+
+    	Lista_Instrucciones lista3;
+
+    	lista3.id = 3;
+    	lista3.instruccion = "SET BX 10";
+    	lista2.lista_siguiente = &lista3;
+
+    	Lista_Instrucciones lista4;
+
+    	lista4.id = 4;
+    	lista4.instruccion = "ADD AX BX";
+    	lista3.lista_siguiente = &lista4;
+
+    	Lista_Instrucciones lista5;
+
+    	lista5.id = 5;
+    	lista5.instruccion = "ADD AX BX";
+    	lista4.lista_siguiente = &lista5;
+
+    	Lista_Instrucciones lista6;
+
+    	lista6.id = 6;
+    	lista6.instruccion = "EXIT";
+    	lista5.lista_siguiente = &lista6;
+
+    	Lista_Instrucciones lista7;
+
+    	lista7.id = 7;
+    	lista7.instruccion = "SET AX 100";
+    	lista6.lista_siguiente = &lista7;
+    	lista7.lista_siguiente = NULL;
+
+    	pcb pcb1;
+    	pcb1.id = malloc(sizeof(int));
+    	pcb1.id = 1;
+    	pcb1.instrucciones = malloc(sizeof(Lista_Instrucciones*));
+    	pcb1.instrucciones = &lista1;
+    	pcb1.program_counter = malloc(sizeof(int));
+    	pcb1.program_counter = 2;
+    	pcb1.reg_general.ax = malloc(sizeof(int));
+    	pcb1.reg_general.ax = 7;
+    	pcb1.reg_general.bx = malloc(sizeof(int));
+    	pcb1.reg_general.bx = 1;
+    	pcb1.reg_general.cx = malloc(sizeof(int));
+    	pcb1.reg_general.cx = 0;
+    	pcb1.reg_general.dx = malloc(sizeof(int));
+    	pcb1.reg_general.dx = 0;
+
+   // 	seguir_instrucciones(&pcb1);
+
+
+   iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
+    iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&pcb1));
+
+
+
+
+
+    /* Wait till threads are complete before main continues. Unless we  */
+    /* wait we run the risk of executing an exit which will terminate   */
+    /* the process and all threads before the threads have completed.   */
+
+    pthread_join( thread2, NULL);
+    interrumpir = 1;
+    pthread_join( thread1, NULL);
+    printf("Valor AX: %d", pcb1.reg_general.ax);
+
 
 
 
@@ -257,7 +355,7 @@ int regreso;
 
 	//terminar_programa(conexion_Memoria, logger, config);
 	log_destroy(logger); //BORRAR LUEGO
-	return regreso;
+	return 0;
 }
 
 t_log* iniciar_logger(void)
