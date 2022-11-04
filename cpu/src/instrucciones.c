@@ -10,99 +10,55 @@
 int i = 2;
 int tiempo_demora;
 int interrumpido = 0;
-lista_operaciones* lista_ope;
+char* lista_ope[6];
 registros* contexto;
 
+int tipo_operacion = -1;
+char* operando_1_NOMBRE = NULL;
+char* operando_2_NOMBRE = NULL;
+int* operando_1_APUNTA = NULL;
+int* operando_2_APUNTA = NULL;
 
-//FUNCIONES DE PRUEBA
-int start_prueba(void){
-	int cero = 0;
+char* io = NULL;
+int unidades = 0;
 
-	Lista_Instrucciones lista1;
+int continuar = 0;
 
-	lista1.id = 1;
-	lista1.instruccion = "SET AX 100";
 
-	Lista_Instrucciones lista2;
-
-	lista2.id = 2;
-	lista2.instruccion = "SET AX 50";
-	lista1.lista_siguiente = &lista2;
-
-	Lista_Instrucciones lista3;
-
-	lista3.id = 3;
-	lista3.instruccion = "SET BX 10";
-	lista2.lista_siguiente = &lista3;
-
-	Lista_Instrucciones lista4;
-
-	lista4.id = 4;
-	lista4.instruccion = "ADD AX BX";
-	lista3.lista_siguiente = &lista4;
-
-	Lista_Instrucciones lista5;
-
-	lista5.id = 5;
-	lista5.instruccion = "EXIT";
-	lista4.lista_siguiente = &lista5;
-	lista5.lista_siguiente = NULL;
-
-	pcb pcb1;
-	pcb1.id = malloc(sizeof(int));
-	pcb1.id = 1;
-	pcb1.instrucciones = malloc(sizeof(Lista_Instrucciones*));
-	pcb1.instrucciones = &lista1;
-	pcb1.program_counter = malloc(sizeof(int));
-	pcb1.program_counter = 2;
-	pcb1.reg_general.ax = malloc(sizeof(int));
-	pcb1.reg_general.ax = 2;
-	pcb1.reg_general.bx = malloc(sizeof(int));
-	pcb1.reg_general.bx = 1;
-	pcb1.reg_general.cx = malloc(sizeof(int));
-	pcb1.reg_general.cx = 0;
-	pcb1.reg_general.dx = malloc(sizeof(int));
-	pcb1.reg_general.dx = 0;
-
-	seguir_instrucciones(&pcb1);
-	printf("Exitos");
-	return cero;
+void* inicializar()
+{
+	io = NULL;
+	unidades = 0;
+	continuar = 0;
 }
-
-
-void* funcion_hilo(void* p){
-  // Print value received as argument:
-  printf("Value recevied as argument in starting routine: ");
-  printf("%i\n", * (int*)p);
-
-  // Return reference to global variable:
-  pthread_exit(&i);
-}
-
 int sePuedeConvertirEnInt(char* palabra){
-	int valor = atoi( palabra);
-	int sePuede = 0;
-	if (sizeof(valor) <= 4)
-		sePuede = 1;
-	else{
-		sePuede = 0;
-	}
-	return sePuede;
-}
 
+    	int valor;
+    	sscanf(palabra, "%d", &valor);
+
+    	int sePuede;
+    	if (sizeof(valor) <= 4)
+    		sePuede = 1;
+    	else{
+    		sePuede = 0;
+    	}
+    	return sePuede;
+    }
 
 void* seguir_instrucciones(pcb* pcb_kernel){
+	inicializar();
 	int devolucion = OPTIMO;
-	lista_ope = todas_operaciones();
+	todas_operaciones();
+
 	contexto = &(pcb_kernel->reg_general);
 	do {
 		devolucion = ciclo_instrucciones(pcb_kernel);
 
 	} while (devolucion == OPTIMO);
 
-printf("OK");
 
-printf("AX: nos queda: %d  ", contexto->ax);
+
+
 }
 
   //pthread_t id;
@@ -148,152 +104,105 @@ char* fetch(pcb* pcb_kernel)
 	return instruccion_en_bruto;
 }
 
-lista_operaciones* todas_operaciones(void){
+void* todas_operaciones(void){
 	//char* path_1 = getcwd(NULL, 0);
 	//path_1 = concatenar(path_1, "/instrucciones.config");
 //	char numero;
-	lista_operaciones* lista = malloc(sizeof(lista_operaciones*));
+
 
 	//for (int i = 0; i <= 5; i++){
 		//numero = i + '0';
-		//printf("%s \n",numero);
+
 		//lista[i].t_instruccion = numero;
 		//lista[i].nombre_instruccion = config_get_string_value(path_1, numero);
 	//}
 
-	lista_operaciones listita;
-	listita.t_instruccion = 0;
-	listita.nombre_instruccion = "SET";
-	lista[0] = listita;
+	lista_ope[SET] = "SET____";
+	lista_ope[ADD] = "ADD____";
+	lista_ope[MOV_IN] = "MOV_IN_";
+	lista_ope[MOV_OUT] = "MOV_OUT";
+	lista_ope[IO] = "I/O____";
+	lista_ope[EXIT] = "EXIT___";
 
-	listita.t_instruccion = 1;
-		listita.nombre_instruccion = "ADD";
-		lista[1] = listita;
-
-		listita.t_instruccion = 2;
-			listita.nombre_instruccion = "MOV_IN";
-			lista[2] = listita;
-
-			listita.t_instruccion = 3;
-				listita.nombre_instruccion = "MOV_OUT";
-				lista[3] = listita;
-
-				listita.t_instruccion = 4;
-					listita.nombre_instruccion = "I/O";
-					lista[4] = listita;
-
-					listita.t_instruccion = 5;
-						listita.nombre_instruccion = "EXIT";
-						lista[5] = listita;
-
-
-
-	return lista;
 
 }
 
-int buscarValorOperacion (char* operacion_charm){
-	int numero;
-	int encontrado = 0;
-	printf("Operacion_charm: %s ++", operacion_charm);
-	lista_operaciones  operacion_buscada = lista_ope[i];
-	for (int i = 0; i < 10; i++){
-		numero = operacion_buscada.t_instruccion;
-		if (operacion_charm == operacion_buscada.nombre_instruccion){
-			encontrado = 1;
-			break;
-		}else
-		{
-			printf("operacion_ buscada: %s ++", operacion_buscada.nombre_instruccion);
-		}
-	}
-	if (encontrado == 0) numero = -1;
-	return numero;
-}
 
-int esABCD(char* valor, int* apunta){
-	int cierto;
-	if (valor[1] == 'X'){
+int* buscaOperando(char* nombre){
 
-	switch(valor[0]) {
-	  case 'A':
-	    cierto = 1;
-	    *apunta = contexto->ax;
-	    break;
-	  case 'B':
-	    cierto = 1;
-	    *apunta = contexto->bx;
-	    break;
-	  case 'C':
-		cierto = 1;
-		*apunta = contexto->cx;
+	int numerico;
+	if (nombre[1] == 'X'){
+		switch(nombre[0]) {
+		  case 'A':
+		    return &contexto->ax;
 		    break;
-	  case 'D':
-		cierto = 1;
-		*apunta = contexto->dx;
+		  case 'B':
+		    return &contexto->bx;
 		    break;
-	  default:
-		    cierto = 0;
-	}
-	} else cierto = 1;
-	return cierto;
-}
-
-int llamaMemoria(operando* operacion){
-	//1 si tiene que llamar a memoria
-	int llama = 0;
-	//es un valor?
-	if (esABCD(operacion->nombre, &(operacion->apunta)) == 0){
-		if (sePuedeConvertirEnInt(operacion->nombre) == 1){
-			llama = 1;
-			operacion->apunta = (int)(operacion->nombre);
+		  case 'C':
+			return &contexto->cx;
+		    break;
+		  case 'D':
+			return &contexto->dx;
+		    break;
+			}
 		}
-	}
+	sscanf(nombre, "%d", &numerico);
 
-	return llama;
+return numerico;
 }
 
-void accederMemoria(operando* op){
+//void accederMemoria(operando* op){
+void accederMemoria(int* op){
 	//CAMBIAR LUEGO
-	op->apunta = contexto->ax;
+	//op->apunta = contexto->ax;
+	op = contexto->ax;
+}
+
+int comparacion(char* valor1, char* valor2){
+
+
+	int a = 0;
+		for (int i = 0; i<=6; i++){
+			if (valor1[i] != valor2[i]){
+				a = 1;
+			break;
+			}
+		}
+
+		return a;
+
 }
 
 
 
+void decodificar (char* instruccion_en_bruto){
 
-instruccion decodificar(char* instruccion_en_bruto){
-	instruccion instruct;
-//	char* blanco = " ";
-//	int m = strlen(instruccion_en_bruto);
-	//char n[m] = (char[m])instruccion_en_bruto;
-		//	instruccion_en_bruto;
-//	char** palabras_instrucciones = string_array_new();
-	//palabras_instrucciones = string_split(instruccion_en_bruto, blanco);
-	//char** palabras_instrucciones = string_split(instruccion_en_bruto, blanco);
-	//palabras_instrucciones = string_split("Hola", blanco);
-	//char* operacion_ext =  strtok(instruccion_en_bruto, blanco);
-
-	//char* operacion_ext =  string_split(instruccion_en_bruto, blanco)[0];
-	printf("INS: %s", instruccion_en_bruto);
 	int a = strlen(instruccion_en_bruto);
-	char atributo_1[20];
-	char atributo_2[20];
-	char atributo_3[20];
+	char atributo_1[7];
+	char atributo_2[10];
+	char atributo_3[10];
 	int buscador = 1;
+
+	int i2 = 0;
 	int j = 0;
 	int k = 0;
 	char letra;
 	for (int i = 0; i < a; i++){
-				if (instruccion_en_bruto[i] == ' ')
+				if (  (instruccion_en_bruto[i] == ' ') || (instruccion_en_bruto[i] == '\0') )
 				{
 					buscador++;
 				}
 				else
 				{
 					letra = instruccion_en_bruto[i];
+
 					switch(buscador){
 					 case 1:
-						 atributo_1[i] = letra;
+						 if (letra != '\0'){
+							 atributo_1[i] = letra;
+						 i2++;
+						 }
 						 break;
 					 case 2:
 						 atributo_2[j] = letra;
@@ -306,72 +215,104 @@ instruccion decodificar(char* instruccion_en_bruto){
 					}
 				}
 			}
-	instruct.operacion = buscarValorOperacion(atributo_1);
-	instruct.operando_1.nombre = atributo_2;
-	instruct.operando_2.nombre = atributo_3;
+
+	if(i2 <= 6){
+		for(i2; i2<=6; i2++){
+			atributo_1[i2]= '_';
+		}
+	}
+	if(j <= 9){
+		for(j; j<=9; j++){
+			atributo_2[j]= ' ';
+		}
+	}
+	if(k <= 9){
+		for(k; k<=9; k++){
+			atributo_3[k]= ' ';
+		}
+	}
+	tipo_operacion = -1;
+
+	for (int l = SET; l <= EXIT; l++){
+		if (comparacion(atributo_1, lista_ope[l]) == 0){
+			tipo_operacion = l;
+			break;
+		}
+	}
+
+
+
+	operando_1_NOMBRE = atributo_2;
+	operando_2_NOMBRE = atributo_3;
 
 	int accede_Memoria = 0;
 
-	if  (llamaMemoria(&(instruct.operando_1)) == 1){
-		accede_Memoria = 1;
-		accederMemoria(&(instruct.operando_1));
-	}
-
-	if  (llamaMemoria(&(instruct.operando_2)) == 1){
-			accede_Memoria = 1;
-			accederMemoria(&(instruct.operando_2));
-		}
+	operando_1_APUNTA = buscaOperando(operando_1_NOMBRE);
+	operando_2_APUNTA = buscaOperando(operando_2_NOMBRE);
 
 	if (accede_Memoria == 0){
 		sleep(tiempo_demora);
 	}
 
-	return instruct;
+
 }
 
-int ins_set(instruccion* instruct){
-	instruct->operando_1.apunta = instruct->operando_2.apunta;
+//int ins_set(instruccion* instruct){
+	int ins_set(void){
+	*operando_1_APUNTA = operando_2_APUNTA;
+
 	return OPTIMO;
 }
 
-int ins_add(instruccion* instruct){
-	instruct->operando_1.apunta += instruct->operando_2.apunta;
-	return OPTIMO;
+int ins_add2(int* a, int* b){
+	int c = 0;
+	c = *a;
+	c += *b;
+
+
+
+	return c;
 }
 
-//void ins_mov_in(instruccion instruct){
-	//int valor = traer_Dato(instruct.operando_2);
-	//do_set(instruct.operando_1, valor);
-//}
+int ins_add(void){
+	operando_2_APUNTA = ins_add2(operando_1_APUNTA, operando_2_APUNTA);
 
-//void ins_mov_out(instruccion instruct){
+	return ins_set();
 
-//}
+}
 
-int ins_io(instruccion* instruct){
+int ins_io(void){
+
+	io = operando_1_NOMBRE;
+	unidades = operando_2_APUNTA;
+
 	return BLOQUEO;
 }
 
-int  ins_exit(instruccion* instruct){
+int  ins_exit(void){
 	return FINALIZADO;
 }
 
-int ejecutar(instruccion* instruct){
+//int ejecutar(instruccion* instruct){
+int ejecutar(void){
 	int estado = OPTIMO;
-	int opera = instruct->operacion;
-	printf("instruccion: %d", opera);
-	switch(opera){
+
+	//int opera = instruct->operacion;
+	//switch(opera){
+
+
+	switch(tipo_operacion){
 	case SET:
-		estado = ins_set(&instruct);
+		estado = ins_set();
 		break;
 	case ADD:
-		estado = ins_add(&instruct);
+		estado = ins_add();
 		break;
 	case IO:
-		estado = ins_io(&instruct);
+		estado = ins_io();
 		break;
 	case EXIT:
-		estado = ins_exit(&instruct);
+		estado = ins_exit();
 		break;
 	default:
 		printf("Error");
@@ -381,13 +322,15 @@ int ejecutar(instruccion* instruct){
 }
 
 
-
+void interrumpe(void){
+	continuar = 1;
+}
 
 
 int check_interrupt(int devuelve){
 
 	//desactivar semáforo ckeck_kernel
-	if (interrumpido > 0){
+	if (continuar > 0){
 		devuelve = INTERRUPCION;
 	}
 	//activar semáforo check_kernel
@@ -397,25 +340,28 @@ int check_interrupt(int devuelve){
 
 int ciclo_instrucciones(pcb* pcb_kernel)
 {
+
 	int devuelve = OPTIMO;
 	//fetch
 	char *instruccion_en_bruto = fetch(pcb_kernel);
 
 	//decodificar
-	instruccion instruct = decodificar(instruccion_en_bruto);
-	printf("+Valor: %s", instruct.operando_1.nombre);
+	decodificar(instruccion_en_bruto);
 
 	//ejecutar
-	printf("valor op: %d", instruct.operacion);
-	devuelve = ejecutar(&instruct);
+	devuelve = ejecutar();
 
 	//check interrupt
-	//devuelve = check_interrupt(devuelve);
+	devuelve = check_interrupt(devuelve);
 
 	//actualizar ciclo
 	pcb_kernel->program_counter ++;
 
+
+
+
 	return devuelve;
+	//return EXIT;
 
 
 }
