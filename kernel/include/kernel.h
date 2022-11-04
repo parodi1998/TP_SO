@@ -4,5 +4,10 @@
 #include "init.h"
 #include "conexion.h"
 #include "comunicacion_kernel.h"
+#include "planificacion.h"
+
+
+
+void inicializar_listas();
 
 #endif

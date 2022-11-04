@@ -8,8 +8,7 @@ static void procesar_conexion(void* void_args) {
     free(args);
 
     op_code codigo;
-
-    //t_pcb* pcb;
+    t_list lista_instrucciones=new list();
 
     while (cliente_fd != -1) {
 
@@ -31,6 +30,16 @@ static void procesar_conexion(void* void_args) {
         }
     }
     
+    t_pcb* pcb_proceso = malloc(sizeof(pcb_t));
+    pcb_proceso->id_proceso=contador;//habria que definir bien el contador para que enumere los procesos a medida que van entrando
+    pcb_proceso->program_counter=0;//arranca señalando la primer instruccion
+    //pcb_proceso->tabla_segmentos=pedir tabla;
+    //pcb_proceso->registros_cpu=buscar registros;
+    pcb_proceso->instrucciones=lista_instrucciones;
+    pcb_proceso->estado="NEW";
+
+    procesoANew(pcb_proceso);
+
     log_warning(logger, "El cliente se desconecto de %s server", server_name);
     return;
 }

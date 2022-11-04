@@ -1,6 +1,17 @@
 #include "include/kernel.h"
 
+void inicializar_listas(){
+
+	colaNew = queue_create();
+	colaReady = list_create();
+	listaExit = list_create();
+	lista_instrucciones_kernel = list_create();
+
+}
+
 int main(int argc, char** argv){
+
+    inicializar_listas();
 
     if(!iniciar_programa()) {
         terminar_programa();
