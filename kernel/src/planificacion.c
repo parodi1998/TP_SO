@@ -5,7 +5,7 @@ void procesoANew (t_pcb* proceso)
 {
     pthread_mutex_lock(&mutexNew);
 	queue_push(colaNew, proceso);
-	log_info(log_kernel, "Entra el proceso de PID: %d a la cola de new.", proceso->id_proceso);
+	log_info(log_kernel, "Entra el proceso de ID: %d a la cola de new.", proceso->id_proceso);
 	pthread_mutex_unlock(&mutexNew);
     sem_post(&contadorNew); // Despierta al planificador de largo plazo
 	sem_post(&largoPlazo);

@@ -20,14 +20,16 @@ sem_t contadorExe;
 sem_t contadorBlock;
 sem_t multiprogramacion;
 sem_t largoPlazo;
-sem_t medianoPlazo;
 
 
 typedef struct {
     uint32_t id_proceso;
     t_list* instrucciones;
     uint32_t program_counter;
-    uint32_t registros_cpu;
+    uint32_t registro_AX;
+    uint32_t registro_BX;
+    uint32_t registro_CX;
+    uint32_t registro_DX;
     uint32_t tabla_segmentos;
     char* estado;
 } t_pcb;

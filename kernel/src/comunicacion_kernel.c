@@ -31,12 +31,11 @@ static void procesar_conexion(void* void_args) {
     }
     
     t_pcb* pcb_proceso = malloc(sizeof(pcb_t));
-    pcb_proceso->id_proceso=contador;//habria que definir bien el contador para que enumere los procesos a medida que van entrando
-    pcb_proceso->program_counter=0;//arranca señalando la primer instruccion
+    pcb_proceso->id_proceso=contador;//hay que sumarle 1 en cada instruccion cuando hagas el que recibe la lista
+    pcb_proceso->program_counter=0;
     //pcb_proceso->tabla_segmentos=pedir tabla;
     //pcb_proceso->registros_cpu=buscar registros;
     pcb_proceso->instrucciones=lista_instrucciones;
-    pcb_proceso->estado="NEW";
 
     procesoANew(pcb_proceso);
 
@@ -58,4 +57,22 @@ int server_escuchar(t_log* logger, char* server_name, int server_socket) {
         return 1;
     }
     return 0;
+}
+
+void enviar_pcb_cpu(t_pcb* pcb_proceso){
+
+	send_pid(fd_cpu,pcb_proceso->id_proceso);
+    send_instrucciones(fd_cpu,pcb_proceso->instrucciones);
+	send_PC(fd_cpu,pcb_proceso->program_counter);
+	send_registroAX(fd_cpu,pcb_proceso->registro_AX);
+	send_registroBX(fd_cpu,pcb_proceso->registro_BX);
+	send_registroCX(fd_cpu,pcb_proceso->registro_CX);
+	send_registroDX(fd_cpu,pcb_proceso->registro_DX);
+	send_indice_tabla_paginas(fd_cpu,pcb_proceso->tabla_segmentos);
+	
+	list_clean(lista_instrucciones_kernel);
+    }
+
+void pedir_tabla_a_memoria(){
+	send_TAM(fd_memoria,config_get_string_value(config_kernel,"PUERTO_MEMORIA"));
 }
