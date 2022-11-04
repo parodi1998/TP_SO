@@ -1,6 +1,7 @@
 #include "conexiones.h"
+#include "config_cpu.h"
 
-#include<commons/collections/list.h>
+#include <commons/collections/list.h>
 
 int kernel = 1;
 sem_t* comunicacion_kernel;
@@ -11,101 +12,6 @@ char * concatenar(char* palabra1, char* palabra2)
 	string_append(&palabraFinal, palabra1);
 	string_append(&palabraFinal, palabra2);
 	return palabraFinal;
-}
-
-cpu_config* cargarConfiguracion(t_config* rutaConfiguracion, t_log* logger){
-	cpu_config* configuracion_Cpu = malloc(sizeof(cpu_config));
-	
-	configuracion_Cpu->entrada = malloc(sizeof(int));
-	int in_entrada = config_get_int_value(rutaConfiguracion, "ENTRADAS_TLB");
-	if (in_entrada == NULL)
-	{
-		log_info(logger, "ERROR");
-	}
-	else{
-		configuracion_Cpu->entrada = in_entrada;
-		log_info(logger, "Entrada: %d \n", configuracion_Cpu->entrada);
-	}
-	configuracion_Cpu->entrada = config_get_int_value(rutaConfiguracion, "ENTRADAS_TLB");
-	
-	configuracion_Cpu->reemplazo = malloc(sizeof(int));
-	char* in_reemplazo = config_get_string_value(rutaConfiguracion, "REEMPLAZO_TLB");
-	if (in_reemplazo == NULL)
-	{
-		log_info(logger, "ERROR");
-	}
-	else
-	{
-		configuracion_Cpu->reemplazo = in_reemplazo;
-		log_info(logger, "REEMPLAZO_TLB: %s \n", configuracion_Cpu->reemplazo);
-	}
-
-	configuracion_Cpu->retardo = malloc(sizeof(int));
-	int in_retardo;
-	in_retardo = config_get_int_value(rutaConfiguracion, "RETARDO_INSTRUCCION");
-	if (in_retardo == NULL)
-		{
-			log_info(logger, "ERROR");
-		}
-		else
-		{
-			configuracion_Cpu->retardo = in_retardo;
-			log_info(logger, "RETARDO_INSTRUCCION: %d \n", configuracion_Cpu->retardo);
-		}
-
-	configuracion_Cpu->ip_memoria = malloc(sizeof(int));
-	char* in_ip_memoria;
-	in_ip_memoria = config_get_string_value(rutaConfiguracion, "IP_MEMORIA");
-	if(in_ip_memoria == NULL)
-	{
-		log_info(logger, "ERROR");
-	}
-	else
-	{
-		configuracion_Cpu->ip_memoria = in_ip_memoria;
-		log_info(logger, "IP_MEMORIA: %s \n", configuracion_Cpu->ip_memoria);
-	}
-	
-	configuracion_Cpu->puerto_memoria = malloc(sizeof(int));
-	int in_puerto_memoria;
-	in_puerto_memoria = config_get_int_value(rutaConfiguracion, "PUERTO_MEMORIA");
-	if(in_puerto_memoria == NULL)
-		{
-			log_info(logger, "ERROR");
-		}
-		else
-		{
-			configuracion_Cpu->puerto_memoria = in_puerto_memoria;
-			log_info(logger, "PUERTO_MEMORIA: %d \n", configuracion_Cpu->puerto_memoria);
-		}
-	
-	configuracion_Cpu->puerto_escucha_dispatch = malloc(sizeof(int));
-	int puerto_escucha_dispatch;
-	puerto_escucha_dispatch = config_get_int_value(rutaConfiguracion, "PUERTO_ESCUCHA_DISPATCH");
-	if(puerto_escucha_dispatch == NULL)
-			{
-				log_info(logger, "ERROR");
-			}
-			else
-			{
-				configuracion_Cpu->puerto_escucha_dispatch = puerto_escucha_dispatch;
-				log_info(logger, "PUERTO_ESCUCHA_DISPATCH: %d \n", configuracion_Cpu->puerto_memoria);
-			}
-	configuracion_Cpu->puerto_escucha_interrupt = malloc(sizeof(int));
-	int in_puerto_escucha_interrupt;
-	in_puerto_escucha_interrupt = config_get_int_value(rutaConfiguracion, "PUERTO_ESCUCHA_INTERRUPT");
-	if (in_puerto_escucha_interrupt == NULL)
-	{
-		log_info(logger, "ERROR");
-	}
-	else
-	{
-		configuracion_Cpu->puerto_escucha_interrupt = in_puerto_escucha_interrupt;
-		log_info(logger, "PUERTO_ESCUCHA_INTERRUPT: %d \n", configuracion_Cpu->puerto_escucha_interrupt);
-
-	}
-	
-	return configuracion_Cpu;
 }
 
 //Acá recibe instrucciones del Kernel
@@ -170,32 +76,29 @@ int start(int arg)
 //	lista_operaciones* lista;
 //	lista = todas_operaciones(void);
 	
-	cpu_config* configuracion_Cpu;
-	
 	char* valor;
 	t_log* logger;
 	t_config* config;
 
 	/* ---------------- LOGGING ---------------- */
-	logger = iniciar_logger();
+	logger = get_log();
 
 	log_info(logger, "Se inició el logger");
 
 
 //	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
 
-	config = iniciar_config();
+	config = get_config();
 	log_info(logger, "Se cargó la configuración");
-	configuracion_Cpu = cargarConfiguracion(config, logger);
 
 
 	//CONECTAR AL KERNEL
-	//conexion_Kernel_Dispatch = crearConexion(IP, configuracion_Cpu->puerto_escucha_dispatch);
+	//conexion_Kernel_Dispatch = crearConexion(IP, get_puerto_escucha_dispatch());
 	//sem_init(comunicacion_kernel_dispatch, 1, 0);
 	//pthread_t * hilo_instrucciones_kernel;
     	//pthread_create(hilo_instrucciones_kernel, NULL, recibir_Instrucciones_Kernel, &conexion_Kernel_Dispatch);
 	
-	//conexion_Kernel_Interrupt = crearConexion(IP, configuracion_Cpu->puerto_escucha_interrupt);
+	//conexion_Kernel_Interrupt = crearConexion(IP, get_puerto_escucha_interrupt());
 	//sem_init(comunicacion_kernel_interrupt, 1, 0);
 	//pthread_t * hilo_interrupciones_kernel;
     	//pthread_create(hilo_interrupciones_kernel, NULL, recibir_Interrupciones_Kernel, &conexion_Kernel_Interrupt);
@@ -203,7 +106,7 @@ int start(int arg)
 
 	//CONECTAR A MEMORIA
 	log_info(logger, "Cargar memoria");
-	//conexion_Memoria = crear_conexion(configuracion_Cpu->ip_memoria, htons(configuracion_Cpu->puerto_memoria));
+	//conexion_Memoria = crear_conexion(get_ip_memoria(), htons(get_puerto_memoria()));
 	//conexion_Memoria = crear_conexion("127.0.0.1", "8092");
 	//conexion_Memoria = crearConexionAuxiliar("127.0.0.1", 8050, logger);
 
@@ -221,7 +124,7 @@ int regreso;
 	//if (arg == 1)
 //	{
 		//HANDSHAKE CON MEMORIA
-//		int cliente = generarCliente(4, configuracion_Cpu->ip_memoria, "8002");
+//		int cliente = generarCliente(4, get_ip_memoria, "8002");
 //		regreso = cliente;
 //	}
 //	else
@@ -235,13 +138,13 @@ int regreso;
 
 
 		 //enviar a kernel
-		// 		int conexion_kernel = iniciar_servidor2(logger, "cpu-kernel", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
+		// 		int conexion_kernel = iniciar_servidor2(logger, "cpu-kernel", get_ip_memoria, get_puerto_memoria);
 	//	 		log_info(logger, "Conexion creada");
 	//	 		int esperaKernel = esperar_cliente2(logger, "cpu-kernel", conexion_Memoria);
 	//	 		enviar_mensaje2(mensajeEnviar, espera);
 	//	 		liberar_conexion2(conexion_kernel);
 		 		//recibir de memoria
-	//	 		int socket_ClienteKernel = crear_conexion2(logger, "kernel-cpu", configuracion_Cpu->ip_memoria, configuracion_Cpu->puerto_memoria);
+	//	 		int socket_ClienteKernel = crear_conexion2(logger, "kernel-cpu", get_ip_memoria, get_puerto_memoria());
 	//	 		 recibir_mensaje2(logger, socket_ClienteKernel);
 	//	 		liberar_conexion2(socket_ClienteKernel);
 

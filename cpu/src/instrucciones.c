@@ -80,8 +80,8 @@ void* funcion_hilo(void* p){
 }
 
 int sePuedeConvertirEnInt(char* palabra){
-	int valor = (int)palabra;
-	int sePuede;
+	int valor = atoi( palabra);
+	int sePuede = 0;
 	if (sizeof(valor) <= 4)
 		sePuede = 1;
 	else{
@@ -213,7 +213,7 @@ int buscarValorOperacion (char* operacion_charm){
 
 int esABCD(char* valor, int* apunta){
 	int cierto;
-	if (valor[1] = 'X'){
+	if (valor[1] == 'X'){
 
 	switch(valor[0]) {
 	  case 'A':
