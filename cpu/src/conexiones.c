@@ -70,8 +70,8 @@ char * concatenar(char* palabra1, char* palabra2)
 
 void esperarInterrupcion(){
 	while(interrumpir == 0){
-
-		if (0==1)
+		int socket_interrupcion = conexion_Server(2, get_puerto_escucha_interrupt());
+		if (socket_interrupcion > 0)
 		{
 			interrumpe();
 			interrumpir = 1;
@@ -113,6 +113,20 @@ t_contexto_ejecucion iniciar_proceso(t_pcb pcb1){
 	    return contexto_ejecucion;
 }
 
+void ciclo_recibir_instruccines(){
+	int error = 0;
+	int recibir_instrucciones;
+	while (error == 0){
+		recibir_instrucciones = conexion_Server(2, get_puerto_memoria_dispatch);
+		if (recibir_instrucciones < 0){
+			error = 1;
+		}
+		t_pcb pcb1; //SE OBTIENE
+		t_contexto_ejecucion contexto = iniciar_proceso(pcb1);
+		//SE DEVUELVE contexto
+	}
+}
+
 int start()
 {
 
@@ -148,14 +162,9 @@ int start()
 int regreso;
 
 //CONECTAR A KERNEL
-	//while(1){
 
-		//SI RECIBE MENSAJE {regreso = inciar_proceso()		}
-		t_pcb pcb1; //SE OBTIENE
-		t_contexto_ejecucion contexto = iniciar_proceso(pcb1);
 
-	//}
-
+	ciclo_recibir_instruccines();
 
 	log_destroy(logger); //BORRAR LUEGO
 	return 0;
