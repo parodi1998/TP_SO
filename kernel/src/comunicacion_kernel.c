@@ -22,11 +22,10 @@ static void procesar_conexion(void* void_args) {
         switch (codigo) {
             case INSTRUCCIONES:
                 log_info(logger, "Estas en la opcion de recibir INSTRUCCIONES");
-                if(!recv_instrucciones(cliente_fd, &instrucciones, &segmentos)) {
-                    log_error(logger,"Hubo un error al recuperar la lista de instrucciones o el tamanio del proceso");
+                if(!recv_instrucciones(cliente_fd, &instrucciones)) {
+                    log_error(logger,"Hubo un error al recuperar la lista de instrucciones");
                 }else {
                     log_info(logger,"Se recibio la informacion con exito");
-                    log_info(logger,"Segmentos: %s", segmentos);
                     cantidad_instrucciones = list_size(instrucciones);
                     for(size_t i = 0; i < cantidad_instrucciones; i++) {
                         char* instruccion = list_get(instrucciones,i);
@@ -39,7 +38,6 @@ static void procesar_conexion(void* void_args) {
                 log_error(logger, "el cliente se desconecto. Terminando servidor");
                 return;
             default:
-                log_warning(logger,"%s", codigo);
                 log_warning(logger,"Operacion desconocida. No quieras meter la pata");
                 return;
         }

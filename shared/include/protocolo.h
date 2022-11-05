@@ -22,8 +22,8 @@ typedef struct{
 /**
  * Funciones para comunicacion entre conso y kernel
  * */
-bool send_instrucciones(int fd, t_list* instrucciones, char* segmentos);
-bool recv_instrucciones(int fd, t_list** instrucciones, char** segmentos);
+bool send_instrucciones(int fd, t_list* instrucciones);
+bool recv_instrucciones(int fd, t_list** instrucciones);
 
 /**
  * Funciones para enviar y recibir un PCB
