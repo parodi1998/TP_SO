@@ -17,7 +17,7 @@ t_config* CONFIG;
 
 void iniciar_config_cpu(void){
 
-	CONFIG = config_create("../cpu/src/cpu.config");
+	CONFIG = config_create("cpu.config");
 
 	entradas_tlb = config_get_int_value(CONFIG,"ENTRADAS_TLB");
 	reemplazo_tlb = config_get_string_value(CONFIG,"REEMPLAZO_TLB");
