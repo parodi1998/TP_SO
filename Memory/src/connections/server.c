@@ -128,7 +128,7 @@ void devolver_mensaje(void* payload, int size, int socket_cliente,int op_code)
 	paquete->buffer->stream = malloc(size);
 	memcpy(paquete->buffer->stream, payload,size);
 
-	int bytes = paquete->buffer->size + 2*sizeof(int);
+	int bytes = paquete->buffer->size + sizeof(int);
 
 	void* a_enviar = serializar_paquete(paquete, bytes);
 
@@ -177,7 +177,7 @@ void* procesar_mensaje_escribir(char* string,int* size_response,int* op_code){
 
 	save_value_in_memory(address,(void*) array[2],size);
 	*op_code = OK;
-	*size_response = string_length("OK");
+	*size_response = string_length("OK")+1;
 	return (void*)"OK";
 
 }
@@ -190,7 +190,7 @@ void* procesar_suspender_proceso(char* string,int* size,int* op_code){
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
 	suspend_process(pid,segment);
 
-	*size = string_length("OK");
+	*size = string_length("OK")+1;
 	*op_code = OK;
 	return (void*)"OK";
 }
@@ -203,7 +203,7 @@ void* procesar_finalizar_proceso(char* string,int* size,int* op_code){
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
 	finalize_process(pid,segment);
-	*size = string_length("OK");
+	*size = string_length("OK")+1;
 	*op_code = OK;
 	return (void*)"OK";
 }
@@ -237,7 +237,7 @@ void* procesar_swapping(char* string, int* size,int* op_code){
 		uint32_t segment = (volatile uint32_t) atoi( array[1]);
 		uint32_t page_number = (volatile uint32_t) atoi( array[2]);
 		swap_page(pid, segment,page_number);
-		*size = string_length("OK");
+		*size = string_length("OK")+1;
 		*op_code = OK;
 		return (void*)"OK";
 
