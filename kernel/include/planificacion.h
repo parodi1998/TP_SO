@@ -3,7 +3,6 @@
 
 #include "commons.h"
 t_queue* colaNew;
-t_queue* colaReadySuspended;
 t_list* colaReady;
 t_list* listaExit;
 

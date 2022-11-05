@@ -6,9 +6,8 @@ void procesoANew (t_pcb* proceso)
 	queue_push(colaNew, proceso);
 	log_info(logger, "Entra el proceso de ID: %d a la cola de new.", proceso->id_proceso);
 	pthread_mutex_unlock(&mutexNew);
-    sem_post(&contadorNew); // Despierta al planificador de largo plazo
+    sem_post(&contadorNew);
 	sem_post(&largoPlazo);
-
 }
 
 t_pcb* sacarDeNew(){
@@ -24,12 +23,11 @@ t_pcb* sacarDeNew(){
 	return proceso;
 }
 
-void hiloNew_Ready(){
+//hilos
 
+void hiloNewRdy(){
 		sem_wait(&largoPlazo);//Este se trigerea cada vez que entra un proceso al new
         sem_wait(&multiprogramacion);//Hay que ver como hacer lo de la mp
 		t_pcb* proceso = sacarDeNew();//Saca de la cola en fifo
         //agregarAReady(proceso);
 }
-
-
