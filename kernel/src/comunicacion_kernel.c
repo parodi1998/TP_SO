@@ -12,12 +12,22 @@ static void procesar_conexion(void* void_args) {
     char* segmentos;
     size_t cantidad_instrucciones;
     t_pcb* pcb;
+    t_pcb* pcb_proceso;
 
     while (cliente_fd != -1) {
 
         if(!recibir_operacion(&codigo, cliente_fd)){
-            log_error(logger, "Hubo un error al recibir el codigo de operacion");
-            return;
+            contador++;
+            pcb_proceso = malloc(sizeof(t_pcb));
+            pcb_proceso->id_proceso = contador;
+            pcb_proceso->program_counter = 0;
+            //pcb_proceso->tabla_segmentos=pedir tabla;
+            //pcb_proceso->registros_cpu=buscar registros;
+            pcb_proceso->instrucciones = instrucciones;
+
+            procesoANew(pcb_proceso);
+            break;
+            
         }
 
         switch (codigo) {
@@ -60,19 +70,11 @@ static void procesar_conexion(void* void_args) {
                 log_error(logger, "el cliente se desconecto. Terminando servidor");
                 return;
             default:
-                log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-                return;
+                log_error(logger, "Algo anduvo mal en el server de %s", server_name);
+                log_info(logger, "Cop: %d", codigo);
+                break;
         }
     }
-    
-    t_pcb* pcb_proceso = malloc(sizeof(t_pcb));
-    pcb_proceso->id_proceso=contador;//hay que sumarle 1 en cada instruccion cuando hagas el que recibe la lista
-    pcb_proceso->program_counter=0;
-    //pcb_proceso->tabla_segmentos=pedir tabla;
-    //pcb_proceso->registros_cpu=buscar registros;
-    pcb_proceso->instrucciones = instrucciones;
-
-    procesoANew(pcb_proceso);
 
     log_warning(logger, "El cliente se desconecto de %s server", server_name);
     return;

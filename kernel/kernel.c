@@ -1,7 +1,7 @@
 #include "include/kernel.h"
 
 void inicializar_listas(){
-
+    contador = 0;
 	colaNew = queue_create();
 	colaReady = list_create();
 	listaExit = list_create();

@@ -77,14 +77,6 @@ int main(int argc, char** argv){
         log_info(logger,"La informacion fue enviada con exito al kernel");
     }
 
-    t_pcb* pcb = create_pcb(instrucciones);
-
-    if(!send_pcb(fd, pcb)) {
-        log_error(logger,"Hubo un error enviando el pcb al kernel");
-    } else {
-        log_info(logger,"El pcb fue enviada con exito al kernel");
-    }
-
     liberar_conexion(&fd);
     terminar_programa();
 
