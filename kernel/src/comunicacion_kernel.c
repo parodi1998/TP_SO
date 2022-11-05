@@ -11,6 +11,7 @@ static void procesar_conexion(void* void_args) {
     t_list* instrucciones;
     char* segmentos;
     size_t cantidad_instrucciones;
+    t_pcb* pcb;
 
     while (cliente_fd != -1) {
 
@@ -33,6 +34,27 @@ static void procesar_conexion(void* void_args) {
                     }
                     log_info(logger,"");
                 }
+                break;
+            case PCB_KERNEL: 
+                log_info(logger, "Estas en la opcion de recibir un PCB");
+                    if(!recv_pcb(cliente_fd, &pcb)) {
+                        log_error(logger,"Hubo un error al recuperar el pcb");
+                    }else {
+                        log_info(logger,"Se recibio la informacion con exito");
+                        log_info(logger,"PCB - ID: %d", pcb->id_proceso);
+                        log_info(logger,"PCB - PROGRAM COUNTER: %d", pcb->program_counter);
+                        log_info(logger,"PCB - TABLA DE SEGMENTOS: %d", pcb->tabla_segmentos);
+                        log_info(logger,"PCB - REGISTRO AX: %d", pcb->registro_AX);
+                        log_info(logger,"PCB - REGISTRO BX: %d", pcb->registro_BX);
+                        log_info(logger,"PCB - REGISTRO CX: %d", pcb->registro_CX);
+                        log_info(logger,"PCB - REGISTRO DX: %d", pcb->registro_DX);
+                        cantidad_instrucciones = list_size(pcb->instrucciones);
+                        for(size_t i = 0; i < cantidad_instrucciones; i++) {
+                            char* instruccion = list_get(pcb->instrucciones,i);
+                            log_info(logger,instruccion);
+                        }
+                        log_info(logger,"");
+                    }
                 break;
             case -1:
                 log_error(logger, "el cliente se desconecto. Terminando servidor");

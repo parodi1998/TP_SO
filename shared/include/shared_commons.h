@@ -18,6 +18,7 @@
 typedef enum {
     MENSAJE,
 	INSTRUCCIONES,
+	PCB_KERNEL,
     PAQUETE,
     DEBUG = 100,
 } op_code;

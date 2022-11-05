@@ -1,5 +1,20 @@
 #include "include/consola.h"
 
+// funcion de prueba, despues borrarla
+static t_pcb* create_pcb(t_list* instrucciones) {
+    t_pcb* pcb = malloc(sizeof(t_pcb));
+    pcb->id_proceso = 1;
+    pcb->instrucciones = instrucciones;
+    pcb->program_counter = 1;
+    pcb->tabla_segmentos = 2;
+    pcb->registro_AX = 3;
+    pcb->registro_BX = 4;
+    pcb->registro_CX = 5;
+    pcb->registro_DX = 6;
+    pcb->estado = PCB_NEW;
+    return pcb;
+}
+
 int main(int argc, char** argv){
 
     iniciar_programa();
@@ -60,6 +75,14 @@ int main(int argc, char** argv){
         log_error(logger,"Hubo un error enviando la informacion al kernel");
     } else {
         log_info(logger,"La informacion fue enviada con exito al kernel");
+    }
+
+    t_pcb* pcb = create_pcb(instrucciones);
+
+    if(!send_pcb(fd, pcb)) {
+        log_error(logger,"Hubo un error enviando el pcb al kernel");
+    } else {
+        log_info(logger,"El pcb fue enviada con exito al kernel");
     }
 
     liberar_conexion(&fd);
