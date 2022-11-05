@@ -17,7 +17,7 @@
 #include<semaphore.h>
 #include "server.h"
 #include "client.h"
-
+#include <commons/collections/list.h>
 #include "utils.h"
 
 enum tipo_instruccion{
@@ -62,13 +62,27 @@ typedef struct tabla_de_segmentos{
 	struct tabla_de_segmentos* siguiente;
 } Tabla_De_Segmentos;
 
-typedef struct pcb{
-	int id;
-	Lista_Instrucciones* instrucciones;
+typedef struct t_contexto_ejecucion{
+	t_list * instrucciones;
 	int program_counter;
 	registros reg_general;
+	char * io_dispositivo;
+	int io_unidades;
+	int estado;
 	Tabla_De_Segmentos* tabla_segmentos;
-} pcb;
+} t_contexto_ejecucion;
+
+typedef struct t_pcb{
+	uint32_t id_proceso;
+	t_list* instrucciones;
+	uint32_t program_counter;
+	uint32_t registro_AX;
+	uint32_t registro_BX;
+	uint32_t registro_CX;
+	uint32_t registro_DX;
+	uint32_t tabla_segmentos;
+	char* estado;
+} t_pcb;
 
 typedef struct lista_operaciones{
 	int t_instruccion;
@@ -81,16 +95,10 @@ typedef struct instruccion{
 	operando operando_2;
 } instruccion;
 
-typedef struct pcb_con_estado{
-	pcb suPcb;
-	int estado_pcb;
-	char* dispositivo_interrumpido;
-	int unidades_dispositivo_interrumpido;
-} pcb_con_estado;
 
 void* funcion_hilo(void*);
-void* seguir_instrucciones(pcb*);
-char* fetch(pcb*);
+void* seguir_instrucciones(t_contexto_ejecucion*);
+//char* fetch(t_contexto_ejecucion*);
 void* todas_operaciones(void);
 
 
@@ -110,6 +118,6 @@ void ins_mov_in(instruccion);
 int ins_io(void);
 int  ins_exit(void);
 int check_interrupt(int);
-int ciclo_instrucciones(pcb*);
+int ciclo_instrucciones(t_contexto_ejecucion*);
 
 #endif /* INSTRUCCIONES_H_ */
