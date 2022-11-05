@@ -10,7 +10,7 @@ char* puerto_escucha_interrupt;
 char* log_path;
 
 
-t_log* LOGGER;
+t_log* LOGGER_2;
 
 t_config* CONFIG;
 
@@ -29,7 +29,7 @@ void iniciar_config_cpu(void){
 	log_path = config_get_string_value(CONFIG,"LOG_PATH");
 
 
-	LOGGER = log_create(log_path, "cpu", true, LOG_LEVEL_INFO);
+	LOGGER_2 = log_create(log_path, "cpu", true, LOG_LEVEL_INFO);
 }
 
 t_config* get_config(){
@@ -37,7 +37,7 @@ t_config* get_config(){
 }
 
 t_log* get_log(){
-	return LOGGER;
+	return LOGGER_2;
 }
 
 int get_entradas_tlb(){

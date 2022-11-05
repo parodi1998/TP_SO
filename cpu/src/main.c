@@ -17,7 +17,7 @@
 int main(void) {
 	puts("ENCENDIDOS");
 	iniciar_config_cpu();
-	int valor = start(2);
+	int valor = start();
 
 	return valor;
 }

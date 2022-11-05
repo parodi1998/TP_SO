@@ -45,9 +45,10 @@ int sePuedeConvertirEnInt(char* palabra){
     	return sePuede;
     }
 
-void* seguir_instrucciones(pcb* pcb_kernel){
+void* seguir_instrucciones(t_contexto_ejecucion* pcb_kernel){
 	inicializar();
 	int devolucion = OPTIMO;
+
 	todas_operaciones();
 
 	contexto = &(pcb_kernel->reg_general);
@@ -73,49 +74,7 @@ void* seguir_instrucciones(pcb* pcb_kernel){
 
 
 
-char* fetch(pcb* pcb_kernel)
-{
-	char *instruccion_en_bruto;
-	int continuar = 1;
-	Lista_Instrucciones* lista_buscar = pcb_kernel->instrucciones;
-	int instruccion_buscada = pcb_kernel->program_counter;
-
-
-	do{
-
-	if (lista_buscar->id != instruccion_buscada){
-		if (lista_buscar->lista_siguiente == NULL){
-			continuar = 0;
-			}
-			else
-			{
-				lista_buscar = lista_buscar->lista_siguiente;
-			}
-		}
-		else{
-			instruccion_en_bruto = lista_buscar->instruccion;
-			continuar = 0;
-		}
-
-	} while (continuar == 1);
-
-		int a = lista_buscar->id;
-
-	return instruccion_en_bruto;
-}
-
 void* todas_operaciones(void){
-	//char* path_1 = getcwd(NULL, 0);
-	//path_1 = concatenar(path_1, "/instrucciones.config");
-//	char numero;
-
-
-	//for (int i = 0; i <= 5; i++){
-		//numero = i + '0';
-
-		//lista[i].t_instruccion = numero;
-		//lista[i].nombre_instruccion = config_get_string_value(path_1, numero);
-	//}
 
 	lista_ope[SET] = "SET____";
 	lista_ope[ADD] = "ADD____";
@@ -124,9 +83,20 @@ void* todas_operaciones(void){
 	lista_ope[IO] = "I/O____";
 	lista_ope[EXIT] = "EXIT___";
 
-
 }
 
+char* fetch(t_contexto_ejecucion* pcb_kernel){
+	char* instruccion_en_bruto;
+	t_link_element* elemento = pcb_kernel->instrucciones->head;
+	int siguiente_instruccion = pcb_kernel->program_counter;
+	int total_instrucciones = pcb_kernel->instrucciones->elements_count;
+	for (int i = 1; i < siguiente_instruccion; i++) {
+		elemento = elemento->next;
+	}
+	instruccion_en_bruto = elemento->data;
+
+	return instruccion_en_bruto;
+}
 
 int* buscaOperando(char* nombre){
 
@@ -338,7 +308,7 @@ int check_interrupt(int devuelve){
 }
 
 
-int ciclo_instrucciones(pcb* pcb_kernel)
+int ciclo_instrucciones(t_contexto_ejecucion* pcb_kernel)
 {
 
 	int devuelve = OPTIMO;
@@ -356,12 +326,10 @@ int ciclo_instrucciones(pcb* pcb_kernel)
 
 	//actualizar ciclo
 	pcb_kernel->program_counter ++;
-
-
-
+	pcb_kernel->io_unidades = unidades;
+	pcb_kernel->io_dispositivo = io;
+	pcb_kernel->estado = devuelve;
 
 	return devuelve;
-	//return EXIT;
-
 
 }
