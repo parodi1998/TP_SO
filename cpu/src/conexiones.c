@@ -136,18 +136,10 @@ int start()
 
 	char* valor;
 	t_log* logger;
-	t_config* config;
 
 	/* ---------------- LOGGING ---------------- */
 	logger = get_log();
 
-	log_info(logger, "Se inició el logger");
-
-
-//	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
-
-	config = get_config();
-	log_info(logger, "Se cargó la configuración");
 
 
 
@@ -160,7 +152,6 @@ int start()
 
 
 int regreso;
-
 //CONECTAR A KERNEL
 
 
@@ -168,49 +159,4 @@ int regreso;
 
 	log_destroy(logger); //BORRAR LUEGO
 	return 0;
-}
-
-t_log* iniciar_logger(void)
-{
-	t_log* nuevo_logger;
-
-	if ((nuevo_logger = log_create("cpu.log", "CPU", 1, LOG_LEVEL_INFO)) == NULL)
-	{
-		printf("Error al crear logger\n");
-		exit(1);
-	}
-	return nuevo_logger;
-}
-
-
-t_config* iniciar_config(void)
-{
-	t_config* nuevo_config;
-	char *current_dir = getcwd(NULL, 0);
-	char* path = getcwd(NULL, 0);
-	path = concatenar(path, "/cpu.config");
-
-	if ((nuevo_config = config_create(path)) == NULL)
-	{
-		printf("No pude leer la configuración\n");
-		exit(1);
-	}
-	return nuevo_config;
-}
-
-
-
-
-void terminar_programa(int conexion, t_log* logger, t_config* config)
-{
-
-	if (logger != NULL)
-	{
-		log_destroy(logger);
-	}
-	if (config != NULL)
-	{
-		config_destroy(config);
-	}
-
 }

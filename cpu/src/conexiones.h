@@ -12,7 +12,7 @@
 #include "server.h"
 #include "client.h"
 
-#include "utils.h"
+#include "client_memoria.h"
 #include "instrucciones.h"
 
 
@@ -22,7 +22,6 @@ void leer_consola();
 void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
 int start(void);
-cpu_config* cargarConfiguracion(t_config*, t_log*);
 int crearConexionAuxiliar(char* ip, int puerto, t_log* logger);
 
 #endif /* CONEXIONES_H_ */

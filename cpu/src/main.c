@@ -13,11 +13,11 @@
 #include "conexiones.h"
 #include "instrucciones.h"
 #include "config_cpu.h"
+#include "client_memoria.h"
 
 int main(void) {
 	puts("ENCENDIDOS");
 	iniciar_config_cpu();
 	int valor = start();
 
-	return valor;
 }

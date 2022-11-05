@@ -1,7 +1,7 @@
 #include "utils.h"
 
 
-void* serializar_paquete(t_paquete* paquete, int bytes)
+/*void* serializar_paquete(t_paquete* paquete, int bytes)
 {
 	void * magic = malloc(bytes);
 	int desplazamiento = 0;
@@ -84,4 +84,4 @@ void eliminar_paquete(t_paquete* paquete)
 	free(paquete->buffer->stream);
 	free(paquete->buffer);
 	free(paquete);
-}
+}*/

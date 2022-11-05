@@ -30,6 +30,8 @@ void iniciar_config_cpu(void){
 
 
 	LOGGER_2 = log_create(log_path, "cpu", true, LOG_LEVEL_INFO);
+	log_info(LOGGER_2, "Se inició el logger");
+	log_info(LOGGER_2, "Se cargó la configuración");
 }
 
 t_config* get_config(){

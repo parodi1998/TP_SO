@@ -15,7 +15,7 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
-
+#include<commons/string.h>
 
 typedef enum
 {
