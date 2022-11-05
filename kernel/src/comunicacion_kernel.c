@@ -8,7 +8,9 @@ static void procesar_conexion(void* void_args) {
     free(args);
 
     op_code codigo;
-    t_list lista_instrucciones=new list();
+    t_list* instrucciones;
+    char* segmentos;
+    size_t cantidad_instrucciones;
 
     while (cliente_fd != -1) {
 
@@ -18,24 +20,37 @@ static void procesar_conexion(void* void_args) {
         }
 
         switch (codigo) {
-            case MENSAJE:
-                recibir_mensaje(logger, cliente_fd);
+            case INSTRUCCIONES:
+                log_info(logger, "Estas en la opcion de recibir INSTRUCCIONES");
+                if(!recv_instrucciones(cliente_fd, &instrucciones, &segmentos)) {
+                    log_error(logger,"Hubo un error al recuperar la lista de instrucciones o el tamanio del proceso");
+                }else {
+                    log_info(logger,"Se recibio la informacion con exito");
+                    log_info(logger,"Segmentos: %s", segmentos);
+                    cantidad_instrucciones = list_size(instrucciones);
+                    for(size_t i = 0; i < cantidad_instrucciones; i++) {
+                        char* instruccion = list_get(instrucciones,i);
+                        log_info(logger,instruccion);
+                    }
+                    log_info(logger,"");
+                }
                 break;
             case -1:
                 log_error(logger, "el cliente se desconecto. Terminando servidor");
                 return;
             default:
+                log_warning(logger,"%s", codigo);
                 log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-                break;
+                return;
         }
     }
     
-    t_pcb* pcb_proceso = malloc(sizeof(pcb_t));
+    t_pcb* pcb_proceso = malloc(sizeof(t_pcb));
     pcb_proceso->id_proceso=contador;//hay que sumarle 1 en cada instruccion cuando hagas el que recibe la lista
     pcb_proceso->program_counter=0;
     //pcb_proceso->tabla_segmentos=pedir tabla;
     //pcb_proceso->registros_cpu=buscar registros;
-    pcb_proceso->instrucciones=lista_instrucciones;
+    pcb_proceso->instrucciones = instrucciones;
 
     procesoANew(pcb_proceso);
 
@@ -59,6 +74,7 @@ int server_escuchar(t_log* logger, char* server_name, int server_socket) {
     return 0;
 }
 
+/*
 void enviar_pcb_cpu(t_pcb* pcb_proceso){
 
 	send_pid(fd_cpu,pcb_proceso->id_proceso);
@@ -76,3 +92,4 @@ void enviar_pcb_cpu(t_pcb* pcb_proceso){
 void pedir_tabla_a_memoria(){
 	send_TAM(fd_memoria,config_get_string_value(config_kernel,"PUERTO_MEMORIA"));
 }
+*/

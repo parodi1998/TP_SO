@@ -19,7 +19,16 @@ typedef struct{
 }instruccion_IO;
 
 
-bool send_instrucciones(int fd, t_list* instrucciones);
-bool recv_instrucciones(int fd, t_list** instrucciones); 
+/**
+ * Funciones para comunicacion entre conso y kernel
+ * */
+bool send_instrucciones(int fd, t_list* instrucciones, char* segmentos);
+bool recv_instrucciones(int fd, t_list** instrucciones, char** segmentos);
+
+/**
+ * Funciones para enviar y recibir un PCB
+ * */
+// bool send_pcb(int fd, t_pcb* pcb);
+// bool recv_pcb(int fd, t_pcb** pcb);
 
 #endif

@@ -18,23 +18,6 @@ void* recibir_buffer(int* size, int socket_cliente)
 	return buffer;
 }
 
-bool recibir_buffer_bool(int* size, int socket_cliente)
-{
-	void * buffer;
-
-	if (recv(socket_cliente, size, sizeof(int), MSG_WAITALL) != sizeof(int)) {
-		return false;
-    }
-
-	buffer = malloc(*size);
-
-	if (recv(socket_cliente, buffer, *size, MSG_WAITALL) != *size) {
-		return false;
-    }
-
-	return buffer;
-}
-
 void recibir_mensaje(t_log* logger, int socket_cliente)
 {
 	int size;

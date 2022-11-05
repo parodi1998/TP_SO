@@ -33,5 +33,9 @@ typedef struct {
     uint32_t tabla_segmentos;
     char* estado;
 } t_pcb;
-void procesoANew (t_pcb* proceso)
+
+void procesoANew (t_pcb* proceso);
+void hiloNew_Ready();
+t_pcb* sacarDeNew();
+
 #endif

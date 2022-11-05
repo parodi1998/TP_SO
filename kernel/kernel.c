@@ -5,7 +5,7 @@ void inicializar_listas(){
 	colaNew = queue_create();
 	colaReady = list_create();
 	listaExit = list_create();
-	lista_instrucciones_kernel = list_create();
+	//lista_instrucciones_kernel = list_create();
 
 }
 

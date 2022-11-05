@@ -28,6 +28,9 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
+    char* segmentos = config_consola->segmentos;
+    log_info(logger,segmentos);
+
     // Leer archivo
     t_list* instrucciones;
 
@@ -50,15 +53,12 @@ int main(int argc, char** argv){
         terminar_programa();
         return EXIT_FAILURE;
     }
-/*
-    if(!send_instrucciones(fd, instrucciones)) {
-        log_error(logger,"No se pudo enviar las instrucciones a kernel");
-        liberar_conexion(&fd);
-        terminar_programa();
-        return EXIT_FAILURE;
+
+    if(!send_instrucciones(fd, instrucciones, segmentos)) {
+        log_error(logger,"Hubo un error enviando la informacion al kernel");
+    } else {
+        log_info(logger,"La informacion fue enviada con exito al kernel");
     }
-*/
-    enviar_mensaje("mensaje de prueba", fd);
 
     liberar_conexion(&fd);
     terminar_programa();
