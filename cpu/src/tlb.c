@@ -6,6 +6,7 @@
  */
 #include "tlb.h"
 #include "config_cpu.h"
+#include "client_memoria.h"
 
 t_list* SEGMENT_TABLE;
 
@@ -80,6 +81,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 			record->last_use = 0;
 
 			list_add(TLB,(void*) record);
+			return;
 		}
 
 		t_tlb_entry* victim;
@@ -89,7 +91,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 			bool sort_by_lru(t_tlb_entry* record_aux1,t_tlb_entry* record_aux2 ){
 						return record_aux1->last_use > record_aux2;
 			}
-
+			update_lru();
 			t_list* list_sorted_by_time = list_sorted(TLB,(void*) sort_by_lru);
 			victim = list_get(list_sorted_by_time,0);
 
@@ -114,11 +116,10 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 
 
 	}else{
+		update_lru();
 		record->frame = frame;
 		record->last_use = 0;
 	}
-
-	update_lru();
 
 
 }
@@ -143,11 +144,9 @@ void update_lru(){
 	}
 }
 
-void find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page) {
+void find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura) {
 
-char* response_from_module = "0|0";
-
-
+char* response_from_module = traducir_memoria(pid,segment,page,es_escritura);
 
 
 char** parts = string_split(response_from_module, "|");
@@ -170,14 +169,18 @@ if (parts[0] == "1") {
 
 }
 
-void write_value_from_memory_module(int32_t address, void* value) {
+void finalize_process_tlb(int32_t pid){
+	//eliminar todos los registros pertenecientes a la tlb
+	bool has_pid(t_tlb_entry* aux){
+		return aux->pid == pid;
+	}
 
+	void destroy_tlb_entry(t_tlb_entry* aux){
+		free(aux);
+	}
+
+	list_remove_and_destroy_all_by_condition(TLB,(void*)has_pid,(void*)destroy_tlb_entry);
 }
-
-void* read_value_from_memory_module(int32_t address) {
-return (void*) "valor";
-}
-
 
 
 
