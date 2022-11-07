@@ -19,6 +19,7 @@
 
 typedef enum
 {
+	CONFIG_CPU,
 	INICIAR_PROCESO,
 	TRADUCIR,
 	ESCRIBIR,

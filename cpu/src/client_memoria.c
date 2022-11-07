@@ -45,11 +45,20 @@ char* finalizar_proceso(uint32_t pid,uint32_t segment){
 	char* mensaje = string_from_format("%d|%d",pid,segment);
 
 	int conexion = crear_conexion_memoria();
-	log_info(get_log(),"REQUEST SUSPENDER_PROCESO: %s" , mensaje );
-	enviar_mensaje(mensaje,conexion,SUSPENDER_PROCESO);
+	log_info(get_log(),"REQUEST FINALIZAR_PROCESO: %s" , mensaje );
+	enviar_mensaje(mensaje,conexion,FINALIZAR_PROCESO);
 	char* rta = recibir_mensaje(conexion);
-	log_info(get_log(),"RESPUESTA SUSPENDER_PROCESO: %s" , rta );
+	log_info(get_log(),"RESPUESTA FINALIZAR_PROCESO: %s" , rta );
 	free(mensaje);
+	return rta;
+}
+
+char* recibir_config_para_mmu(){
+	log_info(get_log(),"REQUEST CONFIG_CPU");
+	int conexion = crear_conexion_memoria();
+	enviar_mensaje("",conexion,CONFIG_CPU);
+	char* rta = recibir_mensaje(conexion);
+	log_info(get_log(),"RESPUESTA CONFIG_CPU: %s" , rta );
 	return rta;
 }
 
