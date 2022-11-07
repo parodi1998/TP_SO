@@ -55,21 +55,20 @@ typedef struct lista_instrucciones{
 	struct lista_instrucciones* lista_siguiente;
 } Lista_Instrucciones;
 
-typedef struct tabla_de_segmentos{
+typedef struct{
 	int nro;
 	int tam;
-	int nro_indice_pagina;
-	struct tabla_de_segmentos* siguiente;
-} Tabla_De_Segmentos;
+	int nro_indice_tabla_paginas;
+} t_segmento;
 
-typedef struct t_contexto_ejecucion{
-	t_list * instrucciones;
+typedef struct {
+	t_list* instrucciones;
 	int program_counter;
 	registros reg_general;
 	char * io_dispositivo;
 	int io_unidades;
 	int estado;
-	Tabla_De_Segmentos* tabla_segmentos;
+	t_list* tabla_segmentos;
 } t_contexto_ejecucion;
 
 typedef struct t_pcb{

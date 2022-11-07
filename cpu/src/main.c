@@ -18,6 +18,8 @@
 int main(void) {
 	puts("ENCENDIDOS");
 	iniciar_config_cpu();
-	int valor = start();
+	init_tlb();
+	iniciar_mmu();
+	start();
 
 }
