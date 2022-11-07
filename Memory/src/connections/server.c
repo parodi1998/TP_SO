@@ -69,6 +69,10 @@ void process_request(int cod_op, int cliente_fd) {
 	void* response;
 	msg = recibir_mensaje(cliente_fd, &size);
 		switch (cod_op) {
+		case CONFIG_CPU:
+			response = config_cpu();
+			size = sizeof(response);
+			break;
 		case INICIAR_PROCESO:
 			response = procesar_mensaje_iniciar_proceso(msg,&size,&op_code_response);
 			break;
@@ -93,6 +97,7 @@ void process_request(int cod_op, int cliente_fd) {
 		}
 		devolver_mensaje(response,size, cliente_fd,op_code_response);
 		free(msg);
+		free(response);
 }
 
 void* recibir_mensaje(int socket_cliente, int* size)

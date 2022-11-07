@@ -92,4 +92,5 @@ t_list* find_all_pages_from_process(uint32_t pid);
 t_list* get_free_frames();
 void book_frames(uint32_t pid);
 void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number);
+char* config_cpu();
 #endif //KISS_MEMORY_FILE_MANAGEMENT_H

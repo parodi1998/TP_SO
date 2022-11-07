@@ -640,3 +640,7 @@ void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 
 }
 
+char* config_cpu(){
+	return string_from_format("%d|%d",entries_per_table_getter(),page_size_getter());
+}
+
