@@ -13,15 +13,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <commons/string.h>
-#include<commons/log.h>
+#include <commons/log.h>
 #include <commons/collections/list.h>
 #include <commons/collections/queue.h>
 #include <pthread.h>
 #include <semaphore.h>
 
 typedef enum {
-    MENSAJE,
+	MENSAJE,
 	INSTRUCCIONES,
+	SEGMENTOS,
 	PCB_KERNEL,
     PAQUETE,
     DEBUG = 100,

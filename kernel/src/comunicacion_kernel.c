@@ -9,7 +9,7 @@ static void procesar_conexion(void* void_args) {
 
     op_code codigo;
     t_list* instrucciones;
-    char* segmentos;
+    t_list* segmentos;
     size_t cantidad_instrucciones;
     t_pcb* pcb;
     t_pcb* pcb_proceso;
@@ -37,11 +37,17 @@ static void procesar_conexion(void* void_args) {
                     log_error(logger,"Hubo un error al recuperar la lista de instrucciones");
                 }else {
                     log_info(logger,"Se recibio la informacion con exito");
-                    cantidad_instrucciones = list_size(instrucciones);
-                    for(size_t i = 0; i < cantidad_instrucciones; i++) {
-                        char* instruccion = list_get(instrucciones,i);
-                        log_info(logger,instruccion);
-                    }
+                    log_list_of_chars(logger, instrucciones);
+                    log_info(logger,"");
+                }
+                break;
+            case SEGMENTOS:
+                log_info(logger, "Estas en la opcion de recibir SEGMENTOS");
+                if(!recv_segmentos(cliente_fd, &segmentos)) {
+                    log_error(logger,"Hubo un error al recuperar la lista de segmentos");
+                }else {
+                    log_info(logger,"Se recibio la informacion con exito");
+                    log_list_of_chars(logger, segmentos);
                     log_info(logger,"");
                 }
                 break;
@@ -72,7 +78,7 @@ static void procesar_conexion(void* void_args) {
             default:
                 log_error(logger, "Algo anduvo mal en el server de %s", server_name);
                 log_info(logger, "Cop: %d", codigo);
-                break;
+                return;
         }
     }
 

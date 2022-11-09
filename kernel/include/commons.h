@@ -9,6 +9,8 @@
 #include <commons/collections/list.h>
 #include "../../shared/include/sockets.h"
 #include "../../shared/include/protocolo.h"
+#include "../../shared/include/server_utils.h"
+#include "../../shared/include/shared_commons.h"
 
 #define LOGGER_FILE "kernel.log"
 #define LOGGER_NAME "KERNEL"

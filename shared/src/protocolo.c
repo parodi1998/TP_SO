@@ -162,11 +162,11 @@ static size_t calcular_tamanio_informacion(t_list* instrucciones, size_t cantida
 	return tamanio_informacion;
 }
 
-static void* serializar_instrucciones(size_t* size, t_list* instrucciones) {
+static void* serializar_instrucciones(op_code codigo, size_t* size, t_list* instrucciones) {
 	/**
 	 * Tamanio de la informacion es cantad de instrucciones + la cantidad de espacio que necesito para las instruccioens
 	 * */
-    op_code cop = INSTRUCCIONES;
+    op_code cop = codigo;
 	size_t cantidad_instrucciones = list_size(instrucciones);
 	size_t tamanio_instrucciones = calcular_tamanio_informacion(instrucciones, cantidad_instrucciones);
 	size_t tamanio_informacion = sizeof(size_t) + tamanio_instrucciones;
@@ -222,7 +222,7 @@ static void deserializar_instrucciones(void* stream, t_list** instrucciones) {
 
 bool send_instrucciones(int fd, t_list* instrucciones) {
     size_t size;
-    void* stream = serializar_instrucciones(&size, instrucciones);
+    void* stream = serializar_instrucciones(INSTRUCCIONES, &size, instrucciones);
     if (send(fd, stream, size, 0) == -1) {
         free(stream);
         return false;
@@ -403,6 +403,45 @@ bool recv_pcb(int fd, t_pcb** pcb) {
     deserializar_pcb(stream, &pcb_aux);
 
     *pcb = pcb_aux;
+
+    free(stream);
+    return true;
+}
+
+
+static void* serializar_segmentos(size_t* size, t_list* segmentos) {
+    serializar_instrucciones(SEGMENTOS, size, segmentos);
+}
+
+bool send_segmentos(int fd, t_list* segmentos) {
+    size_t size;
+    void* stream = serializar_segmentos(&size, segmentos);
+    if (send(fd, stream, size, 0) == -1) {
+        free(stream);
+        return false;
+    }
+    free(stream);
+    return true;
+}
+
+bool recv_segmentos(int fd, t_list** segmentos) {
+    // tamanio total del stream    
+    size_t size;
+    if (recv(fd, &size, sizeof(size_t), 0) != sizeof(size_t)) {
+        return false;
+    }
+    // recibe TODO el stream
+    void* stream = malloc(size);
+    if (recv(fd, stream, size, 0) != size) {
+        free(stream);
+        return false;
+    }
+
+    t_list* instrucciones_aux; // el malloc lo realiza la funcion deserializar
+	
+    deserializar_instrucciones(stream, &instrucciones_aux);
+
+    *segmentos = instrucciones_aux;
 
     free(stream);
     return true;

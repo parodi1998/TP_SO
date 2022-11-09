@@ -2,6 +2,7 @@
 #define KERNEL_PLANIFICACION_H_
 
 #include "commons.h"
+
 t_queue* colaNew;
 t_list* colaReady;
 t_list* listaExit;

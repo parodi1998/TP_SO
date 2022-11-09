@@ -1,7 +1,7 @@
 #ifndef SERVER_UTILS_H_
 #define SERVER_UTILS_H_
 
-
+#include "shared_commons.h"
 
 void* recibir_buffer(int*, int);
 t_list* recibir_paquete(int);
