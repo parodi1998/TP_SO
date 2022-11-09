@@ -1,20 +1,5 @@
 #include "include/consola.h"
 
-// funcion de prueba, despues borrarla
-static t_pcb* create_pcb(t_list* instrucciones) {
-    t_pcb* pcb = malloc(sizeof(t_pcb));
-    pcb->id_proceso = 1;
-    pcb->instrucciones = instrucciones;
-    pcb->program_counter = 1;
-    pcb->tabla_segmentos = 2;
-    pcb->registro_AX = 3;
-    pcb->registro_BX = 4;
-    pcb->registro_CX = 5;
-    pcb->registro_DX = 6;
-    pcb->estado = PCB_NEW;
-    return pcb;
-}
-
 int main(int argc, char** argv){
 
     iniciar_programa();
@@ -43,7 +28,9 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    char* segmentos = config_consola->segmentos;
+    t_list* segmentos = config_consola->segmentos;
+    log_list_of_chars(logger,segmentos);
+
 
     // Leer archivo
     t_list* instrucciones;

@@ -1,5 +1,13 @@
 #include "../include/protocolo.h"
 
+void log_list_of_chars(t_log* logger, t_list* list) {
+    size_t size = list_size(list);
+    for(size_t i = 0; i < size; i++) {
+        char* item = list_get(list,i);
+        log_info(logger,item);
+    }
+}
+
 static void* serializar_pid(uint32_t parametro1) {
     void* stream = malloc(sizeof(uint32_t));
     memcpy(stream, &parametro1, sizeof(uint32_t));

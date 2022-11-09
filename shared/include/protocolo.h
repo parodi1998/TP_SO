@@ -1,8 +1,7 @@
 #ifndef PROTOCOLO_H_
 #define PROTOCOLO_H_
 
-#include "client_utils.h"
-#include "server_utils.h"
+#include "shared_commons.h"
 
 typedef enum {
 	PCB_NEW,
@@ -40,6 +39,10 @@ typedef struct{
 	uint32_t parametro;
 }instruccion_IO;
 
+/**
+ * Funciones utiles
+ * */
+void log_list_of_chars(t_log* logger, t_list* list);
 
 /**
  * Funciones para comunicacion entre conso y kernel

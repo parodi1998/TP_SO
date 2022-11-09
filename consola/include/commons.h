@@ -16,7 +16,7 @@
 typedef struct {
     char* ip_kernel;
     char* puerto_kernel;
-    char* segmentos;
+    t_list* segmentos;
     char* tiempo_pantalla;
 } t_config_consola;
 
