@@ -52,6 +52,17 @@ int main(int argc, char** argv){
 	log_info(logger, "Servidor listo para recibir al cliente");
     while (server_escuchar(logger, "kernel", kernel_server_fd));    
 
+    int fd_cpu_dispatch = 0;
+    if (!generar_conexiones_cpu(logger, config_get_string_value(config_kernel,"IP_CPU", config_get_string_value(config_kernel,"PUERTO_CPU_DISPATCH", &fd_cpu_dispatch)) {
+    		terminar_programa();
+    		return EXIT_FAILURE;
+    }
+    int fd_cpu_interrupt = 0;
+    if (!generar_conexiones_cpu(logger, config_get_string_value(config_kernel,"IP_CPU", config_get_string_value(config_kernel,"PUERTO_CPU_INTERRUPT", &fd_cpu_interrupt)) {
+      		terminar_programa());
+      		return EXIT_FAILURE;
+     }
+
     liberar_conexion(&kernel_server_fd);
     terminar_programa();
 
