@@ -30,20 +30,6 @@ typedef struct {
     size_t id_tabla_paginas;
 } t_pcb_segmentos;
 
-typedef struct{
-	int id;
-	char* nombre;
-	uint32_t parametro1;
-	uint32_t parametro2;
-} instruccion;
-
-typedef struct{
-	int id;
-	char* nombre;
-	char* dispositivo;
-	uint32_t parametro;
-} instruccion_IO;
-
 /**
  * Funciones utiles
  * */
