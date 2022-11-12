@@ -1,17 +1,17 @@
 #include "../include/comunicacion_kernel.h"
 
-static t_list* carga_tabla_segmentos_pcb(t_list* segmentos) {
+static void carga_tabla_segmentos_pcb( t_list** lista_a_cargar, t_list* segmentos) {
     t_list* tabla_segmentos = list_create();
     size_t index;
     size_t size = list_size(segmentos);
     for(index = 0; index < size; index++) {
         char* segmento = list_get(segmentos,index);
-        t_pcb_segmentos segmento_pcb;
-        segmento_pcb.id_tabla_paginas = 0;
-        segmento_pcb.tamanio_segmento = atoi(segmento);
-        list_add(tabla_segmentos,&segmento_pcb);
+        t_pcb_segmentos* segmento_pcb = malloc(sizeof(t_pcb_segmentos));
+        segmento_pcb->id_tabla_paginas = 0;
+        segmento_pcb->tamanio_segmento = atoi(segmento);
+        list_add(tabla_segmentos, segmento_pcb);
     }
-    return tabla_segmentos;
+    *lista_a_cargar = tabla_segmentos;
 }
 
 static void procesar_conexion(void* void_args) {
@@ -34,7 +34,7 @@ static void procesar_conexion(void* void_args) {
             pcb_proceso = malloc(sizeof(t_pcb));
             pcb_proceso->id_proceso = contador;
             pcb_proceso->program_counter = 0;
-            pcb_proceso->tabla_segmentos = carga_tabla_segmentos_pcb(segmentos);
+            carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
             //pcb_proceso->registros_cpu=buscar registros;
             pcb_proceso->instrucciones = instrucciones;
 

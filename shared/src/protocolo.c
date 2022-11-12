@@ -15,14 +15,11 @@ void log_pcb(t_log* logger, t_pcb* pcb) {
     log_info(logger, "PCB -> INSTRUCCIONES:");
     log_list_of_chars(logger, pcb->instrucciones);
     log_info(logger, "PCB -> SEGMENTOS: No logro imprimirlos bien todavia");
-    /*
     size_t size = list_size(pcb->tabla_segmentos);
     for(size_t i = 0; i < size; i++) {
-        t_pcb_segmentos* item = malloc(sizeof(t_pcb_segmentos));
-        item = list_get(pcb->tabla_segmentos,i);
-        log_info(logger,"Segmento %d tamanio %p id_tabla_paginas %d",i,item->tamanio_segmento,item->id_tabla_paginas);
+        t_pcb_segmentos* item = list_get(pcb->tabla_segmentos,i);
+        log_info(logger,"Segmento %d tamanio %d id_tabla_paginas %d", i, *item, *(item+sizeof(size_t)));
     }
-    */
 }
 
 static void* serializar_pid(uint32_t parametro1) {
