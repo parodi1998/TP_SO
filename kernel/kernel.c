@@ -53,13 +53,13 @@ int main(int argc, char** argv){
     while (server_escuchar(logger, "kernel", kernel_server_fd));    
 
     int fd_cpu_dispatch = 0;
-    if (!generar_conexiones_cpu(logger, config_get_string_value(config_kernel,"IP_CPU", config_get_string_value(config_kernel,"PUERTO_CPU_DISPATCH", &fd_cpu_dispatch)) {
+    if (!generar_conexiones_cpu(logger, config_kernel->ip_cpu, config_kernel->puerto_cpu_dispatch, &fd_cpu_dispatch)) {
     		terminar_programa();
     		return EXIT_FAILURE;
     }
     int fd_cpu_interrupt = 0;
-    if (!generar_conexiones_cpu(logger, config_get_string_value(config_kernel,"IP_CPU", config_get_string_value(config_kernel,"PUERTO_CPU_INTERRUPT", &fd_cpu_interrupt)) {
-      		terminar_programa());
+    if (!generar_conexiones_cpu(logger, config_kernel->ip_cpu, config_kernel->puerto_cpu_interrupt, &fd_cpu_interrupt)) {
+      		terminar_programa();
       		return EXIT_FAILURE;
      }
 

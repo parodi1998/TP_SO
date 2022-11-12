@@ -86,8 +86,9 @@ int crear_conexion(t_log* logger, const char* server_name, char* ip, char* puert
         log_error(logger, "Error al conectar (a %s)\n", server_name);
         freeaddrinfo(servinfo);
         return 0;
-    } else
+    } else {
         log_info(logger, "Cliente conectado en %s:%s (a %s)\n", ip, puerto, server_name);
+    }  
 
     freeaddrinfo(servinfo);
 
@@ -100,14 +101,14 @@ void liberar_conexion(int* socket_cliente) {
     *socket_cliente = -1;
 }
 
-bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto,int* fd_mod3){
-	 *fd_mod3 = crear_conexion(logger,"MEMORIA", ip, puerto );
+bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto,int* fd_mod3) {
+	*fd_mod3 = crear_conexion(logger,"MEMORIA", ip, puerto );
 
-	   log_error(logger,"El ip en grar conexiones es: %s",ip);
-	   log_error(logger,"El puerto en grar conexiones es: %s",puerto);
-	   log_error(logger,"El socket  en generar conexiones cpu es: %d",fd_mod3);
+	log_error(logger,"El ip en grar conexiones es: %s",ip);
+	log_error(logger,"El puerto en grar conexiones es: %s",puerto);
+	log_error(logger,"El socket  en generar conexiones cpu es: %d",fd_mod3);
 
-	    return *fd_mod3 != 0;
+	return *fd_mod3 != 0;
 }
 
 bool generar_conexiones_cpu(t_log* logger, char* ip, char* puerto, int* fd_mod3) {
