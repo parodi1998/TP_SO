@@ -2,6 +2,7 @@
 #define COMUNICACION_KERNEL_H_
 
 #include "commons.h"
+#include "planificacion.h"
 
 int contador;
 int server_escuchar(t_log* logger, char* server_name, int server_socket);

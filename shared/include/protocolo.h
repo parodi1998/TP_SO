@@ -21,28 +21,34 @@ typedef struct {
     size_t registro_BX;
     size_t registro_CX;
     size_t registro_DX;
-    size_t tabla_segmentos;
+    t_list* tabla_segmentos;
     t_estado_pcb estado;
 } t_pcb;
+
+typedef struct {
+    size_t tamanio_segmento;
+    size_t id_tabla_paginas;
+} t_pcb_segmentos;
 
 typedef struct{
 	int id;
 	char* nombre;
 	uint32_t parametro1;
 	uint32_t parametro2;
-}instruccion;
+} instruccion;
 
 typedef struct{
 	int id;
 	char* nombre;
 	char* dispositivo;
 	uint32_t parametro;
-}instruccion_IO;
+} instruccion_IO;
 
 /**
  * Funciones utiles
  * */
 void log_list_of_chars(t_log* logger, t_list* list);
+void log_pcb(t_log* logger, t_pcb* pcb);
 
 /**
  * Funciones para comunicacion entre conso y kernel

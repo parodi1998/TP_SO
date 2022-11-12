@@ -1,5 +1,19 @@
 #include "../include/comunicacion_kernel.h"
 
+static t_list* carga_tabla_segmentos_pcb(t_list* segmentos) {
+    t_list* tabla_segmentos = list_create();
+    size_t index;
+    size_t size = list_size(segmentos);
+    for(index = 0; index < size; index++) {
+        char* segmento = list_get(segmentos,index);
+        t_pcb_segmentos segmento_pcb;
+        segmento_pcb.id_tabla_paginas = 0;
+        segmento_pcb.tamanio_segmento = atoi(segmento);
+        list_add(tabla_segmentos,&segmento_pcb);
+    }
+    return tabla_segmentos;
+}
+
 static void procesar_conexion(void* void_args) {
     t_procesar_conexion_args* args = (t_procesar_conexion_args*) void_args;
     t_log* logger = args->log;
@@ -10,8 +24,6 @@ static void procesar_conexion(void* void_args) {
     op_code codigo;
     t_list* instrucciones;
     t_list* segmentos;
-    size_t cantidad_instrucciones;
-    t_pcb* pcb;
     t_pcb* pcb_proceso;
 
     while (cliente_fd != -1) {
@@ -21,7 +33,7 @@ static void procesar_conexion(void* void_args) {
             pcb_proceso = malloc(sizeof(t_pcb));
             pcb_proceso->id_proceso = contador;
             pcb_proceso->program_counter = 0;
-            //pcb_proceso->tabla_segmentos=pedir tabla;
+            pcb_proceso->tabla_segmentos = carga_tabla_segmentos_pcb(segmentos);
             //pcb_proceso->registros_cpu=buscar registros;
             pcb_proceso->instrucciones = instrucciones;
 
@@ -35,42 +47,13 @@ static void procesar_conexion(void* void_args) {
                 log_info(logger, "Estas en la opcion de recibir INSTRUCCIONES");
                 if(!recv_instrucciones(cliente_fd, &instrucciones)) {
                     log_error(logger,"Hubo un error al recuperar la lista de instrucciones");
-                }else {
-                    log_info(logger,"Se recibio la informacion con exito");
-                    log_list_of_chars(logger, instrucciones);
-                    log_info(logger,"");
                 }
                 break;
             case SEGMENTOS:
                 log_info(logger, "Estas en la opcion de recibir SEGMENTOS");
                 if(!recv_segmentos(cliente_fd, &segmentos)) {
                     log_error(logger,"Hubo un error al recuperar la lista de segmentos");
-                }else {
-                    log_info(logger,"Se recibio la informacion con exito");
-                    log_list_of_chars(logger, segmentos);
-                    log_info(logger,"");
                 }
-                break;
-            case PCB_KERNEL: 
-                log_info(logger, "Estas en la opcion de recibir un PCB");
-                    if(!recv_pcb(cliente_fd, &pcb)) {
-                        log_error(logger,"Hubo un error al recuperar el pcb");
-                    }else {
-                        log_info(logger,"Se recibio la informacion con exito");
-                        log_info(logger,"PCB - ID: %d", pcb->id_proceso);
-                        log_info(logger,"PCB - PROGRAM COUNTER: %d", pcb->program_counter);
-                        log_info(logger,"PCB - TABLA DE SEGMENTOS: %d", pcb->tabla_segmentos);
-                        log_info(logger,"PCB - REGISTRO AX: %d", pcb->registro_AX);
-                        log_info(logger,"PCB - REGISTRO BX: %d", pcb->registro_BX);
-                        log_info(logger,"PCB - REGISTRO CX: %d", pcb->registro_CX);
-                        log_info(logger,"PCB - REGISTRO DX: %d", pcb->registro_DX);
-                        cantidad_instrucciones = list_size(pcb->instrucciones);
-                        for(size_t i = 0; i < cantidad_instrucciones; i++) {
-                            char* instruccion = list_get(pcb->instrucciones,i);
-                            log_info(logger,instruccion);
-                        }
-                        log_info(logger,"");
-                    }
                 break;
             case -1:
                 log_error(logger, "el cliente se desconecto. Terminando servidor");
