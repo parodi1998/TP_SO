@@ -51,16 +51,10 @@ void log_list_of_chars(t_log* logger, t_list* list);
 void log_pcb(t_log* logger, t_pcb* pcb);
 
 /**
- * Funciones para comunicacion entre conso y kernel
+ * Funciones para comunicacion entre consola y kernel
  * */
-bool send_instrucciones(int fd, t_list* instrucciones);
-bool recv_instrucciones(int fd, t_list** instrucciones);
-
-/**
- * Funciones para comunicacion entre conso y kernel
- * */
-bool send_segmentos(int fd, t_list* segmentos);
-bool recv_segmentos(int fd, t_list** segmentos);
+bool send_instrucciones_y_segmentos(int fd, t_list* instrucciones, t_list* segmentos);
+bool recv_instrucciones_y_segmentos(int fd, t_list** instrucciones, t_list** segmentos);
 
 /**
  * Funciones para enviar y recibir un PCB

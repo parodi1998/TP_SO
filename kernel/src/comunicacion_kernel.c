@@ -28,7 +28,8 @@ static void procesar_conexion(void* void_args) {
 
     while (cliente_fd != -1) {
 
-        if(!recibir_operacion(&codigo, cliente_fd)){
+        if (recv(cliente_fd, &codigo, sizeof(op_code), 0) != sizeof(op_code)) {
+            // Una vez que recibimos las instrucciones y los segmentos, creamos el PCB y lo ponemos en la cola de ready
             contador++;
             pcb_proceso = malloc(sizeof(t_pcb));
             pcb_proceso->id_proceso = contador;
@@ -39,20 +40,12 @@ static void procesar_conexion(void* void_args) {
 
             procesoANew(pcb_proceso);
             break;
-            
         }
 
         switch (codigo) {
-            case INSTRUCCIONES:
-                log_info(logger, "Estas en la opcion de recibir INSTRUCCIONES");
-                if(!recv_instrucciones(cliente_fd, &instrucciones)) {
-                    log_error(logger,"Hubo un error al recuperar la lista de instrucciones");
-                }
-                break;
-            case SEGMENTOS:
-                log_info(logger, "Estas en la opcion de recibir SEGMENTOS");
-                if(!recv_segmentos(cliente_fd, &segmentos)) {
-                    log_error(logger,"Hubo un error al recuperar la lista de segmentos");
+            case INSTRUCCIONES_Y_SEGMENTOS:
+                if(!recv_instrucciones_y_segmentos(cliente_fd, &instrucciones, &segmentos)) {
+                    log_error(logger,"Hubo un error al recuperar la lista de instrucciones y segmentos");
                 }
                 break;
             case -1:

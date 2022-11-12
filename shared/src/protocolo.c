@@ -166,43 +166,46 @@ bool send_TAM(int fd, uint32_t parametro1) {
 /**
  * Consola -> Kernel: Envio y recepcion de Instrucciones
  * */
-static size_t calcular_tamanio_informacion(t_list* instrucciones, size_t cantidad_instrucciones) {
+static size_t calcular_tamanio_informacion_de_lista(t_list* lista, size_t size_lista) {
 	size_t tamanio_informacion;
-	if(list_is_empty(instrucciones)) {
+	if(list_is_empty(lista)) {
 		tamanio_informacion = 0;
 	} else {
-		for(size_t i = 0; i<cantidad_instrucciones; i++) {
-        	char* instruccion = list_get(instrucciones,i);
-        	tamanio_informacion += sizeof(size_t) + string_length(instruccion)+1;
+		for(size_t i = 0; i<size_lista; i++) {
+        	char* item = list_get(lista,i);
+        	tamanio_informacion += sizeof(size_t) + string_length(item)+1;
     	}
 	}
 	return tamanio_informacion;
 }
 
-static void* serializar_instrucciones(op_code codigo, size_t* size, t_list* instrucciones) {
-	/**
-	 * Tamanio de la informacion es cantad de instrucciones + la cantidad de espacio que necesito para las instruccioens
-	 * */
-    op_code cop = codigo;
+static void* serializar_instrucciones_y_segmentos(size_t* size, t_list* instrucciones, t_list* segmentos) {
+    op_code cop = INSTRUCCIONES_Y_SEGMENTOS;
 	size_t cantidad_instrucciones = list_size(instrucciones);
-	size_t tamanio_instrucciones = calcular_tamanio_informacion(instrucciones, cantidad_instrucciones);
-	size_t tamanio_informacion = sizeof(size_t) + tamanio_instrucciones;
-	*size = 
-		sizeof(op_code) + 		// codigo de operacion
-		sizeof(size_t) +  		// cantidad de informacion util
-		sizeof(size_t) +		// cantidad de instrucciones
-		tamanio_instrucciones;	// (largo de instruccion + instruccion) * cantidad de instrucciones 
+	size_t tamanio_instrucciones = calcular_tamanio_informacion_de_lista(instrucciones, cantidad_instrucciones);
+    size_t cantidad_segmentos = list_size(segmentos);
+    size_t tamanio_segmentos = calcular_tamanio_informacion_de_lista(segmentos, cantidad_segmentos);
+	size_t tamanio_informacion_total = 
+        sizeof(size_t) +            //cantidad instrucciones
+        tamanio_instrucciones +     //tamanio instrucciones
+        sizeof(size_t) +            //cantidad segmentos
+        tamanio_segmentos;          //tamanio segmentos
+	
+    *size = 
+		sizeof(op_code) + 		    // codigo de operacion
+		sizeof(size_t) +  		    // cantidad de informacion util
+		tamanio_informacion_total;	// informacion util
 
     void* stream = malloc(*size);
 	void* p = stream;
 
-	memcpy(p, &cop, sizeof(op_code)); // mando el codigo de operacion
+	memcpy(p, &cop, sizeof(op_code));
 	p += sizeof(op_code);
 
-    memcpy(p,&tamanio_informacion,sizeof(size_t)); // mando el tamaño de toda la info a recibir
+    memcpy(p,&tamanio_informacion_total,sizeof(size_t)); 
 	p += sizeof(size_t);
 
-	memcpy(p,&cantidad_instrucciones,sizeof(size_t)); // mando la cantidad de instrucciones
+	memcpy(p,&cantidad_instrucciones,sizeof(size_t)); 
 	p += sizeof(size_t);
 
 	for(size_t i = 0; i<cantidad_instrucciones; i++) {
@@ -214,15 +217,31 @@ static void* serializar_instrucciones(op_code codigo, size_t* size, t_list* inst
 		p += tamanio_instruccion;
     }
 
+    memcpy(p,&cantidad_segmentos,sizeof(size_t));
+	p += sizeof(size_t);
+
+	for(size_t i = 0; i<cantidad_segmentos; i++) {
+        char* segmento = list_get(segmentos,i);
+		size_t tamanio_segmento = string_length(segmento)+1;
+		memcpy(p,&tamanio_segmento,sizeof(size_t));
+		p += sizeof(size_t);
+		memcpy(p,segmento,tamanio_segmento);
+		p += tamanio_segmento;
+    }
+
     return stream;
 }
 
-static void deserializar_instrucciones(void* stream, t_list** instrucciones) {
+static void deserializar_instrucciones_y_segmentos(void* stream, t_list** instrucciones, t_list** segmentos) {
 	// se supone que si llegue aca, ya saque el codigo de operacion del paquete
 	size_t cantidad_instrucciones;
 	t_list* instrucciones_aux = list_create();
-	void* p = stream;
-	memcpy(&cantidad_instrucciones, p, sizeof(size_t));	
+    size_t cantidad_segmentos;
+	t_list* segmentos_aux = list_create();
+	
+    void* p = stream;
+	
+    memcpy(&cantidad_instrucciones, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
 	for(size_t i = 0; i<cantidad_instrucciones; i++) {
@@ -234,13 +253,28 @@ static void deserializar_instrucciones(void* stream, t_list** instrucciones) {
 		p += tamanio_instruccion;
 		list_add(instrucciones_aux, instruccion);
     }
+
+    memcpy(&cantidad_segmentos, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+	for(size_t i = 0; i<cantidad_segmentos; i++) {
+		size_t tamanio_segmento;
+		memcpy(&tamanio_segmento, p, sizeof(size_t));
+		p += sizeof(size_t);
+		char* segmento = malloc(tamanio_segmento);
+		memcpy(segmento, p, tamanio_segmento);
+		p += tamanio_segmento;
+		list_add(segmentos_aux, segmento);
+    }
+
 	*instrucciones = instrucciones_aux;
+    *segmentos = segmentos_aux;
 }
 
-bool send_instrucciones(int fd, t_list* instrucciones) {
+bool send_instrucciones_y_segmentos(int fd, t_list* instrucciones, t_list* segmentos) {
     size_t size;
-    void* stream = serializar_instrucciones(INSTRUCCIONES, &size, instrucciones);
-    if (send(fd, stream, size, 0) == -1) {
+    void* stream = serializar_instrucciones_y_segmentos(&size, instrucciones, segmentos);
+    if (send(fd, stream, size, 0) != size) {
         free(stream);
         return false;
     }
@@ -248,7 +282,7 @@ bool send_instrucciones(int fd, t_list* instrucciones) {
     return true;
 }
 
-bool recv_instrucciones(int fd, t_list** instrucciones) {
+bool recv_instrucciones_y_segmentos(int fd, t_list** instrucciones, t_list** segmentos) {
     // tamanio total del stream    
     size_t size;
     if (recv(fd, &size, sizeof(size_t), 0) != sizeof(size_t)) {
@@ -262,15 +296,16 @@ bool recv_instrucciones(int fd, t_list** instrucciones) {
     }
 
     t_list* instrucciones_aux; // el malloc lo realiza la funcion deserializar
+    t_list* segmentos_aux; // el malloc lo realiza la funcion deserializar
 	
-    deserializar_instrucciones(stream, &instrucciones_aux);
+    deserializar_instrucciones_y_segmentos(stream, &instrucciones_aux, &segmentos_aux);
 
     *instrucciones = instrucciones_aux;
+    *segmentos = segmentos_aux;
 
     free(stream);
     return true;
 }
-
 
 /**
  * PCB: envio y recepcion
@@ -280,7 +315,7 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 
     op_code cop = PCB_KERNEL;
 	size_t cantidad_instrucciones = list_size(pcb->instrucciones);
-	size_t tamanio_instrucciones = calcular_tamanio_informacion(pcb->instrucciones, cantidad_instrucciones);
+	size_t tamanio_instrucciones = calcular_tamanio_informacion_de_lista(pcb->instrucciones, cantidad_instrucciones);
 	size_t tamanio_pcb = 7 * sizeof(size_t) + sizeof(t_estado_pcb) + tamanio_instrucciones;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
@@ -420,45 +455,6 @@ bool recv_pcb(int fd, t_pcb** pcb) {
     deserializar_pcb(stream, &pcb_aux);
 
     *pcb = pcb_aux;
-
-    free(stream);
-    return true;
-}
-
-
-static void* serializar_segmentos(size_t* size, t_list* segmentos) {
-    serializar_instrucciones(SEGMENTOS, size, segmentos);
-}
-
-bool send_segmentos(int fd, t_list* segmentos) {
-    size_t size;
-    void* stream = serializar_segmentos(&size, segmentos);
-    if (send(fd, stream, size, 0) == -1) {
-        free(stream);
-        return false;
-    }
-    free(stream);
-    return true;
-}
-
-bool recv_segmentos(int fd, t_list** segmentos) {
-    // tamanio total del stream    
-    size_t size;
-    if (recv(fd, &size, sizeof(size_t), 0) != sizeof(size_t)) {
-        return false;
-    }
-    // recibe TODO el stream
-    void* stream = malloc(size);
-    if (recv(fd, stream, size, 0) != size) {
-        free(stream);
-        return false;
-    }
-
-    t_list* instrucciones_aux; // el malloc lo realiza la funcion deserializar
-	
-    deserializar_instrucciones(stream, &instrucciones_aux);
-
-    *segmentos = instrucciones_aux;
 
     free(stream);
     return true;

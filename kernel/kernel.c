@@ -42,16 +42,7 @@ int main(int argc, char** argv){
         return EXIT_SUCCESS;
     }
 
-    int kernel_server_fd = 0;
-    if(!iniciar_kernel(&kernel_server_fd)) {
-        log_error(logger,"No se pudo generar iniciar el proceso kernel");
-        terminar_programa();
-        return EXIT_FAILURE;
-    }
-
-	log_info(logger, "Servidor listo para recibir al cliente");
-    while (server_escuchar(logger, "kernel", kernel_server_fd));    
-
+    /*
     int fd_cpu_dispatch = 0;
     if (!generar_conexiones_cpu(logger, config_kernel->ip_cpu, config_kernel->puerto_cpu_dispatch, &fd_cpu_dispatch)) {
     		terminar_programa();
@@ -62,6 +53,17 @@ int main(int argc, char** argv){
       		terminar_programa();
       		return EXIT_FAILURE;
      }
+*/
+
+    int kernel_server_fd = 0;
+    if(!iniciar_kernel(&kernel_server_fd)) {
+        log_error(logger,"No se pudo generar iniciar el proceso kernel");
+        terminar_programa();
+        return EXIT_FAILURE;
+    }
+
+	log_info(logger, "Servidor listo para recibir al cliente");
+    while (server_escuchar(logger, "kernel", kernel_server_fd));    
 
     liberar_conexion(&kernel_server_fd);
     terminar_programa();

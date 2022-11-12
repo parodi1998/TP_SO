@@ -54,17 +54,9 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    // Mando las instrucciones
-    if(!send_instrucciones(fd, instrucciones)) {
-        log_error(logger,"Hubo un error enviando la informacion al kernel");
-    } else {
-        log_info(logger,"La informacion fue enviada con exito al kernel");
-    }
-
-    // Mando los segmentos
     t_list* segmentos = config_consola->segmentos;
 
-    if(!send_segmentos(fd, segmentos)) {
+    if(!send_instrucciones_y_segmentos(fd, instrucciones, segmentos)) {
         log_error(logger,"Hubo un error enviando la informacion al kernel");
     } else {
         log_info(logger,"La informacion fue enviada con exito al kernel");
