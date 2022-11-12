@@ -175,7 +175,9 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
     op_code cop = PCB_KERNEL;
 	size_t cantidad_instrucciones = list_size(pcb->instrucciones);
 	size_t tamanio_instrucciones = calcular_tamanio_informacion_de_lista(pcb->instrucciones, cantidad_instrucciones);
-	size_t tamanio_pcb = 7 * sizeof(size_t) + sizeof(t_estado_pcb) + tamanio_instrucciones;
+    size_t cantidad_segmentos = list_size(pcb->tabla_segmentos);
+	size_t tamanio_segmentos = 2 * sizeof(size_t) * cantidad_segmentos;
+	size_t tamanio_pcb = 7 * sizeof(size_t) + sizeof(t_estado_pcb) + tamanio_instrucciones + tamanio_segmentos;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
 		sizeof(size_t) +  		    // tamanio total del pcb
@@ -185,8 +187,9 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
         sizeof(size_t) +		    // pcb.registro_BX 
         sizeof(size_t) +		    // pcb.registro_CX 
         sizeof(size_t) +		    // pcb.registro_DX
-        sizeof(size_t) +		    // pcb.tabla_segmentos
+        sizeof(size_t) +		    // cantidad segmentos
         sizeof(t_estado_pcb) +		// pcb.estado
+        tamanio_segmentos +         // 2 size_t * cantidad segmentos
 		sizeof(size_t) +		    // cantidad de instrucciones
 		tamanio_instrucciones;	    // (largo de instruccion + instruccion) * cantidad de instrucciones 
 
@@ -205,23 +208,31 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
     memcpy(p,&pcb->program_counter,sizeof(size_t)); // guardo el program_counter del pcb
 	p += sizeof(size_t);
 
-    memcpy(p,&pcb->tabla_segmentos,sizeof(size_t)); // guardo el tabla_paginas del pcb
+    memcpy(p,&pcb->registro_AX,sizeof(size_t)); // guardo el registro_AX del pcb
 	p += sizeof(size_t);
 
-    memcpy(p,&pcb->registro_AX,sizeof(size_t)); // guardo el tabla_paginas del pcb
+    memcpy(p,&pcb->registro_BX,sizeof(size_t)); // guardo el registro_BX del pcb
 	p += sizeof(size_t);
 
-    memcpy(p,&pcb->registro_BX,sizeof(size_t)); // guardo el tabla_paginas del pcb
+    memcpy(p,&pcb->registro_CX,sizeof(size_t)); // guardo el registro_CX del pcb
 	p += sizeof(size_t);
 
-    memcpy(p,&pcb->registro_CX,sizeof(size_t)); // guardo el tabla_paginas del pcb
-	p += sizeof(size_t);
-
-    memcpy(p,&pcb->registro_DX,sizeof(size_t)); // guardo el tabla_paginas del pcb
+    memcpy(p,&pcb->registro_DX,sizeof(size_t)); // guardo el registro_DX del pcb
 	p += sizeof(size_t);
 
     memcpy(p,&pcb->estado,sizeof(t_estado_pcb)); // guardo el estado del pcb
 	p += sizeof(t_estado_pcb);
+
+    memcpy(p,&cantidad_segmentos,sizeof(size_t)); // guardo la cantidad_segmentos del pcb
+	p += sizeof(size_t);
+
+    for(size_t i = 0; i<cantidad_segmentos; i++) {
+        t_pcb_segmentos* segmento = list_get(pcb->tabla_segmentos,i);
+        memcpy(p,segmento,sizeof(size_t)); // guardo el tamanio_segmento
+	    p += sizeof(size_t);
+        memcpy(p,segmento+sizeof(size_t),sizeof(size_t)); // guardo el id_tabla_paginas
+	    p += sizeof(size_t);
+    }
 
     memcpy(p,&cantidad_instrucciones,sizeof(size_t)); // guardo la cantidad de instrucciones
 	p += sizeof(size_t);
@@ -241,17 +252,16 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 static void deserializar_pcb(void* stream, t_pcb** pcb) {
     // se supone que si llegue aca, ya saque el codigo de operacion del paquete
 	size_t cantidad_instrucciones;
+    size_t cantidad_segmentos;
     t_pcb* pcb_aux = malloc(sizeof(t_pcb));
 	t_list* instrucciones_aux = list_create();
+    t_list* segmentos_aux = list_create();
 	void* p = stream;
 
     memcpy(&pcb_aux->id_proceso, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
     memcpy(&pcb_aux->program_counter, p, sizeof(size_t));	
-	p += sizeof(size_t);
-
-    memcpy(&pcb_aux->tabla_segmentos, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
     memcpy(&pcb_aux->registro_AX, p, sizeof(size_t));	
@@ -269,6 +279,22 @@ static void deserializar_pcb(void* stream, t_pcb** pcb) {
     memcpy(&pcb_aux->estado, p, sizeof(t_estado_pcb));	
 	p += sizeof(t_estado_pcb);
 
+    memcpy(&cantidad_segmentos, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    for(size_t i = 0; i<cantidad_segmentos; i++) {
+		size_t tamanio_segmento;
+        size_t id_tabla_paginas;
+		memcpy(&tamanio_segmento, p, sizeof(size_t));
+		p += sizeof(size_t);
+        memcpy(&id_tabla_paginas, p, sizeof(size_t));
+		p += sizeof(size_t);
+		t_pcb_segmentos* segmento_pcb = malloc(sizeof(t_pcb_segmentos));
+        segmento_pcb->id_tabla_paginas = id_tabla_paginas;
+        segmento_pcb->tamanio_segmento = tamanio_segmento;
+        list_add(segmentos_aux, segmento_pcb);
+    }
+
 	memcpy(&cantidad_instrucciones, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
@@ -282,6 +308,7 @@ static void deserializar_pcb(void* stream, t_pcb** pcb) {
 		list_add(instrucciones_aux, instruccion);
     }
 	pcb_aux->instrucciones = instrucciones_aux;
+    pcb_aux->tabla_segmentos = segmentos_aux;
     *pcb = pcb_aux;
 }
 
