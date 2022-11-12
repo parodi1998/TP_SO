@@ -62,7 +62,7 @@ typedef struct{
 } t_segmento;
 
 typedef struct {
-	t_list* instrucciones;
+	char* instrucciones;
 	int program_counter;
 	registros reg_general;
 	char * io_dispositivo;
@@ -73,7 +73,7 @@ typedef struct {
 
 typedef struct t_pcb{
 	uint32_t id_proceso;
-	t_list* instrucciones;
+	char* instrucciones;
 	uint32_t program_counter;
 	uint32_t registro_AX;
 	uint32_t registro_BX;

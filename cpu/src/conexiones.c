@@ -6,6 +6,7 @@
 int kernel = 1;
 int interrumpir = 0;
 sem_t* comunicacion_kernel;
+int alfa = 0;
 
 char * concatenar(char* palabra1, char* palabra2)
 {
@@ -70,7 +71,8 @@ char * concatenar(char* palabra1, char* palabra2)
 
 void esperarInterrupcion(){
 	while(interrumpir == 0){
-		int socket_interrupcion = conexion_Server(2, get_puerto_escucha_interrupt());
+		int socket_interrupcion;
+		//socket_interrupcion = conexion_Server(2, get_puerto_escucha_interrupt());
 		if (socket_interrupcion > 0)
 		{
 			interrumpe();
@@ -86,7 +88,7 @@ t_contexto_ejecucion iniciar_proceso(t_pcb pcb1){
 	   /* Create independent threads each of which will execute function */
 
 	    //FUNCION DE PRUEBA
-	  //  int start_prueba(void){
+
 
 	    	t_contexto_ejecucion  contexto_ejecucion;
 	    	contexto_ejecucion.estado = OPTIMO;
@@ -97,33 +99,40 @@ t_contexto_ejecucion iniciar_proceso(t_pcb pcb1){
 	    	contexto_ejecucion.reg_general.cx = pcb1.registro_CX;
 	    	contexto_ejecucion.reg_general.dx = pcb1.registro_DX;
 
-	    	seguir_instrucciones(&contexto_ejecucion);
 
 
-	   iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
-	    iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion));
 
-
+	   // 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
+	    	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion));
 
 
 	    pthread_join( thread2, NULL);
 	    interrumpir = 1;
-	    pthread_join( thread1, NULL);
-	    printf("Valor AX: %d", contexto_ejecucion.reg_general.ax);
-	    return contexto_ejecucion;
+	  // pthread_join( thread1, NULL);
+	   return contexto_ejecucion;
 }
 
 void ciclo_recibir_instruccines(){
 	int error = 0;
 	int recibir_instrucciones;
 	while (error == 0){
-		recibir_instrucciones = conexion_Server(2, get_puerto_memoria_dispatch);
-		if (recibir_instrucciones < 0){
-			error = 1;
-		}
+	//	recibir_instrucciones = conexion_Server(2, get_puerto_memoria_dispatch);
+		//if (recibir_instrucciones < 0){
+			//error = 1;
+		//}
 		t_pcb pcb1; //SE OBTIENE
+
+			pcb1.estado = "OPTIMO";
+			pcb1.id_proceso = 5;
+			pcb1.instrucciones = "SET AX 2\nSET BX 4\nADD AX BX\nEXIT\n";
+			pcb1.program_counter = 1;
+			pcb1.registro_AX = 0;
+			pcb1.registro_BX = 0;
+
 		t_contexto_ejecucion contexto = iniciar_proceso(pcb1);
 		//SE DEVUELVE contexto
+			alfa = pcb1.registro_AX;
+			error = 1;
 	}
 }
 
@@ -135,28 +144,30 @@ int start()
 	int conexion_Kernel_Interrupt;
 
 	char* valor;
-	t_log* logger;
+//	t_log* logger;
 
 	/* ---------------- LOGGING ---------------- */
-	logger = get_log();
-
-
-
-
+	//if (logger = get_log() <= 0){
+	//	printf("nop");
+	//	return -2;
+	//}
+	//else
+//	{
 	//CONECTAR A MEMORIA
-	log_info(logger, "Cargar memoria");
+	//log_info(logger, "Cargar memoria");
 
 
 	char* mensajeEnviar = "Acá voy";
 	char* mensajeRecibido;
 
 
-int regreso;
+	int regreso;
 //CONECTAR A KERNEL
 
 
 	ciclo_recibir_instruccines();
 
-	log_destroy(logger); //BORRAR LUEGO
-	return 0;
+//	log_destroy(logger); //BORRAR LUEGO
+	return alfa;
 }
+//}

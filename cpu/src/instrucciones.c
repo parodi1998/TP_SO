@@ -24,6 +24,7 @@ int unidades = 0;
 
 int continuar = 0;
 
+int cantidadCaracteres_Lista;
 
 void* inicializar()
 {
@@ -50,7 +51,7 @@ void* seguir_instrucciones(t_contexto_ejecucion* pcb_kernel){
 	int devolucion = OPTIMO;
 
 	todas_operaciones();
-
+	cantidadCaracteres_Lista = strlen(pcb_kernel->instrucciones);
 	contexto = &(pcb_kernel->reg_general);
 	do {
 		devolucion = ciclo_instrucciones(pcb_kernel);
@@ -58,7 +59,9 @@ void* seguir_instrucciones(t_contexto_ejecucion* pcb_kernel){
 	} while (devolucion == OPTIMO);
 
 
-
+	pcb_kernel->io_unidades = unidades;
+	pcb_kernel->io_dispositivo = io;
+	pcb_kernel->estado = devolucion;
 
 }
 
@@ -85,17 +88,36 @@ void* todas_operaciones(void){
 
 }
 
-char* fetch(t_contexto_ejecucion* pcb_kernel){
-	char* instruccion_en_bruto;
-	t_link_element* elemento = pcb_kernel->instrucciones->head;
-	int siguiente_instruccion = pcb_kernel->program_counter;
-	int total_instrucciones = pcb_kernel->instrucciones->elements_count;
-	for (int i = 1; i < siguiente_instruccion; i++) {
-		elemento = elemento->next;
-	}
-	instruccion_en_bruto = elemento->data;
+void fetch(t_contexto_ejecucion* pcb_kernel, char** instruccion){
+	char instruccion_en_bruto[15];
+	int instruccion_buscada = pcb_kernel->program_counter;
+	char * busqueda = pcb_kernel->instrucciones;
+	int caracter = 0;
+	int limite = 1;
 
-	return instruccion_en_bruto;
+
+	while(limite < instruccion_buscada && caracter < cantidadCaracteres_Lista){
+
+		if (busqueda[caracter] == '\n'){
+			limite++;
+		}
+		caracter++;
+	}
+	int caracter_ingresar = 0;
+
+
+
+	while(busqueda[caracter_ingresar + caracter] != '\n' && (caracter_ingresar + caracter) < cantidadCaracteres_Lista){
+
+			instruccion_en_bruto[caracter_ingresar] = busqueda[caracter_ingresar + caracter];
+
+			caracter_ingresar++;
+
+	}
+	instruccion_en_bruto[caracter_ingresar] = '\n';
+	*instruccion = instruccion_en_bruto;
+
+
 }
 
 int* buscaOperando(char* nombre){
@@ -159,7 +181,7 @@ void decodificar (char* instruccion_en_bruto){
 	int k = 0;
 	char letra;
 	for (int i = 0; i < a; i++){
-				if (  (instruccion_en_bruto[i] == ' ') || (instruccion_en_bruto[i] == '\0') )
+				if (  (instruccion_en_bruto[i] == ' ') || (instruccion_en_bruto[i] == '\n') )
 				{
 					buscador++;
 				}
@@ -312,8 +334,11 @@ int ciclo_instrucciones(t_contexto_ejecucion* pcb_kernel)
 {
 
 	int devuelve = OPTIMO;
+
 	//fetch
-	char *instruccion_en_bruto = fetch(pcb_kernel);
+	char *instruccion_en_bruto;
+	fetch(pcb_kernel, &instruccion_en_bruto);
+
 
 	//decodificar
 	decodificar(instruccion_en_bruto);
@@ -326,10 +351,8 @@ int ciclo_instrucciones(t_contexto_ejecucion* pcb_kernel)
 
 	//actualizar ciclo
 	pcb_kernel->program_counter ++;
-	pcb_kernel->io_unidades = unidades;
-	pcb_kernel->io_dispositivo = io;
-	pcb_kernel->estado = devuelve;
 
 	return devuelve;
+
 
 }
