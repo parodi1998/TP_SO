@@ -109,3 +109,8 @@ bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto,int
 
 	    return *fd_mod3 != 0;
 }
+
+bool generar_conexiones_cpu(t_log* logger, char* ip, char* puerto, int* fd_mod3) {
+    *fd_mod3 = crear_conexion(logger,"CPU", ip, puerto );
+    return *fd_mod3 != 0;
+}
