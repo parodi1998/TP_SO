@@ -3,26 +3,16 @@
 
 #include "commons.h"
 
-t_queue* colaNew;
-t_list* colaReady;
-t_list* listaExit;
+#define SEM_NOT_SHARE_BETWEEN_PROCESS 0
 
-pthread_mutex_t mutexNew;
-pthread_mutex_t mutexRdy;
-pthread_mutex_t mutexBlck;
-pthread_mutex_t mutexExe;
-pthread_mutex_t mutexExit;
-pthread_mutex_t multiprocesamiento;
+t_list* cola_new;
+// t_list* cola_exit;
 
-sem_t contadorNew;
-sem_t contadorReady;
-sem_t contadorExe;
-sem_t contadorBlock;
-sem_t multiprogramacion;
-sem_t largoPlazo;
+pthread_mutex_t mutex_new;
 
-void procesoANew (t_pcb* proceso);
-void hiloNew_Ready();
-t_pcb* sacarDeNew();
+sem_t contador_new;
+sem_t sem_largo_plazo_new;
+
+void meter_proceso_en_new(t_pcb* proceso);
 
 #endif

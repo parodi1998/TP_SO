@@ -30,15 +30,15 @@ static void procesar_conexion(void* void_args) {
 
         if (recv(cliente_fd, &codigo, sizeof(op_code), 0) != sizeof(op_code)) {
             // Una vez que recibimos las instrucciones y los segmentos, creamos el PCB y lo ponemos en la cola de ready
-            contador++;
+            generador_pcb_id++;
             pcb_proceso = malloc(sizeof(t_pcb));
-            pcb_proceso->id_proceso = contador;
+            pcb_proceso->id_proceso = generador_pcb_id;
             pcb_proceso->program_counter = 0;
             carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
             //pcb_proceso->registros_cpu=buscar registros;
             pcb_proceso->instrucciones = instrucciones;
 
-            procesoANew(pcb_proceso);
+            meter_proceso_en_new(pcb_proceso);
             break;
         }
 
