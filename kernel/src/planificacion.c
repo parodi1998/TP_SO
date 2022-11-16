@@ -130,6 +130,7 @@ void meter_proceso_en_ready(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_ready);
 	actualizar_estado_proceso(logger, proceso, PCB_READY);
 	list_add(cola_ready, proceso);
+	log_procesos_en_ready(logger, cola_ready, config_kernel->algoritmo_planificacion);
 	pthread_mutex_unlock(&mutex_ready);
 
 	sem_post(&contador_ready);
@@ -148,7 +149,7 @@ t_pcb* sacar_proceso_de_ready(uint32_t index_proceso) {
 
 void hilo_planificador_corto_plazo_ready() {
 	while(1) {
-		
+		sem_wait(&sem_cpu_libre);
 		sem_wait(&sem_corto_plazo_ready);
 		
 		char* planificador = config_kernel->algoritmo_planificacion;
@@ -156,19 +157,48 @@ void hilo_planificador_corto_plazo_ready() {
 		
 		t_pcb* proceso = sacar_proceso_de_ready(indice);
 		
-		//wait(mutex_comunicacion_kernel_memoria)
-		//send_proceso_a_memoria(proceso)				// memoria inicializa sus estructuras necesarias
-		//proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
-		//signal(mutex_comunicacion_kernel_memoria)
-
-		sem_post(&sem_comienza_timer_quantum);
-		sem_wait(&sem_finaliza_timer_quantum);
-		
-		meter_proceso_en_exit(proceso);
-		//meter_proceso_en_ready(proceso)
+		meter_proceso_en_execute(proceso);
 	}
 }
 
+void meter_proceso_en_execute(t_pcb* proceso) {
+	pthread_mutex_lock(&mutex_execute);
+	actualizar_estado_proceso(logger, proceso, PCB_EXECUTE);
+	list_add(cola_execute, proceso);
+	pthread_mutex_unlock(&mutex_execute);
+	
+	sem_post(&contador_execute);
+	sem_post(&sem_corto_plazo_execute);
+}
+
+t_pcb* sacar_proceso_de_execute() {
+	sem_wait(&contador_execute);			
+
+	pthread_mutex_lock(&mutex_execute);
+	t_pcb* proceso = list_remove(cola_execute, 0);
+	pthread_mutex_unlock(&mutex_execute);
+	
+	return proceso;
+}
+
+void hilo_planificador_corto_plazo_execute() {
+	while(1) {
+		sem_wait(&sem_corto_plazo_execute);
+
+		t_pcb* proceso = sacar_proceso_de_execute();
+		
+		sem_post(&sem_comienza_timer_quantum);
+		sem_wait(&sem_finaliza_timer_quantum);
+
+		meter_proceso_en_exit(proceso);
+
+		sem_post(&sem_cpu_libre);
+	}
+}
+
+/**
+ * Timer de quantum
+ */
 void hilo_timer_contador_quantum() {
 	while(1) {
 		sem_wait(&sem_comienza_timer_quantum);

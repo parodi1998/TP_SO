@@ -6,6 +6,7 @@
 typedef enum {
 	PCB_NEW,
     PCB_READY,
+    PCB_EXECUTE,
     PCB_EXIT
 } t_estado_pcb;
 
@@ -40,6 +41,7 @@ void liberar_pcb(t_pcb* proceso);
  */
 
 void log_proceso_en_new(t_log* logger, t_pcb* proceso);
+void log_procesos_en_ready(t_log* logger, t_list* procesos, char* algoritmo);
 void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso);
 void actualizar_estado_proceso(t_log* logger, t_pcb* proceso, t_estado_pcb nuevo_estado);
 

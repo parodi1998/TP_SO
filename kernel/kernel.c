@@ -4,12 +4,14 @@ void inicializar_listas() {
     generador_pcb_id = 0;
 	cola_new = list_create();
     cola_ready = list_create();
+    cola_execute = list_create();
     cola_exit = list_create();
 }
 
 void destruir_listas() {
     list_destroy_and_destroy_elements(cola_new,free);
     list_destroy_and_destroy_elements(cola_ready,free);
+    list_destroy_and_destroy_elements(cola_execute,free);
     list_destroy_and_destroy_elements(cola_exit,free);
 }
 
@@ -22,6 +24,11 @@ void inicializar_semaforos() {
     pthread_mutex_init(&mutex_ready, NULL);
 	sem_init(&contador_ready, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
 	sem_init(&sem_corto_plazo_ready, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    // execute
+    pthread_mutex_init(&mutex_execute, NULL);
+	sem_init(&contador_execute, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
+	sem_init(&sem_corto_plazo_execute, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_cpu_libre, SEM_NOT_SHARE_BETWEEN_PROCESS, 1);
     //exit
     pthread_mutex_init(&mutex_exit, NULL);
 	sem_init(&contador_exit, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
@@ -40,6 +47,11 @@ void destruir_semaforos() {
     sem_destroy(&contador_ready);
     sem_destroy(&sem_corto_plazo_ready);
 
+    pthread_mutex_destroy(&mutex_execute);
+    sem_destroy(&contador_execute);
+    sem_destroy(&sem_corto_plazo_execute);
+    sem_destroy(&sem_cpu_libre);
+
     pthread_mutex_destroy(&mutex_exit);
     sem_destroy(&contador_exit);
     sem_destroy(&sem_largo_plazo_exit);
@@ -54,6 +66,9 @@ void inicializar_planificadores() {
 
     pthread_create(&hilo_corto_plazo_ready, NULL, (void*)hilo_planificador_corto_plazo_ready, NULL);
 	pthread_detach(hilo_corto_plazo_ready);
+
+    pthread_create(&hilo_corto_plazo_execute, NULL, (void*)hilo_planificador_corto_plazo_execute, NULL);
+	pthread_detach(hilo_corto_plazo_execute);
 
     pthread_create(&hilo_largo_plazo_exit, NULL, (void*)hilo_planificador_largo_plazo_exit, NULL);
 	pthread_detach(hilo_largo_plazo_exit);

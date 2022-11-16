@@ -13,6 +13,9 @@ char* convertir_estado_pcb_a_string(t_estado_pcb estado) {
         case PCB_READY:
             string_append(&estado_string, "READY");
             break;
+        case PCB_EXECUTE:
+            string_append(&estado_string, "EXECUTE");
+            break;
         case PCB_EXIT:
             string_append(&estado_string, "EXIT");
             break;     
@@ -47,12 +50,46 @@ void log_pcb(t_log* logger, t_pcb* pcb) {
     }
 }
 
+static char* lista_de_pids(t_list* procesos) {
+    
+    void* pid_as_string(void* proceso) {
+        t_pcb* p = proceso;
+        return (void*) string_itoa(p->id_proceso);
+    }
+
+    t_list* pids_list = list_map(procesos,pid_as_string);
+    char* pids_string = string_new();
+
+    for(uint32_t index = 0; index < list_size(pids_list); index++) {
+            char* pid = list_get(pids_list,index);
+            if(index == list_size(pids_list) - 1) {
+                string_append_with_format(&pids_string, "%s",pid);
+            } else {
+                string_append_with_format(&pids_string, "%s,",pid);
+            }   
+        }
+
+    free(pids_list);
+    return pids_string;
+}
+
 /**
  * Logs obligatiorios
  */
 
 void log_proceso_en_new(t_log* logger, t_pcb* proceso) {
     log_info(logger, "Se crea el proceso <%d> en NEW", proceso->id_proceso);
+}
+
+void log_procesos_en_ready(t_log* logger, t_list* procesos, char* algoritmo) {
+
+    char* pids = lista_de_pids(procesos);
+
+    if(string_equals_ignore_case(algoritmo,"FEEDBACK")) {
+		log_info(logger, "Cola Ready <%s>: [%s]", algoritmo, pids); //aca tendria 2 colas de ready
+	} else {
+        log_info(logger, "Cola Ready <%s>: [%s]", algoritmo, pids);
+	}
 }
 
 void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso) {
