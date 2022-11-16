@@ -26,6 +26,9 @@ void inicializar_semaforos() {
     pthread_mutex_init(&mutex_exit, NULL);
 	sem_init(&contador_exit, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
 	sem_init(&sem_largo_plazo_exit, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    // quantum
+    sem_init(&sem_comienza_timer_quantum, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_finaliza_timer_quantum, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
 }
 
 void destruir_semaforos() {
@@ -40,6 +43,9 @@ void destruir_semaforos() {
     pthread_mutex_destroy(&mutex_exit);
     sem_destroy(&contador_exit);
     sem_destroy(&sem_largo_plazo_exit);
+
+    sem_destroy(&sem_comienza_timer_quantum);
+    sem_destroy(&sem_finaliza_timer_quantum);
 }
 
 void inicializar_planificadores() {
@@ -51,6 +57,9 @@ void inicializar_planificadores() {
 
     pthread_create(&hilo_largo_plazo_exit, NULL, (void*)hilo_planificador_largo_plazo_exit, NULL);
 	pthread_detach(hilo_largo_plazo_exit);
+
+    pthread_create(&hilo_cuenta_quantum, NULL, (void*)hilo_timer_contador_quantum, NULL);
+	pthread_detach(hilo_cuenta_quantum);
 }
 
 void inicializar_todo() {

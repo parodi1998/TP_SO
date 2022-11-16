@@ -161,7 +161,25 @@ void hilo_planificador_corto_plazo_ready() {
 		//proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
 		//signal(mutex_comunicacion_kernel_memoria)
 
+		sem_post(&sem_comienza_timer_quantum);
+		sem_wait(&sem_finaliza_timer_quantum);
+		
 		meter_proceso_en_exit(proceso);
 		//meter_proceso_en_ready(proceso)
+	}
+}
+
+void hilo_timer_contador_quantum() {
+	while(1) {
+		sem_wait(&sem_comienza_timer_quantum);
+
+		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		
+		sleep(quantum_in_seconds);
+
+		// enviar_interrupcion_a_cpu();
+
+		//imagino que esto podria estar en un hilo que se encargue solo de enviar la señal interrupt a cpu
+		sem_post(&sem_finaliza_timer_quantum);
 	}
 }
