@@ -118,6 +118,6 @@ void hilo_planificador_largo_plazo_exit() {
 		t_pcb* proceso = sacar_proceso_de_exit();
 
 		// avisar a consola
-		// free pcb
+		liberar_pcb(proceso);
 	}
 }

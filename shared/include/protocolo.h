@@ -33,6 +33,7 @@ typedef struct {
 void log_list_of_chars(t_log* logger, t_list* list);
 void log_pcb(t_log* logger, t_pcb* pcb);
 char* convertir_estado_pcb_a_string(t_estado_pcb estado);
+void liberar_pcb(t_pcb* proceso);
 
 /**
  * Logs obligatiorios

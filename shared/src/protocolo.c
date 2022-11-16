@@ -403,3 +403,12 @@ bool recv_pcb(int fd, t_pcb** pcb) {
     free(stream);
     return true;
 }
+
+void liberar_pcb(t_pcb* proceso) {
+    for(int index = 0; index < list_size(proceso->instrucciones); index++) {
+        free(list_get(proceso->instrucciones,index));
+    }
+    list_destroy(proceso->instrucciones);
+    list_destroy(proceso->tabla_segmentos);
+    free(proceso);
+}
