@@ -9,5 +9,6 @@
 
 void inicializar_listas();
 void inicializar_semaforos();
+void inicializar_planificadores();
 
 #endif

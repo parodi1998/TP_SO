@@ -1,5 +1,9 @@
 #include "../include/protocolo.h"
 
+/**
+ * Funciones utiles
+ */
+
 void log_list_of_chars(t_log* logger, t_list* list) {
     size_t size = list_size(list);
     for(size_t i = 0; i < size; i++) {
@@ -20,6 +24,42 @@ void log_pcb(t_log* logger, t_pcb* pcb) {
         t_pcb_segmentos* item = list_get(pcb->tabla_segmentos,i);
         log_info(logger,"Segmento %d tamanio %d id_tabla_paginas %d", i, *item, *(item+sizeof(size_t)));
     }
+}
+
+char* convertir_estado_pcb_a_string(t_estado_pcb estado) {
+    char* estado_string = string_new();
+    switch(estado) {
+        case PCB_NEW:
+            string_append(&estado_string, "NEW");
+            break;
+        case PCB_READY:
+            string_append(&estado_string, "READY");
+            break;
+        case PCB_EXIT:
+            string_append(&estado_string, "EXIT");
+            break;     
+        default:
+            string_append(&estado_string, "UNKNOWN");
+            break;  
+    }
+    return estado_string;
+}
+
+/**
+ * Logs obligatiorios
+ */
+
+void log_proceso_en_new(t_log* logger, t_pcb* proceso) {
+    log_info(logger, "Se crea el proceso <%d> en NEW", proceso->id_proceso);
+}
+
+void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso) {
+    int id = proceso->id_proceso;
+    char* estado_anterior = convertir_estado_pcb_a_string(proceso->estado);
+    char* estado_actual = convertir_estado_pcb_a_string(4);
+    log_info(logger, "PID: <%d> - Estado Anterior: <%s> - Estado Actual: <%s>", id, estado_anterior, estado_actual);
+    free(estado_anterior);
+    free(estado_actual);
 }
 
 /**

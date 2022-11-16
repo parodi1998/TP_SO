@@ -6,11 +6,7 @@
 typedef enum {
 	PCB_NEW,
     PCB_READY,
-    PCB_EXEC,
-    PCB_EXIT,
-    PCB_BLOCKED,
-    PCB_SUSPENDED_BLOCKED,
-    PCB_SUSPENDED_READY,
+    PCB_EXIT
 } t_estado_pcb;
 
 typedef struct {
@@ -35,6 +31,14 @@ typedef struct {
  * */
 void log_list_of_chars(t_log* logger, t_list* list);
 void log_pcb(t_log* logger, t_pcb* pcb);
+char* convertir_estado_pcb_a_string(t_estado_pcb estado);
+
+/**
+ * Logs obligatiorios
+ */
+
+void log_proceso_en_new(t_log* logger, t_pcb* proceso);
+void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso);
 
 /**
  * Funciones para comunicacion entre consola y kernel

@@ -4,12 +4,38 @@ void meter_proceso_en_new(t_pcb* proceso) {
 
 	pthread_mutex_lock(&mutex_new);
 	list_add(cola_new, proceso);
-	log_info(logger, "Se crea el proceso <%d> en NEW", proceso->id_proceso);
+	log_proceso_en_new(logger, proceso);
 	pthread_mutex_unlock(&mutex_new);
 
 	sem_post(&contador_new);
 	sem_post(&sem_largo_plazo_new);
 }
+
+/**
+ * Planificador Largo Plazo
+ * */
+void hilo_planificador_largo_plazo_new() {
+	
+	while(1) {
+		
+		sem_wait(&sem_largo_plazo_new);					// espera que le avisen que puede hacer algo
+		//wait(multiprogramacion)
+		char* planificador = "FIFO";
+		//uint32_t indice = indice_siguiente_proceso_segun(cola_new, planificador)
+		uint32_t indice = 0; //Aca deberiamos poner siempre Fifo
+		//t_pcb* proceso = sacar_proceso_de_new(indice);
+		
+		//wait(mutex_comunicacion_kernel_memoria)
+		//send_proceso_a_memoria(proceso)				// memoria inicializa sus estructuras necesarias
+		//proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
+		//signal(mutex_comunicacion_kernel_memoria)
+
+		//meter_proceso_en_ready(proceso)
+	}
+
+}
+
+
 /*
 t_pcb* sacarDeNew(){
 

@@ -1,25 +1,31 @@
 #include "include/kernel.h"
 
-void inicializar_listas(){
+void inicializar_listas() {
     generador_pcb_id = 0;
 	cola_new = list_create();
 }
 
-void inicializar_semaforos(){
+void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_new, NULL);
 	sem_init(&contador_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
 	sem_init(&sem_largo_plazo_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
 }
 
-int main(int argc, char** argv){
+void inicializar_planificadores() {
+	pthread_create(&hilo_largo_plazo_new, NULL, (void*)hilo_planificador_largo_plazo_new, NULL);
+	pthread_detach(hilo_largo_plazo_new);
+}
 
-    inicializar_listas();
-    inicializar_semaforos();
+int main(int argc, char** argv){
     
     if(!iniciar_programa()) {
         terminar_programa();
         return EXIT_SUCCESS;
     }
+
+    inicializar_listas();
+    inicializar_semaforos();
+    // inicializar_planificadores();
 
     /*
     int fd_cpu_dispatch = 0;
