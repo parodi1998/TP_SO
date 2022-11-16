@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 
     inicializar_listas();
     inicializar_semaforos();
-    // inicializar_planificadores();
+    inicializar_planificadores();
 
     /*
     int fd_cpu_dispatch = 0;

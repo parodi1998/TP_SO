@@ -5,6 +5,12 @@
 
 #define SEM_NOT_SHARE_BETWEEN_PROCESS 0
 
+typedef enum {
+	PLANIFICADOR_FIFO,
+    PLANIFICADOR_RR,
+    PLANIFICADOR_FEEDBACK
+} t_tipo_planificador;
+
 // colas
 t_list* cola_new;
 // t_list* cola_exit;
