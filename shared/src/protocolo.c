@@ -405,10 +405,7 @@ bool recv_pcb(int fd, t_pcb** pcb) {
 }
 
 void liberar_pcb(t_pcb* proceso) {
-    for(int index = 0; index < list_size(proceso->instrucciones); index++) {
-        free(list_get(proceso->instrucciones,index));
-    }
-    list_destroy(proceso->instrucciones);
-    list_destroy(proceso->tabla_segmentos);
+    list_destroy_and_destroy_elements(proceso->instrucciones,free);
+    list_destroy_and_destroy_elements(proceso->tabla_segmentos,free);
     free(proceso);
 }
