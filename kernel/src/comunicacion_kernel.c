@@ -37,7 +37,8 @@ static void procesar_conexion(void* void_args) {
             carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
             //pcb_proceso->registros_cpu=buscar registros;
             pcb_proceso->instrucciones = instrucciones;
-            pcb_proceso->estado = PCB_NEW;
+            pcb_proceso->estado_anterior = PCB_NEW;
+            pcb_proceso->estado_actual = PCB_NEW;
 
             meter_proceso_en_new(pcb_proceso);
             break;

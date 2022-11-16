@@ -18,7 +18,8 @@ typedef struct {
     size_t registro_CX;
     size_t registro_DX;
     t_list* tabla_segmentos;
-    t_estado_pcb estado;
+    t_estado_pcb estado_anterior;
+    t_estado_pcb estado_actual;
 } t_pcb;
 
 typedef struct {

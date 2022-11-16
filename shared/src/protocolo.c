@@ -4,28 +4,6 @@
  * Funciones utiles
  */
 
-void log_list_of_chars(t_log* logger, t_list* list) {
-    size_t size = list_size(list);
-    for(size_t i = 0; i < size; i++) {
-        char* item = list_get(list,i);
-        log_info(logger,item);
-    }
-}
-
-void log_pcb(t_log* logger, t_pcb* pcb) {
-    log_info(logger, "Imprimiendo PCB en logger");
-    log_info(logger, "PCB -> ID: %d", pcb->id_proceso);
-    log_info(logger, "PCB -> PC: %d", pcb->program_counter);
-    log_info(logger, "PCB -> INSTRUCCIONES:");
-    log_list_of_chars(logger, pcb->instrucciones);
-    log_info(logger, "PCB -> SEGMENTOS: No logro imprimirlos bien todavia");
-    size_t size = list_size(pcb->tabla_segmentos);
-    for(size_t i = 0; i < size; i++) {
-        t_pcb_segmentos* item = list_get(pcb->tabla_segmentos,i);
-        log_info(logger,"Segmento %d tamanio %d id_tabla_paginas %d", i, *item, *(item+sizeof(size_t)));
-    }
-}
-
 char* convertir_estado_pcb_a_string(t_estado_pcb estado) {
     char* estado_string = string_new();
     switch(estado) {
@@ -45,6 +23,30 @@ char* convertir_estado_pcb_a_string(t_estado_pcb estado) {
     return estado_string;
 }
 
+void log_list_of_chars(t_log* logger, t_list* list) {
+    size_t size = list_size(list);
+    for(size_t i = 0; i < size; i++) {
+        char* item = list_get(list,i);
+        log_info(logger,item);
+    }
+}
+
+void log_pcb(t_log* logger, t_pcb* pcb) {
+    log_info(logger, "Imprimiendo PCB en logger");
+    log_info(logger, "PCB -> ID: %d", pcb->id_proceso);
+    log_info(logger, "PCB -> PC: %d", pcb->program_counter);
+    log_info(logger, "PCB -> ESTADO_ANTERIOR: %s", convertir_estado_pcb_a_string(pcb->estado_anterior));
+    log_info(logger, "PCB -> ESTADO_ACTUAL: %s", convertir_estado_pcb_a_string(pcb->estado_actual));
+    log_info(logger, "PCB -> INSTRUCCIONES:");
+    log_list_of_chars(logger, pcb->instrucciones);
+    log_info(logger, "PCB -> SEGMENTOS: No logro imprimirlos bien todavia");
+    size_t size = list_size(pcb->tabla_segmentos);
+    for(size_t i = 0; i < size; i++) {
+        t_pcb_segmentos* item = list_get(pcb->tabla_segmentos,i);
+        log_info(logger,"Segmento %d tamanio %d id_tabla_paginas %d", i, *item, *(item+sizeof(size_t)));
+    }
+}
+
 /**
  * Logs obligatiorios
  */
@@ -55,8 +57,8 @@ void log_proceso_en_new(t_log* logger, t_pcb* proceso) {
 
 void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso) {
     int id = proceso->id_proceso;
-    char* estado_anterior = convertir_estado_pcb_a_string(proceso->estado);
-    char* estado_actual = convertir_estado_pcb_a_string(4);
+    char* estado_anterior = convertir_estado_pcb_a_string(proceso->estado_anterior);
+    char* estado_actual = convertir_estado_pcb_a_string(proceso->estado_actual);
     log_info(logger, "PID: <%d> - Estado Anterior: <%s> - Estado Actual: <%s>", id, estado_anterior, estado_actual);
     free(estado_anterior);
     free(estado_actual);
@@ -217,7 +219,7 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 	size_t tamanio_instrucciones = calcular_tamanio_informacion_de_lista(pcb->instrucciones, cantidad_instrucciones);
     size_t cantidad_segmentos = list_size(pcb->tabla_segmentos);
 	size_t tamanio_segmentos = 2 * sizeof(size_t) * cantidad_segmentos;
-	size_t tamanio_pcb = 7 * sizeof(size_t) + sizeof(t_estado_pcb) + tamanio_instrucciones + tamanio_segmentos;
+	size_t tamanio_pcb = 7 * sizeof(size_t) + 2 * sizeof(t_estado_pcb) + tamanio_instrucciones + tamanio_segmentos;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
 		sizeof(size_t) +  		    // tamanio total del pcb
@@ -228,7 +230,8 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
         sizeof(size_t) +		    // pcb.registro_CX 
         sizeof(size_t) +		    // pcb.registro_DX
         sizeof(size_t) +		    // cantidad segmentos
-        sizeof(t_estado_pcb) +		// pcb.estado
+        sizeof(t_estado_pcb) +		// pcb.estado_anterior
+        sizeof(t_estado_pcb) +      // pcb.estado_actual
         tamanio_segmentos +         // 2 size_t * cantidad segmentos
 		sizeof(size_t) +		    // cantidad de instrucciones
 		tamanio_instrucciones;	    // (largo de instruccion + instruccion) * cantidad de instrucciones 
@@ -260,7 +263,10 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
     memcpy(p,&pcb->registro_DX,sizeof(size_t)); // guardo el registro_DX del pcb
 	p += sizeof(size_t);
 
-    memcpy(p,&pcb->estado,sizeof(t_estado_pcb)); // guardo el estado del pcb
+    memcpy(p,&pcb->estado_anterior,sizeof(t_estado_pcb)); // guardo el estado anterior del pcb
+	p += sizeof(t_estado_pcb);
+
+    memcpy(p,&pcb->estado_actual,sizeof(t_estado_pcb)); // guardo el estado actual del pcb
 	p += sizeof(t_estado_pcb);
 
     memcpy(p,&cantidad_segmentos,sizeof(size_t)); // guardo la cantidad_segmentos del pcb
@@ -316,7 +322,10 @@ static void deserializar_pcb(void* stream, t_pcb** pcb) {
     memcpy(&pcb_aux->registro_DX, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
-    memcpy(&pcb_aux->estado, p, sizeof(t_estado_pcb));	
+    memcpy(&pcb_aux->estado_anterior, p, sizeof(t_estado_pcb));	
+	p += sizeof(t_estado_pcb);
+
+    memcpy(&pcb_aux->estado_actual, p, sizeof(t_estado_pcb));	
 	p += sizeof(t_estado_pcb);
 
     memcpy(&cantidad_segmentos, p, sizeof(size_t));	
