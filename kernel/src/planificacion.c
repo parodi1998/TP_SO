@@ -1,53 +1,9 @@
 #include "../include/planificacion.h"
 
-static t_tipo_planificador convertir_string_a_tipo_planificador(char* planificador_string) {
-	
-	t_tipo_planificador planificador;
-	
-	if(string_equals_ignore_case(planificador_string,"RR")) {
-		planificador = PLANIFICADOR_RR;
-	} else if(string_equals_ignore_case(planificador_string,"FEEDBACK")) {
-		planificador = PLANIFICADOR_FEEDBACK;
-	} else {
-		planificador = PLANIFICADOR_FIFO;
-	}
-    
-    return planificador;
-}
-
-static uint32_t calcular_indice_siguiente_proceso_fifo(t_list* lista) {
-	return 0;
-}
-
-static uint32_t calcular_indice_siguiente_proceso_rr(t_list* lista) {
-	return 0;
-}
-
-static uint32_t calcular_indice_siguiente_proceso_feedback(t_list* lista) {
-	return 0;
-}
-
-static uint32_t indice_siguiente_proceso_segun(t_list* lista, char* planificador_string) {
-	uint32_t indice;
-	t_tipo_planificador planificador = convertir_string_a_tipo_planificador(planificador_string);
-	switch(planificador){
-		PLANIFICADOR_FIFO:
-			indice = calcular_indice_siguiente_proceso_fifo(lista);
-			break;
-		PLANIFICADOR_RR:
-			indice = calcular_indice_siguiente_proceso_rr(lista);
-			break;
-		PLANIFICADOR_FEEDBACK:
-			indice = calcular_indice_siguiente_proceso_feedback(lista);
-			break;
-	}
-	return indice;
-}
-
 void meter_proceso_en_new(t_pcb* proceso) {
 
 	pthread_mutex_lock(&mutex_new);
-	list_add(cola_new, proceso);
+	queue_push(cola_new, proceso);
 	log_proceso_en_new(logger, proceso);
 	pthread_mutex_unlock(&mutex_new);
 
@@ -55,16 +11,15 @@ void meter_proceso_en_new(t_pcb* proceso) {
 	sem_post(&sem_largo_plazo_new);
 }
 
-t_pcb* sacar_proceso_de_new(uint32_t index_proceso) {
+t_pcb* sacar_proceso_de_new() {
 	sem_wait(&contador_new);			// si por casualidad esto se llama y no hay nada en new (no deberia pasar nunca) se bloquea
 
 	pthread_mutex_lock(&mutex_new);
-	t_pcb* proceso = list_remove(cola_new, index_proceso);
+	t_pcb* proceso = queue_pop(cola_new);
 	pthread_mutex_unlock(&mutex_new);
 	
 	return proceso;
 }
-
 
 /**
  * Planificador Largo Plazo
@@ -75,10 +30,8 @@ void hilo_planificador_largo_plazo_new() {
 		
 		sem_wait(&sem_largo_plazo_new);					// espera que le avisen que puede hacer algo
 		//wait(multiprogramacion)
-		char* planificador = "FIFO";
-		uint32_t indice = indice_siguiente_proceso_segun(cola_new, planificador);
 		
-		t_pcb* proceso = sacar_proceso_de_new(indice);
+		t_pcb* proceso = sacar_proceso_de_new();
 		
 		//wait(mutex_comunicacion_kernel_memoria)
 		//send_proceso_a_memoria(proceso)				// memoria inicializa sus estructuras necesarias
@@ -93,7 +46,7 @@ void hilo_planificador_largo_plazo_new() {
 void meter_proceso_en_exit(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_exit);
 	actualizar_estado_proceso(logger, proceso, PCB_EXIT);
-	list_add(cola_exit, proceso);
+	queue_push(cola_exit, proceso);
 	pthread_mutex_unlock(&mutex_exit);
 
 	sem_post(&contador_exit);
@@ -104,7 +57,7 @@ t_pcb* sacar_proceso_de_exit() {
 	sem_wait(&contador_exit);			
 
 	pthread_mutex_lock(&mutex_exit);
-	t_pcb* proceso = list_remove(cola_exit, 0);
+	t_pcb* proceso = queue_pop(cola_exit);
 	pthread_mutex_unlock(&mutex_exit);
 	
 	return proceso;
@@ -126,37 +79,108 @@ void hilo_planificador_largo_plazo_exit() {
  * Planificador Corto Plazo
  * */
 
-void meter_proceso_en_ready(t_pcb* proceso) {
+void meter_proceso_en_ready_fifo(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_ready);
+	pthread_mutex_lock(&mutex_ready_fifo);
 	actualizar_estado_proceso(logger, proceso, PCB_READY);
-	list_add(cola_ready, proceso);
-	log_procesos_en_ready(logger, cola_ready, config_kernel->algoritmo_planificacion);
+	queue_push(cola_ready_fifo, proceso);
+	log_procesos_en_ready(logger, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
+	pthread_mutex_unlock(&mutex_ready_fifo);
 	pthread_mutex_unlock(&mutex_ready);
 
-	sem_post(&contador_ready);
+	sem_post(&contador_ready_fifo);
+	sem_post(&sem_proceso_agregado_a_ready);
+}
+
+void meter_proceso_en_ready_rr(t_pcb* proceso) {
+	pthread_mutex_lock(&mutex_ready);
+	pthread_mutex_lock(&mutex_ready_rr);
+	actualizar_estado_proceso(logger, proceso, PCB_READY);
+	queue_push(cola_ready_rr, proceso);
+	log_procesos_en_ready(logger, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
+	pthread_mutex_unlock(&mutex_ready_rr);
+	pthread_mutex_unlock(&mutex_ready);
+
+	sem_post(&contador_ready_rr);
+	sem_post(&sem_proceso_agregado_a_ready);
+}
+
+void meter_proceso_en_ready_feedback(t_pcb* proceso) {
+	switch(proceso->estado_actual) {
+		case PCB_NEW: 
+			meter_proceso_en_ready_rr(proceso);
+			break;
+		case PCB_EXECUTE:
+			meter_proceso_en_ready_fifo(proceso);
+			break;
+		case PCB_BLOCK:
+			meter_proceso_en_ready_rr(proceso);
+			break;
+	}
+}
+
+void meter_proceso_en_ready(t_pcb* proceso) {
+	if(string_equals_ignore_case(config_kernel->algoritmo_planificacion,"FEEDBACK")) {
+		meter_proceso_en_ready_feedback(proceso);
+	} else if(string_equals_ignore_case(config_kernel->algoritmo_planificacion,"RR")) {
+		meter_proceso_en_ready_rr(proceso);
+	} else {
+		meter_proceso_en_ready_fifo(proceso);
+	}
+	sem_wait(&sem_proceso_agregado_a_ready);
 	sem_post(&sem_corto_plazo_ready);
 }
 
-t_pcb* sacar_proceso_de_ready(uint32_t index_proceso) {
-	sem_wait(&contador_ready);			
+t_pcb* sacar_proceso_de_ready_fifo() {
+	sem_wait(&contador_ready_fifo);			
 
 	pthread_mutex_lock(&mutex_ready);
-	t_pcb* proceso = list_remove(cola_ready, 0);
+	pthread_mutex_lock(&mutex_ready_fifo);
+	t_pcb* proceso = queue_pop(cola_ready_fifo);
+	pthread_mutex_unlock(&mutex_ready_fifo);
 	pthread_mutex_unlock(&mutex_ready);
-	
+
+	sem_post(&sem_proceso_sacado_de_ready);
 	return proceso;
+}
+
+t_pcb* sacar_proceso_de_ready_rr() {
+	sem_wait(&contador_ready_rr);			
+
+	pthread_mutex_lock(&mutex_ready);
+	pthread_mutex_lock(&mutex_ready_rr);
+	t_pcb* proceso = queue_pop(cola_ready_rr);
+	pthread_mutex_unlock(&mutex_ready_rr);
+	pthread_mutex_unlock(&mutex_ready);
+
+	sem_post(&sem_proceso_sacado_de_ready);
+	return proceso;
+}
+
+t_pcb* sacar_proceso_de_ready_feedback() {
+	if(!queue_is_empty(cola_ready_rr)) {		// Prioridad 1: RR
+		return sacar_proceso_de_ready_rr();
+	} else {									// Prioridad 2: FIFO
+		return sacar_proceso_de_ready_fifo();
+	}
+}
+
+t_pcb* sacar_proceso_de_ready() {
+	if(string_equals_ignore_case(config_kernel->algoritmo_planificacion,"FEEDBACK")) {
+		return sacar_proceso_de_ready_feedback();
+	} else if(string_equals_ignore_case(config_kernel->algoritmo_planificacion,"RR")) {
+		return sacar_proceso_de_ready_rr();
+	} else {
+		return sacar_proceso_de_ready_fifo();
+	}
 }
 
 void hilo_planificador_corto_plazo_ready() {
 	while(1) {
 		sem_wait(&sem_cpu_libre);
 		sem_wait(&sem_corto_plazo_ready);
-		
-		char* planificador = config_kernel->algoritmo_planificacion;
-		uint32_t indice = indice_siguiente_proceso_segun(cola_ready, planificador);
-		
-		t_pcb* proceso = sacar_proceso_de_ready(indice);
-		
+		t_pcb* proceso = sacar_proceso_de_ready();
+		sem_wait(&sem_proceso_sacado_de_ready);
 		meter_proceso_en_execute(proceso);
 	}
 }
@@ -164,7 +188,7 @@ void hilo_planificador_corto_plazo_ready() {
 void meter_proceso_en_execute(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_execute);
 	actualizar_estado_proceso(logger, proceso, PCB_EXECUTE);
-	list_add(cola_execute, proceso);
+	queue_push(cola_execute, proceso);
 	pthread_mutex_unlock(&mutex_execute);
 	
 	sem_post(&contador_execute);
@@ -175,7 +199,7 @@ t_pcb* sacar_proceso_de_execute() {
 	sem_wait(&contador_execute);			
 
 	pthread_mutex_lock(&mutex_execute);
-	t_pcb* proceso = list_remove(cola_execute, 0);
+	t_pcb* proceso = queue_pop(cola_execute);
 	pthread_mutex_unlock(&mutex_execute);
 	
 	return proceso;

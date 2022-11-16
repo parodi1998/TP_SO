@@ -7,6 +7,7 @@
 #include <commons/config.h>
 #include <commons/string.h>
 #include <commons/collections/list.h>
+#include <commons/collections/queue.h>
 #include "../../shared/include/sockets.h"
 #include "../../shared/include/protocolo.h"
 #include "../../shared/include/server_utils.h"

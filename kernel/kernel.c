@@ -2,17 +2,19 @@
 
 void inicializar_listas() {
     generador_pcb_id = 0;
-	cola_new = list_create();
-    cola_ready = list_create();
-    cola_execute = list_create();
-    cola_exit = list_create();
+	cola_new = queue_create();
+    cola_ready_fifo = queue_create();
+    cola_ready_rr = queue_create();
+    cola_execute = queue_create();
+    cola_exit = queue_create();
 }
 
 void destruir_listas() {
-    list_destroy_and_destroy_elements(cola_new,free);
-    list_destroy_and_destroy_elements(cola_ready,free);
-    list_destroy_and_destroy_elements(cola_execute,free);
-    list_destroy_and_destroy_elements(cola_exit,free);
+    queue_destroy_and_destroy_elements(cola_new,free);
+    queue_destroy_and_destroy_elements(cola_ready_fifo,free);
+    queue_destroy_and_destroy_elements(cola_ready_rr,free);
+    queue_destroy_and_destroy_elements(cola_execute,free);
+    queue_destroy_and_destroy_elements(cola_exit,free);
 }
 
 void inicializar_semaforos() {
@@ -22,8 +24,13 @@ void inicializar_semaforos() {
 	sem_init(&sem_largo_plazo_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     // ready
     pthread_mutex_init(&mutex_ready, NULL);
-	sem_init(&contador_ready, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
-	sem_init(&sem_corto_plazo_ready, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    pthread_mutex_init(&mutex_ready_fifo, NULL);
+	sem_init(&contador_ready_fifo, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    pthread_mutex_init(&mutex_ready_rr, NULL);
+	sem_init(&contador_ready_rr, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_corto_plazo_ready, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_proceso_agregado_a_ready, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_proceso_sacado_de_ready, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     // execute
     pthread_mutex_init(&mutex_execute, NULL);
 	sem_init(&contador_execute, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
@@ -44,8 +51,13 @@ void destruir_semaforos() {
     sem_destroy(&sem_largo_plazo_new);
 
     pthread_mutex_destroy(&mutex_ready);
-    sem_destroy(&contador_ready);
+    pthread_mutex_destroy(&mutex_ready_fifo);
+    sem_destroy(&contador_ready_fifo);
+    pthread_mutex_destroy(&mutex_ready_rr);
+    sem_destroy(&contador_ready_rr);
     sem_destroy(&sem_corto_plazo_ready);
+    sem_destroy(&sem_proceso_agregado_a_ready);
+    sem_destroy(&sem_proceso_sacado_de_ready);
 
     pthread_mutex_destroy(&mutex_execute);
     sem_destroy(&contador_execute);
