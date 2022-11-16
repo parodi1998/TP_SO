@@ -85,8 +85,7 @@ void hilo_planificador_largo_plazo_new() {
 		//proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
 		//signal(mutex_comunicacion_kernel_memoria)
 
-		meter_proceso_en_exit(proceso);
-		//meter_proceso_en_ready(proceso)
+		meter_proceso_en_ready(proceso);
 	}
 
 }
@@ -119,5 +118,50 @@ void hilo_planificador_largo_plazo_exit() {
 
 		// avisar a consola
 		liberar_pcb(proceso);
+	}
+}
+
+
+/**
+ * Planificador Corto Plazo
+ * */
+
+void meter_proceso_en_ready(t_pcb* proceso) {
+	pthread_mutex_lock(&mutex_ready);
+	actualizar_estado_proceso(logger, proceso, PCB_READY);
+	list_add(cola_ready, proceso);
+	pthread_mutex_unlock(&mutex_ready);
+
+	sem_post(&contador_ready);
+	sem_post(&sem_corto_plazo_ready);
+}
+
+t_pcb* sacar_proceso_de_ready(uint32_t index_proceso) {
+	sem_wait(&contador_ready);			
+
+	pthread_mutex_lock(&mutex_ready);
+	t_pcb* proceso = list_remove(cola_ready, 0);
+	pthread_mutex_unlock(&mutex_ready);
+	
+	return proceso;
+}
+
+void hilo_planificador_corto_plazo_ready() {
+	while(1) {
+		
+		sem_wait(&sem_corto_plazo_ready);
+		
+		char* planificador = config_kernel->algoritmo_planificacion;
+		uint32_t indice = indice_siguiente_proceso_segun(cola_ready, planificador);
+		
+		t_pcb* proceso = sacar_proceso_de_ready(indice);
+		
+		//wait(mutex_comunicacion_kernel_memoria)
+		//send_proceso_a_memoria(proceso)				// memoria inicializa sus estructuras necesarias
+		//proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
+		//signal(mutex_comunicacion_kernel_memoria)
+
+		meter_proceso_en_exit(proceso);
+		//meter_proceso_en_ready(proceso)
 	}
 }
