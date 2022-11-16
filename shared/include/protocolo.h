@@ -40,6 +40,7 @@ char* convertir_estado_pcb_a_string(t_estado_pcb estado);
 
 void log_proceso_en_new(t_log* logger, t_pcb* proceso);
 void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso);
+void actualizar_estado_proceso(t_log* logger, t_pcb* proceso, t_estado_pcb nuevo_estado);
 
 /**
  * Funciones para comunicacion entre consola y kernel

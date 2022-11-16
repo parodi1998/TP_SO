@@ -85,27 +85,39 @@ void hilo_planificador_largo_plazo_new() {
 		//proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
 		//signal(mutex_comunicacion_kernel_memoria)
 
+		meter_proceso_en_exit(proceso);
 		//meter_proceso_en_ready(proceso)
 	}
 
 }
 
+void meter_proceso_en_exit(t_pcb* proceso) {
+	pthread_mutex_lock(&mutex_exit);
+	actualizar_estado_proceso(logger, proceso, PCB_EXIT);
+	list_add(cola_exit, proceso);
+	pthread_mutex_unlock(&mutex_exit);
 
-/*
+	sem_post(&contador_exit);
+	sem_post(&sem_largo_plazo_exit);
+}
 
-func meter_proceso_en_exit(proceso) {
-	wait(mutex_exit)
-	agregar_a_lista(cola_exit, proceso)
-	signal(mutex_exit)
+t_pcb* sacar_proceso_de_exit() {
+	sem_wait(&contador_exit);			
 
-	signal(sem_exit);
+	pthread_mutex_lock(&mutex_exit);
+	t_pcb* proceso = list_remove(cola_exit, 0);
+	pthread_mutex_unlock(&mutex_exit);
 	
+	return proceso;
 }
 
-func hilo_planificador_largo_plazo_exit() {
+void hilo_planificador_largo_plazo_exit() {
+	while(1) {
+		sem_wait(&sem_largo_plazo_exit);
+		
+		t_pcb* proceso = sacar_proceso_de_exit();
 
-	wait(sem_largo_plazo_exit) // espera que le avisen que puede hacer algo
+		// avisar a consola
+		// free pcb
+	}
 }
-
-
-*/

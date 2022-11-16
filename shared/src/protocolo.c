@@ -64,6 +64,15 @@ void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso) {
     free(estado_actual);
 }
 
+void actualizar_estado_proceso(t_log* logger, t_pcb* proceso, t_estado_pcb nuevo_estado) {
+	t_estado_pcb estado_aux;
+	estado_aux = proceso->estado_actual;
+	proceso->estado_actual = nuevo_estado;
+	proceso->estado_anterior = estado_aux;
+	log_proceso_cambio_de_estado(logger, proceso);
+}
+
+
 /**
  * Consola -> Kernel: Envio y recepcion de Instrucciones
  * */

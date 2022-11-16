@@ -3,17 +3,25 @@
 void inicializar_listas() {
     generador_pcb_id = 0;
 	cola_new = list_create();
+    cola_exit = list_create();
 }
 
 void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_new, NULL);
 	sem_init(&contador_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
 	sem_init(&sem_largo_plazo_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+
+    pthread_mutex_init(&mutex_exit, NULL);
+	sem_init(&contador_exit, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
+	sem_init(&sem_largo_plazo_exit, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
 }
 
 void inicializar_planificadores() {
 	pthread_create(&hilo_largo_plazo_new, NULL, (void*)hilo_planificador_largo_plazo_new, NULL);
 	pthread_detach(hilo_largo_plazo_new);
+
+    pthread_create(&hilo_largo_plazo_exit, NULL, (void*)hilo_planificador_largo_plazo_exit, NULL);
+	pthread_detach(hilo_largo_plazo_exit);
 }
 
 int main(int argc, char** argv){
