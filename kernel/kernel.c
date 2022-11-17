@@ -43,6 +43,9 @@ void inicializar_semaforos() {
     // quantum
     sem_init(&sem_comienza_timer_quantum, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     sem_init(&sem_finaliza_timer_quantum, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    // multiprogramacion
+    uint32_t grado_multiprogramacion = atoi(config_kernel->grado_max_multiprogramacion);
+    sem_init(&sem_grado_multiprogramacion, SEM_NOT_SHARE_BETWEEN_PROCESS, grado_multiprogramacion);
 }
 
 void destruir_semaforos() {

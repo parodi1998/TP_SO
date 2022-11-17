@@ -29,7 +29,7 @@ void hilo_planificador_largo_plazo_new() {
 	while(1) {
 		
 		sem_wait(&sem_largo_plazo_new);					// espera que le avisen que puede hacer algo
-		//wait(multiprogramacion)
+		sem_wait(&sem_grado_multiprogramacion);
 		
 		t_pcb* proceso = sacar_proceso_de_new();
 		
@@ -72,6 +72,7 @@ void hilo_planificador_largo_plazo_exit() {
 		// wait_memoria_liberar(proceso);
 		// wait_consola_finalizar(proceso);
 		liberar_pcb(proceso);
+		sem_post(&sem_grado_multiprogramacion);
 	}
 }
 

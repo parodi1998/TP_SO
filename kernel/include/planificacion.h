@@ -41,6 +41,7 @@ sem_t sem_comienza_timer_quantum;
 sem_t sem_finaliza_timer_quantum;
 sem_t sem_proceso_agregado_a_ready;
 sem_t sem_proceso_sacado_de_ready;
+sem_t sem_grado_multiprogramacion;
 
 // hilos
 pthread_t hilo_largo_plazo_new;
