@@ -33,10 +33,10 @@ void hilo_planificador_largo_plazo_new() {
 		
 		t_pcb* proceso = sacar_proceso_de_new();
 		
-		//wait(mutex_comunicacion_kernel_memoria)
-		//send_proceso_a_memoria(proceso)				// memoria inicializa sus estructuras necesarias
-		//proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
-		//signal(mutex_comunicacion_kernel_memoria)
+		// wait(mutex_comunicacion_kernel_memoria)
+		// send_proceso_a_memoria(proceso)				// memoria inicializa sus estructuras necesarias
+		// proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
+		// signal(mutex_comunicacion_kernel_memoria)
 
 		meter_proceso_en_ready(proceso);
 	}
@@ -69,7 +69,8 @@ void hilo_planificador_largo_plazo_exit() {
 		
 		t_pcb* proceso = sacar_proceso_de_exit();
 
-		// avisar a consola
+		// wait_memoria_liberar(proceso);
+		// wait_consola_finalizar(proceso);
 		liberar_pcb(proceso);
 	}
 }
@@ -210,9 +211,17 @@ void hilo_planificador_corto_plazo_execute() {
 		sem_wait(&sem_corto_plazo_execute);
 
 		t_pcb* proceso = sacar_proceso_de_execute();
-		
+
+		// send_proceso_a_cpu(proceso);				// recordar agregar mutex en las comunicaciones si es necesario
+		/*
+		if(tengo_que_iniciar_timer()) {
+			sem_post(&sem_comienza_timer_quantum);
+		}
+		*/
+
+		// proceso = recv_proceso_de_cpu()			// esto deberia ser bloqueante
 		sem_post(&sem_comienza_timer_quantum);
-		sem_wait(&sem_finaliza_timer_quantum);
+		sem_wait(&sem_finaliza_timer_quantum);		// creo que el sem finaliza no es necesario, aca lo use para sincro no mas
 
 		meter_proceso_en_exit(proceso);
 
