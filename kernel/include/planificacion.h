@@ -11,12 +11,8 @@ typedef enum {
     PLANIFICADOR_FEEDBACK
 } t_tipo_planificador;
 
-// colas
-t_queue* cola_new;
-t_queue* cola_ready_rr;
-t_queue* cola_ready_fifo;
-t_queue* cola_execute;
-t_queue* cola_exit;
+// diccionario de colas
+t_dictionary* colas;
 
 // mutex
 pthread_mutex_t mutex_new;

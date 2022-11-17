@@ -1,20 +1,22 @@
 #include "include/kernel.h"
 
-void inicializar_listas() {
+void inicializar_diccionario() {
     generador_pcb_id = 0;
-	cola_new = queue_create();
-    cola_ready_fifo = queue_create();
-    cola_ready_rr = queue_create();
-    cola_execute = queue_create();
-    cola_exit = queue_create();
+    colas = dictionary_create();
+    dictionary_put(colas,"NEW",queue_create());
+    dictionary_put(colas,"READY_FIFO",queue_create());
+    dictionary_put(colas,"READY_RR",queue_create());
+    dictionary_put(colas,"EXECUTE",queue_create());
+    dictionary_put(colas,"EXIT",queue_create());
 }
 
-void destruir_listas() {
-    queue_destroy_and_destroy_elements(cola_new,free);
-    queue_destroy_and_destroy_elements(cola_ready_fifo,free);
-    queue_destroy_and_destroy_elements(cola_ready_rr,free);
-    queue_destroy_and_destroy_elements(cola_execute,free);
-    queue_destroy_and_destroy_elements(cola_exit,free);
+void destruir_diccionario() {
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"NEW"),free);
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"READY_FIFO"),free);
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"READY_RR"),free);
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"EXECUTE"),free);
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"EXIT"),free);
+    dictionary_destroy(colas);
 }
 
 void inicializar_semaforos() {
@@ -93,13 +95,13 @@ void inicializar_planificadores() {
 }
 
 void inicializar_todo() {
-    inicializar_listas();
     inicializar_semaforos();
     inicializar_planificadores();
+    inicializar_diccionario(); 
 }
 
 void destruir_todo() {
-    destruir_listas();
+    destruir_diccionario();
     destruir_semaforos();
 }
 

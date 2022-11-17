@@ -8,6 +8,7 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <commons/collections/queue.h>
+#include <commons/collections/dictionary.h>
 #include "../../shared/include/sockets.h"
 #include "../../shared/include/protocolo.h"
 #include "../../shared/include/server_utils.h"

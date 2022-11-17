@@ -3,6 +3,7 @@
 void meter_proceso_en_new(t_pcb* proceso) {
 
 	pthread_mutex_lock(&mutex_new);
+	t_queue* cola_new = dictionary_get(colas,"NEW");
 	queue_push(cola_new, proceso);
 	log_proceso_en_new(logger, proceso);
 	pthread_mutex_unlock(&mutex_new);
@@ -15,6 +16,7 @@ t_pcb* sacar_proceso_de_new() {
 	sem_wait(&contador_new);			// si por casualidad esto se llama y no hay nada en new (no deberia pasar nunca) se bloquea
 
 	pthread_mutex_lock(&mutex_new);
+	t_queue* cola_new = dictionary_get(colas,"NEW");
 	t_pcb* proceso = queue_pop(cola_new);
 	pthread_mutex_unlock(&mutex_new);
 	
@@ -46,6 +48,7 @@ void hilo_planificador_largo_plazo_new() {
 void meter_proceso_en_exit(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_exit);
 	actualizar_estado_proceso(logger, proceso, PCB_EXIT);
+	t_queue* cola_exit = dictionary_get(colas,"EXIT");
 	queue_push(cola_exit, proceso);
 	pthread_mutex_unlock(&mutex_exit);
 
@@ -57,6 +60,7 @@ t_pcb* sacar_proceso_de_exit() {
 	sem_wait(&contador_exit);			
 
 	pthread_mutex_lock(&mutex_exit);
+	t_queue* cola_exit = dictionary_get(colas,"EXIT");
 	t_pcb* proceso = queue_pop(cola_exit);
 	pthread_mutex_unlock(&mutex_exit);
 	
@@ -84,6 +88,8 @@ void hilo_planificador_largo_plazo_exit() {
 void meter_proceso_en_ready_fifo(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_ready);
 	pthread_mutex_lock(&mutex_ready_fifo);
+	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
+	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
 	actualizar_estado_proceso(logger, proceso, PCB_READY);
 	queue_push(cola_ready_fifo, proceso);
 	log_procesos_en_ready(logger, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
@@ -97,6 +103,8 @@ void meter_proceso_en_ready_fifo(t_pcb* proceso) {
 void meter_proceso_en_ready_rr(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_ready);
 	pthread_mutex_lock(&mutex_ready_rr);
+	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
+	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
 	actualizar_estado_proceso(logger, proceso, PCB_READY);
 	queue_push(cola_ready_rr, proceso);
 	log_procesos_en_ready(logger, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
@@ -138,6 +146,7 @@ t_pcb* sacar_proceso_de_ready_fifo() {
 
 	pthread_mutex_lock(&mutex_ready);
 	pthread_mutex_lock(&mutex_ready_fifo);
+	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
 	t_pcb* proceso = queue_pop(cola_ready_fifo);
 	pthread_mutex_unlock(&mutex_ready_fifo);
 	pthread_mutex_unlock(&mutex_ready);
@@ -151,6 +160,7 @@ t_pcb* sacar_proceso_de_ready_rr() {
 
 	pthread_mutex_lock(&mutex_ready);
 	pthread_mutex_lock(&mutex_ready_rr);
+	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
 	t_pcb* proceso = queue_pop(cola_ready_rr);
 	pthread_mutex_unlock(&mutex_ready_rr);
 	pthread_mutex_unlock(&mutex_ready);
@@ -160,6 +170,7 @@ t_pcb* sacar_proceso_de_ready_rr() {
 }
 
 t_pcb* sacar_proceso_de_ready_feedback() {
+	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
 	if(!queue_is_empty(cola_ready_rr)) {		// Prioridad 1: RR
 		return sacar_proceso_de_ready_rr();
 	} else {									// Prioridad 2: FIFO
@@ -190,6 +201,7 @@ void hilo_planificador_corto_plazo_ready() {
 void meter_proceso_en_execute(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_execute);
 	actualizar_estado_proceso(logger, proceso, PCB_EXECUTE);
+	t_queue* cola_execute = dictionary_get(colas,"EXECUTE");
 	queue_push(cola_execute, proceso);
 	pthread_mutex_unlock(&mutex_execute);
 	
@@ -198,9 +210,10 @@ void meter_proceso_en_execute(t_pcb* proceso) {
 }
 
 t_pcb* sacar_proceso_de_execute() {
-	sem_wait(&contador_execute);			
+	sem_wait(&contador_execute);
 
 	pthread_mutex_lock(&mutex_execute);
+	t_queue* cola_execute = dictionary_get(colas,"EXECUTE");
 	t_pcb* proceso = queue_pop(cola_execute);
 	pthread_mutex_unlock(&mutex_execute);
 	
