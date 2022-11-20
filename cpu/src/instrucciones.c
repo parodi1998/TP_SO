@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "instrucciones.h"
+#include "../include/instrucciones.h"
 
 int i = 2;
 int tiempo_demora;

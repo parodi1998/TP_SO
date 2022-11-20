@@ -4,9 +4,9 @@
  *  Created on: 4 oct. 2022
  *      Author: utnso
  */
-#include "tlb.h"
-#include "config_cpu.h"
-#include "client_memoria.h"
+#include "../include/tlb.h"
+#include "../include/config_cpu.h"
+#include "../include/client_memoria.h"
 
 t_list* SEGMENT_TABLE;
 
@@ -44,7 +44,7 @@ int32_t consult_tlb(int32_t pid, int32_t segment, int32_t page){
 		}
 
 
-		t_tlb_entry* record = list_get(TLB,(void*)is_the_entry );
+		t_tlb_entry* record = list_find(TLB,(void*)is_the_entry);
 
 		//actualizo el tiempo de consulta y retorno frame
 		if(record != NULL){
@@ -69,7 +69,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 	}
 
 	//busco si existe la entrada
-	t_tlb_entry* record = list_get(TLB,(void*)is_the_entry );
+	t_tlb_entry* record = list_find(TLB,(void*)is_the_entry );
 	if(record == NULL){
 
 		if(TLB->elements_count < ENTRADAS_TLB){
@@ -89,7 +89,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 		if(REEMPLAZO_TLB == "LRU"){
 
 			bool sort_by_lru(t_tlb_entry* record_aux1,t_tlb_entry* record_aux2 ){
-						return record_aux1->last_use > record_aux2;
+						return record_aux1->last_use > record_aux2->last_use;
 			}
 			update_lru();
 			t_list* list_sorted_by_time = list_sorted(TLB,(void*) sort_by_lru);
@@ -162,7 +162,7 @@ if (parts[0] == "1") {
 	 *
 	 */
 } else {
-	int32_t frame = parts[0];
+	int32_t frame = atoi(parts[0]);
 	//actualizo tlb
 	update_tlb(pid,segment,page,frame);
 }

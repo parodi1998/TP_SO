@@ -4,7 +4,7 @@
  *  Created on: Oct 5, 2022
  *      Author: utnso
  */
-#include "client.h"
+#include "../include/client.h"
 
 int generarCliente (int argc, char * ip_in, char* puerto_in)
 {

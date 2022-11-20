@@ -9,11 +9,11 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<semaphore.h>
-#include "server.h"
-#include "client.h"
+#include "../include/server.h"
+#include "../include/client.h"
 
-#include "client_memoria.h"
-#include "instrucciones.h"
+#include "../include/client_memoria.h"
+#include "../include/instrucciones.h"
 
 
 

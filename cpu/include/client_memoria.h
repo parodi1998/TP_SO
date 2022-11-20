@@ -45,11 +45,11 @@ typedef struct
 	t_buffer* buffer;
 } t_paquete;
 
-int crear_conexion_memoria();
-void enviar_mensaje(char* mensaje, int socket_cliente,op_code codigo_operacion);
-char* recibir_mensaje(int socket_cliente);
-void eliminar_paquete(t_paquete* paquete);
-void liberar_conexion(int socket_cliente);
+int crear_conexion_memoria_cpu();
+void enviar_mensaje_memoria_cpu(char* mensaje, int socket_cliente,op_code codigo_operacion);
+char* recibir_mensaje_memoria_cpu(int socket_cliente);
+void liberar_conexion_memoria_cpu(int socket_cliente);
+char* traducir_memoria(uint32_t pid,uint32_t segment, uint32_t page,uint32_t es_escritura);
 
 
 

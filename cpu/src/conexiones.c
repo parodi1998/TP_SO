@@ -1,5 +1,5 @@
-#include "conexiones.h"
-#include "config_cpu.h"
+#include "../include/conexiones.h"
+#include "../include/config_cpu.h"
 
 #include <commons/collections/list.h>
 
@@ -72,7 +72,7 @@ char * concatenar(char* palabra1, char* palabra2)
 void esperarInterrupcion(){
 	while(interrumpir == 0){
 		int socket_interrupcion;
-		//socket_interrupcion = conexion_Server(2, get_puerto_escucha_interrupt());
+		//socket_interrupcion = cpu_conexion_server(2, get_puerto_escucha_interrupt());
 		if (socket_interrupcion > 0)
 		{
 			interrumpe();
@@ -116,7 +116,7 @@ void ciclo_recibir_instruccines(){
 	int error = 0;
 	int recibir_instrucciones;
 	while (error == 0){
-	//	recibir_instrucciones = conexion_Server(2, get_puerto_memoria_dispatch);
+	//	recibir_instrucciones = cpu_conexion_server(2, get_puerto_memoria_dispatch);
 		//if (recibir_instrucciones < 0){
 			//error = 1;
 		//}

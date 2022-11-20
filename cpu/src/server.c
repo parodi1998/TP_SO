@@ -5,9 +5,14 @@
  *      Author: utnso
  */
 
-#include"server.h"
+#include"../include/server.h"
 
-int conexion_Server(int argc, char * puerto_in)
+void liberar_conexion_cpu_kernel(int* socket_cliente) {
+    close(*socket_cliente);
+    *socket_cliente = -1;
+}
+
+int cpu_conexion_server(int argc, char * puerto_in)
 {
 if (argc > 1)
 {
@@ -46,13 +51,14 @@ printf("error en accept()\n");
 exit(-1);
 }
 send(fd2, "Bienvenido a mi servidor.\n", 26, 0);
-close(fd2);
+liberar_conexion_cpu_kernel(fd2);
 }
-close(fd);
+liberar_conexion_cpu_kernel(fd);
 }
 else{
 printf("No se ingresó el puerto  por parámetro\n");
 }
 return 0;
 }
+
 

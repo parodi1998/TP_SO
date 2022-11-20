@@ -15,5 +15,6 @@
 #include<sys/socket.h>
 #include<netinet/in.h>
 
+void liberar_conexion_cpu_kernel(int* socket_cliente);
 
 #endif /* SERVER_H_ */

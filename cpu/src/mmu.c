@@ -1,9 +1,9 @@
 
 
-#include "mmu.h"
-#include "tlb.h"
-#include "client_memoria.h"
-#include "instrucciones.h"
+#include "../include/mmu.h"
+#include "../include/tlb.h"
+#include "../include/client_memoria.h"
+#include "../include/instrucciones.h"
 
 uint32_t TAMANIO_PAGINA;
 uint32_t CANT_ENTRADAS_POR_TABLA;

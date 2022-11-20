@@ -10,10 +10,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "conexiones.h"
-#include "instrucciones.h"
-#include "config_cpu.h"
-#include "client_memoria.h"
+#include "include/conexiones.h"
+#include "include/instrucciones.h"
+#include "include/config_cpu.h"
+#include "include/client_memoria.h"
+#include "include/tlb.h"
+#include "include/mmu.h"
 
 int main(void) {
 	puts("ENCENDIDOS");

@@ -24,5 +24,6 @@ char* get_puerto_memoria();
 char* get_puerto_memoria_dispatch();
 char* get_puerto_escucha_interrupt();
 char* get_log_path();
+t_log* get_log();
 
 #endif /* CONFIG_CPU_H_ */

@@ -1,15 +1,15 @@
-#include "client_memoria.h"
-#include "config_cpu.h"
+#include "../include/client_memoria.h"
+#include "../include/config_cpu.h"
 
 //principales mensajes de comunicacion con memoria
 
 char* leer_memoria(uint32_t dir_fisica, uint32_t tamanio){
 	char* mensaje = string_from_format("%d|%d",dir_fisica,tamanio);
 
-	int conexion = crear_conexion_memoria();
+	int conexion = crear_conexion_memoria_cpu();
 	log_info(get_log(),"REQUEST LEER: %s" , mensaje );
-	enviar_mensaje(mensaje,conexion,LEER);
-	char* rta = recibir_mensaje(conexion);
+	enviar_mensaje_memoria_cpu(mensaje,conexion,LEER);
+	char* rta = recibir_mensaje_memoria_cpu(conexion);
 	log_info(get_log(),"RESPUESTA LEER: %s" , rta );
 	free(mensaje);
 
@@ -20,10 +20,10 @@ char* leer_memoria(uint32_t dir_fisica, uint32_t tamanio){
 char* escribir_memoria(uint32_t dir_fisica,uint32_t tamanio, char* contenido){
 	char* mensaje = string_from_format("%d|%d|%s",dir_fisica,tamanio,contenido);
 
-	int conexion = crear_conexion_memoria();
+	int conexion = crear_conexion_memoria_cpu();
 	log_info(get_log(),"REQUEST ESCRIBIR: %s" , mensaje );
-	enviar_mensaje(mensaje,conexion,ESCRIBIR);
-	char* rta = recibir_mensaje(conexion);
+	enviar_mensaje_memoria_cpu(mensaje,conexion,ESCRIBIR);
+	char* rta = recibir_mensaje_memoria_cpu(conexion);
 	log_info(get_log(),"RESPUESTA ESCRIBIR: %s" , rta );
 	free(mensaje);
 	return rta;
@@ -32,10 +32,10 @@ char* escribir_memoria(uint32_t dir_fisica,uint32_t tamanio, char* contenido){
 char* traducir_memoria(uint32_t pid,uint32_t segment, uint32_t page,uint32_t es_escritura){
 	char* mensaje = string_from_format("%d|%d|%d|%d",pid,segment,page,es_escritura);
 
-	int conexion = crear_conexion_memoria();
+	int conexion = crear_conexion_memoria_cpu();
 	log_info(get_log(),"REQUEST TRADUCIR: %s" , mensaje );
-	enviar_mensaje(mensaje,conexion,TRADUCIR);
-	char* rta = recibir_mensaje(conexion);
+	enviar_mensaje_memoria_cpu(mensaje,conexion,TRADUCIR);
+	char* rta = recibir_mensaje_memoria_cpu(conexion);
 	log_info(get_log(),"RESPUESTA TRADUCIR: %s" , rta );
 	free(mensaje);
 	return rta;
@@ -44,10 +44,10 @@ char* traducir_memoria(uint32_t pid,uint32_t segment, uint32_t page,uint32_t es_
 char* finalizar_proceso(uint32_t pid,uint32_t segment){
 	char* mensaje = string_from_format("%d|%d",pid,segment);
 
-	int conexion = crear_conexion_memoria();
+	int conexion = crear_conexion_memoria_cpu();
 	log_info(get_log(),"REQUEST FINALIZAR_PROCESO: %s" , mensaje );
-	enviar_mensaje(mensaje,conexion,FINALIZAR_PROCESO);
-	char* rta = recibir_mensaje(conexion);
+	enviar_mensaje_memoria_cpu(mensaje,conexion,FINALIZAR_PROCESO);
+	char* rta = recibir_mensaje_memoria_cpu(conexion);
 	log_info(get_log(),"RESPUESTA FINALIZAR_PROCESO: %s" , rta );
 	free(mensaje);
 	return rta;
@@ -55,9 +55,9 @@ char* finalizar_proceso(uint32_t pid,uint32_t segment){
 
 char* recibir_config_para_mmu(){
 	log_info(get_log(),"REQUEST CONFIG_CPU");
-	int conexion = crear_conexion_memoria();
-	enviar_mensaje("",conexion,CONFIG_CPU);
-	char* rta = recibir_mensaje(conexion);
+	int conexion = crear_conexion_memoria_cpu();
+	enviar_mensaje_memoria_cpu("",conexion,CONFIG_CPU);
+	char* rta = recibir_mensaje_memoria_cpu(conexion);
 	log_info(get_log(),"RESPUESTA CONFIG_CPU: %s" , rta );
 	return rta;
 }
@@ -68,7 +68,7 @@ char* recibir_config_para_mmu(){
 
 
 
-void* serializar_paquete(t_paquete* paquete, int bytes)
+void* serializar_paquete_memoria_cpu(t_paquete* paquete, int bytes)
 {
 	void * magic = malloc(bytes);
 	int desplazamiento = 0;
@@ -85,7 +85,7 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 
 }
 
-int crear_conexion_memoria()
+int crear_conexion_memoria_cpu()
 {
 	struct addrinfo hints;
 	struct addrinfo *server_info;
@@ -108,7 +108,7 @@ int crear_conexion_memoria()
 }
 
 //TODO
-void enviar_mensaje(char* mensaje, int socket_cliente,op_code codigo_operacion)
+void enviar_mensaje_memoria_cpu(char* mensaje, int socket_cliente,op_code codigo_operacion)
 {
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
@@ -120,7 +120,7 @@ void enviar_mensaje(char* mensaje, int socket_cliente,op_code codigo_operacion)
 
 		int bytes = paquete->buffer->size + 2*sizeof(int);
 
-		void* a_enviar = serializar_paquete(paquete, bytes);
+		void* a_enviar = serializar_paquete_memoria_cpu(paquete, bytes);
 
 		send(socket_cliente, a_enviar, bytes, 0);
 
@@ -130,7 +130,7 @@ void enviar_mensaje(char* mensaje, int socket_cliente,op_code codigo_operacion)
 
 
 
-char* recibir_mensaje(int socket_cliente)
+char* recibir_mensaje_memoria_cpu(int socket_cliente)
 {
 	void * buffer;
 	int size;
@@ -142,7 +142,7 @@ char* recibir_mensaje(int socket_cliente)
 	return buffer;
 }
 
-void liberar_conexion(int socket_cliente)
+void liberar_conexion_memoria_cpu(int socket_cliente)
 {
 	close(socket_cliente);
 }

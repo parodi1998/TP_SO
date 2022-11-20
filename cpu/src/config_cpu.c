@@ -1,4 +1,4 @@
-#include "config_cpu.h"
+#include "../include/config_cpu.h"
 
 int entradas_tlb;
 char* reemplazo_tlb;
