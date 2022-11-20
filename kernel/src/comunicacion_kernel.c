@@ -35,10 +35,14 @@ static void procesar_conexion(void* void_args) {
             pcb_proceso->id_proceso = generador_pcb_id;
             pcb_proceso->program_counter = 0;
             carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
-            //pcb_proceso->registros_cpu=buscar registros;
+            pcb_proceso->registro_AX = 0;
+            pcb_proceso->registro_BX = 0;
+            pcb_proceso->registro_CX = 0;
+            pcb_proceso->registro_DX = 0;
             pcb_proceso->instrucciones = instrucciones;
             pcb_proceso->estado_anterior = PCB_NEW;
             pcb_proceso->estado_actual = PCB_NEW;
+            // pcb_proceso->consola_fd = cliente_fd;
 
             meter_proceso_en_new(pcb_proceso);
             break;

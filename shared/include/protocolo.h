@@ -24,6 +24,15 @@ typedef struct {
     t_estado_pcb estado_actual;
 } t_pcb;
 
+/*
+    size_t consola_fd;
+    bool debe_ser_finalizado;
+    bool debe_ser_bloqueado;
+    bool fue_interrumpido;
+    char* dispositivo_bloqueo; // CONSOLA, TECLADO, DISCO
+    size_t unidades_de_trabajo_o_registro_de_bloqueo;
+*/
+
 typedef struct {
     size_t tamanio_segmento;
     size_t id_tabla_paginas;
