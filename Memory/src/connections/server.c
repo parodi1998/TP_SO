@@ -202,12 +202,10 @@ void* procesar_suspender_proceso(char* string,int* size,int* op_code){
 
 
 void* procesar_finalizar_proceso(char* string,int* size,int* op_code){
-	//ENTRADA:<PID>|<SEGMENT>
+	//ENTRADA:<PID>
 	//SALIDA:<OK>
-	char** array = string_split(string,"|");
-	uint32_t pid = (volatile uint32_t) atoi( array[0]);
-	uint32_t segment = (volatile uint32_t) atoi( array[1]);
-	finalize_process(pid,segment);
+	uint32_t pid = (volatile uint32_t) atoi( string);
+	finalize_process(pid);
 	*size = string_length("OK")+1;
 	*op_code = OK;
 	return (void*)"OK";

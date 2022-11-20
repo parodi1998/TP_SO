@@ -26,7 +26,6 @@ void initialize_memory_file_management() {
 	LOGGER = get_logger();
 	PATH_SWAP_BASE = swap_path();
 	initialize_memory();
-
 }
 
 void initialize_memory() {
@@ -158,15 +157,12 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 		list_destroy(free_frames_MP);
 		return FAILURE;
 	}
-	//Reservamos los frames al PID
-	for (int i = 0; i < frames_per_table_getter(); i++) {
-		t_frame* frame_libre = list_get(free_frames_MP, i);
-		frame_libre->pid = pid;
-	}
+
 	pthread_mutex_unlock(&mutex_frames);
 	list_destroy(free_frames_MP);
-	log_info(LOGGER, "Se reservaron frames para el PID %d, SEGMENTO: %d", pid,segment_ID);
 	//creacion de tabla de paginas
+
+	book_frames(pid);
 
 	table_page* new_table = malloc(sizeof(table_page));
 	new_table->pages = list_create();
@@ -205,8 +201,6 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	//retornamos el id de la pagina de primer nivel
 	log_info(LOGGER, "Se crea la tabla de paginas ID: %d  al PID: %d, SEGMENTO %d",new_table->ID, pid,segment_ID);
 
-	book_frames(pid);
-
 	return new_table->ID;
 
 }
@@ -239,43 +233,84 @@ int32_t suspend_process(uint32_t pid, uint32_t segment) {
 	return SUCCESS;
 }
 
-int32_t finalize_process(uint32_t pid, uint32_t segment) {
-	log_info(LOGGER, "Comienza la finalizacion del proceso %d, segmento %d ..",pid, segment);
-	table_page* table = find_table_with_pid(pid, segment);
-	t_page* page;
-	t_frame* frame;
-	for (int i = 0; i < table->pages->elements_count; i++) {
-		page = (t_page*) list_get(table->pages, i);
-		page->locked = true;
-		if (page->present) {
-			//vacio el frame que ocupa
-			page->present = false;
-			page->locked = false;
+int32_t finalize_process(uint32_t pid) {
+	log_info(LOGGER, "Comienza la finalizacion del proceso %d ..",pid);
+	table_page* table = NULL;
+	t_list* list = get_all_table_pages_from_pid(pid);
+	t_page* page = NULL;
+	t_frame* frame = NULL;
 
-			pthread_mutex_lock(&mutex_frames);
-			frame = (t_frame*) list_get(FRAMES, page->frame);
-			frame->is_free = true;
-			frame->pid = -1;
-			pthread_mutex_unlock(&mutex_frames);
+	//elimino los frames libres no asignados
+	clean_free_frames_from_pid(pid);
 
-			t_frame_swap* frame_swap;
-			//vacio (si tiene) el frame ocupado en swap
-			if (page->pos_swap != -1) {
-				pthread_mutex_lock(&mutex_frames_swap);
-				frame_swap = find_frame_swap(page->pos_swap);
-				frame_swap->is_free = true;
-				pthread_mutex_unlock(&mutex_frames_swap);
+	for(int i=0;i<list->elements_count;i++){
+		table = list_get(list,i);
+
+
+
+		for (int i = 0; i < table->pages->elements_count; i++) {
+			page = (t_page*) list_get(table->pages, i);
+			page->locked = true;
+			if (page->present) {
+				//vacio el frame que ocupa
+				page->present = false;
+				page->locked = false;
+
+				pthread_mutex_lock(&mutex_frames);
+				frame = (t_frame*) list_get(FRAMES, page->frame);
+				frame->is_free = true;
+				frame->pid = -1;
+				pthread_mutex_unlock(&mutex_frames);
+				t_frame_swap* frame_swap;
+				//vacio (si tiene) el frame ocupado en swap
+				if (page->pos_swap != -1) {
+					pthread_mutex_lock(&mutex_frames_swap);
+					frame_swap = find_frame_swap(page->pos_swap);
+					frame_swap->is_free = true;
+					pthread_mutex_unlock(&mutex_frames_swap);
+				}
+					log_info(LOGGER, "[Proceso %d, Segmento %d]Se libera frame nro %d",pid, page->segment, page->id, frame->id);
 			}
-
-			log_info(LOGGER, "[Proceso %d, Segmento %d]Se libera frame nro %d",pid, segment, page->id, frame->id);
 		}
-	}
-	delete_swap_file(pid);
 
-	log_info(LOGGER, "Se finalizo el proceso %d segmento %d con exito", pid,segment);
+	}
+	list_destroy(list);
+	log_info(LOGGER, "Se finalizo el proceso %d con exito", pid);
 
 	return SUCCESS;
 }
+
+t_list* get_all_table_pages_from_pid(uint32_t pid){
+	bool find_table_pages_with_pid(table_page* table_aux){
+		return table_aux->PID == pid;
+	}
+	pthread_mutex_lock(&mutex_table_pages);
+	t_list* list = list_filter(TABLE_PAGES,(void*)find_table_pages_with_pid);
+	pthread_mutex_unlock(&mutex_table_pages);
+
+	return list;
+}
+
+void clean_free_frames_from_pid(uint32_t pid){
+	int same_pid_and_free(t_frame* frame_aux) {
+			return (frame_aux->pid == pid && frame_aux->is_free);
+		}
+	pthread_mutex_lock(&mutex_frames);
+	t_list* list_frames_unasigned = list_filter(FRAMES, (void*) same_pid_and_free);
+	t_frame* frame = NULL;
+	for(int i=0;i<list_frames_unasigned->elements_count;i++){
+		frame = list_get(list_frames_unasigned,i);
+		if(frame->pid == pid){
+			frame->is_free = true;
+			frame->pid = -1;
+			log_info(LOGGER,"liberando frame %d de PID %d",frame->id,pid);
+		}
+	}
+	pthread_mutex_unlock(&mutex_frames);
+}
+
+
+
 
 void delete_swap_file(uint32_t pid) {
 	char* path = swap_path();
@@ -610,6 +645,7 @@ void book_frames(uint32_t pid) {
 		for (int i = 0; i < to_book; i++) {
 			frame = list_get(free_frames, i);
 			frame->pid = pid;
+			log_info(LOGGER,"Se reserva el frame %d para el pid %d",frame->id,pid);
 		}
 		list_destroy(free_frames);
 

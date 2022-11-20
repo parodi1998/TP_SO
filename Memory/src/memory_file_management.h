@@ -80,7 +80,7 @@ int32_t suspend_process(uint32_t pid,uint32_t segment);
 int32_t restore_process(uint32_t pid,uint32_t segment);
 
 void delete_swap_file(uint32_t pid);
-int32_t finalize_process(uint32_t pid,uint32_t segment);
+int32_t finalize_process(uint32_t pid);
 void create_swap_file();
 
 void end_memory_module();
@@ -93,4 +93,6 @@ t_list* get_free_frames();
 void book_frames(uint32_t pid);
 void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number);
 char* config_cpu();
+t_list* get_all_table_pages_from_pid(uint32_t pid);
+void clean_free_frames_from_pid(uint32_t pid);
 #endif //KISS_MEMORY_FILE_MANAGEMENT_H
