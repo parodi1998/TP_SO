@@ -1,5 +1,5 @@
-#include "memory_file_management.h"
-#include "config_manager/memory_configuration_manager.h"
+#include "../include/memory_file_management.h"
+#include "../include/memory_configuration_manager.h"
 #include <math.h>
 
 //VARIABLES GLOBALES

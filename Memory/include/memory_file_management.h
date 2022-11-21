@@ -1,5 +1,5 @@
-#ifndef KISS_MEMORY_FILE_MANAGEMENT_H
-#define KISS_MEMORY_FILE_MANAGEMENT_H
+#ifndef MEMORY_FILE_MANAGEMENT_H
+#define MEMORY_FILE_MANAGEMENT_H
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -95,4 +95,4 @@ void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number);
 char* config_cpu();
 t_list* get_all_table_pages_from_pid(uint32_t pid);
 void clean_free_frames_from_pid(uint32_t pid);
-#endif //KISS_MEMORY_FILE_MANAGEMENT_H
+#endif //MEMORY_FILE_MANAGEMENT_H

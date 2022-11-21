@@ -4,12 +4,13 @@
  *  Created on: 26 ago. 2022
  *      Author: utnso
  */
-#include "server.h"
-#include "../config_manager/memory_configuration_manager.h"
-#include "../memory_file_management.h"
+#include "../include/memory_configuration_manager.h"
+#include "../include/memory_file_management.h"
+#include "../include/server.h"
 
 void iniciar_servidor(void)
 {
+	log_info(get_logger(),"INICIANDO SERVIDOR..");
 	int socket_servidor;
 
     struct addrinfo hints, *servinfo, *p;
@@ -57,18 +58,19 @@ void esperar_cliente(int socket_servidor)
 void serve_client(int* socket)
 {
 	int cod_op;
-	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
+	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1){
 		cod_op = -1;
+	}
 	process_request(cod_op, *socket);
 }
 
 void process_request(int cod_op, int cliente_fd) {
 	int size;
 	int op_code_response;
-	void* msg;
-	void* response;
-	msg = recibir_mensaje(cliente_fd, &size);
+	void* msg = NULL;
+	void* response = NULL;
 		switch (cod_op) {
+		msg = recibir_mensaje(cliente_fd, &size);
 		case CONFIG_CPU:
 			response = config_cpu();
 			size = sizeof(response);

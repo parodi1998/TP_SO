@@ -1,6 +1,6 @@
 
-#ifndef CONFIG_MANAGER_MEMORY_CONFIGURATION_MANAGER_H_
-#define CONFIG_MANAGER_MEMORY_CONFIGURATION_MANAGER_H_
+#ifndef MEMORY_CONFIGURATION_MANAGER_H_
+#define MEMORY_CONFIGURATION_MANAGER_H_
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -23,4 +23,4 @@ void initialize_logger();
 t_log* get_logger();
 uint32_t swap_size_getter();
 
-#endif /*CONFIG_MANAGER_MEMORY_CONFIGURATION_MANAGER_H_*/
+#endif /*MEMORY_CONFIGURATION_MANAGER_H_*/

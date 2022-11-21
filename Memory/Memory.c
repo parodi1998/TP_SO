@@ -10,9 +10,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "config_manager/memory_configuration_manager.h"
-#include "memory_file_management.h"
-#include "connections/server.h"
+#include "include/memory_configuration_manager.h"
+#include "include/memory_file_management.h"
+#include "include/server.h"
 
 int main(void) {
 	initialize_memory_configuration_manager();

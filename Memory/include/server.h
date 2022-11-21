@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef CONNECTIONS_SERVER_H_
-#define CONNECTIONS_SERVER_H_
+#ifndef SERVER_H_
+#define SERVER_H_
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -71,4 +71,4 @@ void* procesar_mensaje_leer(char* string,int* size, int* op_code);
 void* procesar_traducir_direccion(char* string,int* size, int* op_code);
 void* procesar_swapping(char* string, int* size,int* op_code);
 
-#endif /* CONNECTIONS_SERVER_H_ */
+#endif /* SERVER_H_ */

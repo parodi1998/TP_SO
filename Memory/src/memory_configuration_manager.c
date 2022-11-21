@@ -1,4 +1,4 @@
-#include "memory_configuration_manager.h"
+#include "../include/memory_configuration_manager.h"
 #include <stdint.h>
 
 char* server_port;
@@ -18,7 +18,7 @@ t_config* CONFIG;
 t_log* logger;
 
 void initialize_memory_configuration_manager(){
-	CONFIG = config_create("../Memory/src/config_manager/memory.config");
+	CONFIG = config_create("../Memory/src/memory.config");
 
     server_port = config_get_string_value(CONFIG,"PUERTO_ESCUCHA");
     memory_size = (volatile uint32_t) config_get_int_value(CONFIG,"TAM_MEMORIA");
