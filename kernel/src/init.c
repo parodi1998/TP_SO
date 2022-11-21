@@ -26,7 +26,6 @@ static bool cargar_config(t_config_kernel* config_kernel) {
         string_append(&config_kernel->ip_cpu, config_get_string_value(config, "IP_CPU"));
         string_append(&config_kernel->puerto_cpu_dispatch, config_get_string_value(config, "PUERTO_CPU_DISPATCH"));
         string_append(&config_kernel->puerto_cpu_interrupt, config_get_string_value(config, "PUERTO_CPU_INTERRUPT"));
-        string_append(&config_kernel->ip_escucha, config_get_string_value(config, "IP_ESCUCHA"));
         string_append(&config_kernel->puerto_escucha, config_get_string_value(config, "PUERTO_ESCUCHA"));
         string_append(&config_kernel->nombre_escucha, config_get_string_value(config, "NOMBRE_ESCUCHA"));
         string_append(&config_kernel->algoritmo_planificacion, config_get_string_value(config, "ALGORITMO_PLANIFICACION"));
@@ -34,6 +33,7 @@ static bool cargar_config(t_config_kernel* config_kernel) {
         string_append(&config_kernel->dispositivos_IO, config_get_string_value(config, "DISPOSITIVOS_IO"));
         string_append(&config_kernel->tiempos_IO, config_get_string_value(config, "TIEMPOS_IO"));
         string_append(&config_kernel->quantum_RR, config_get_string_value(config, "QUANTUM_RR"));
+        string_append(&config_kernel->ip_escucha, "127.0.0.1");
         config_destroy(config);
         return true;
     } else {
