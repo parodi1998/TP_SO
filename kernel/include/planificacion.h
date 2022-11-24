@@ -2,6 +2,7 @@
 #define KERNEL_PLANIFICACION_H_
 
 #include "commons.h"
+#include "kernel_logs.h"
 
 #define SEM_NOT_SHARE_BETWEEN_PROCESS 0
 

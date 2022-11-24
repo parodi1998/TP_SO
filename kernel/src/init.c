@@ -1,7 +1,8 @@
 #include "../include/init.h"
 
 static bool iniciar_logger() {
-    logger = log_create(LOGGER_FILE,LOGGER_NAME,true,LOG_LEVEL_DEBUG);
+    logger = log_create(LOGGER_FILE_AUX,LOGGER_NAME_AUX,true,LOG_LEVEL_DEBUG);
+    logger_kernel_obligatorio = log_create(LOGGER_FILE,LOGGER_NAME,true,LOG_LEVEL_DEBUG);
     return logger != NULL;
 }
 
@@ -63,5 +64,6 @@ bool iniciar_programa() {
 
 void terminar_programa() {
     log_destroy(logger);
+    log_destroy(logger_kernel_obligatorio);
     free(config_kernel);
 }

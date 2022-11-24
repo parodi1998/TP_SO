@@ -44,7 +44,7 @@ static void procesar_conexion(void* void_args) {
             pcb_proceso->estado_actual = PCB_NEW;
             pcb_proceso->consola_fd = cliente_fd;
             pcb_proceso->debe_ser_finalizado = false;
-            pcb_proceso->debe_ser_bloqueado = true;             // cambiar esto a false
+            pcb_proceso->debe_ser_bloqueado = false;             // cambiar esto a false
             pcb_proceso->puede_ser_interrumpido = false;
             pcb_proceso->fue_interrumpido = false;
             pcb_proceso->registro_para_bloqueo = 0;

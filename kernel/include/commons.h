@@ -17,6 +17,9 @@
 #define LOGGER_FILE "kernel.log"
 #define LOGGER_NAME "KERNEL"
 
+#define LOGGER_FILE_AUX "kernel_aux.log"
+#define LOGGER_NAME_AUX "KERNEL_AUX"
+
 #define CONFIG_FILE "kernel.config"
 
 typedef struct {
@@ -42,6 +45,7 @@ typedef struct {
 } t_procesar_conexion_args;
 
 t_log* logger;
+t_log* logger_kernel_obligatorio;
 t_config_kernel* config_kernel;
 
 #endif

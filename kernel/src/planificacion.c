@@ -5,7 +5,7 @@ void meter_proceso_en_new(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_new);
 	t_queue* cola_new = dictionary_get(colas,"NEW");
 	queue_push(cola_new, proceso);
-	log_proceso_en_new(logger, proceso);
+	log_proceso_en_new(logger_kernel_obligatorio, proceso);
 	pthread_mutex_unlock(&mutex_new);
 
 	sem_post(&contador_new);
@@ -51,7 +51,7 @@ void hilo_planificador_largo_plazo_new() {
 
 void meter_proceso_en_exit(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_exit);
-	actualizar_estado_proceso(logger, proceso, PCB_EXIT);
+	actualizar_estado_proceso(logger_kernel_obligatorio, proceso, PCB_EXIT);
 	t_queue* cola_exit = dictionary_get(colas,"EXIT");
 	queue_push(cola_exit, proceso);
 	pthread_mutex_unlock(&mutex_exit);
@@ -94,9 +94,9 @@ void meter_proceso_en_ready_fifo(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_ready_fifo);
 	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
 	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
-	actualizar_estado_proceso(logger, proceso, PCB_READY);
+	actualizar_estado_proceso(logger_kernel_obligatorio, proceso, PCB_READY);
 	queue_push(cola_ready_fifo, proceso);
-	log_procesos_en_ready(logger, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
+	log_procesos_en_ready(logger_kernel_obligatorio, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
 	pthread_mutex_unlock(&mutex_ready_fifo);
 	pthread_mutex_unlock(&mutex_ready);
 
@@ -109,9 +109,9 @@ void meter_proceso_en_ready_rr(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_ready_rr);
 	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
 	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
-	actualizar_estado_proceso(logger, proceso, PCB_READY);
+	actualizar_estado_proceso(logger_kernel_obligatorio, proceso, PCB_READY);
 	queue_push(cola_ready_rr, proceso);
-	log_procesos_en_ready(logger, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
+	log_procesos_en_ready(logger_kernel_obligatorio, cola_ready_fifo->elements, cola_ready_rr->elements, config_kernel->algoritmo_planificacion);
 	pthread_mutex_unlock(&mutex_ready_rr);
 	pthread_mutex_unlock(&mutex_ready);
 
@@ -208,7 +208,7 @@ void hilo_planificador_corto_plazo_ready() {
 
 void meter_proceso_en_execute(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_execute);
-	actualizar_estado_proceso(logger, proceso, PCB_EXECUTE);
+	actualizar_estado_proceso(logger_kernel_obligatorio, proceso, PCB_EXECUTE);
 	t_queue* cola_execute = dictionary_get(colas,"EXECUTE");
 	queue_push(cola_execute, proceso);
 	pthread_mutex_unlock(&mutex_execute);
@@ -302,10 +302,10 @@ void meter_proceso_en_block(t_pcb* proceso, char* key_cola_de_bloqueo) {
 	sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
 	//sem_t sem_hilo = *sem_hilo_pointer;
 	sem_wait(mutex_pointer);
-	actualizar_estado_proceso(logger, proceso, PCB_BLOCK);
+	actualizar_estado_proceso(logger_kernel_obligatorio, proceso, PCB_BLOCK);
 	t_queue* cola_block_dinamica = dictionary_get(colas,key_cola_de_bloqueo);
 	queue_push(cola_block_dinamica, proceso);
-	log_motivo_de_bloqueo(logger, proceso, key_cola_de_bloqueo);
+	log_motivo_de_bloqueo(logger_kernel_obligatorio, proceso, key_cola_de_bloqueo);
 	sem_post(mutex_pointer);
 
 	sem_post(contador_pointer);
