@@ -3,8 +3,8 @@
 
 //principales mensajes de comunicacion con memoria
 
-char* leer_memoria(uint32_t dir_fisica, uint32_t tamanio){
-	char* mensaje = string_from_format("%d|%d",dir_fisica,tamanio);
+char* leer_memoria(uint32_t pid,uint32_t dir_fisica, uint32_t tamanio){
+	char* mensaje = string_from_format("%d|%d|%d",pid,dir_fisica,tamanio);
 
 	int conexion = crear_conexion_memoria_cpu();
 	log_info(get_log(),"REQUEST LEER: %s" , mensaje );
@@ -17,8 +17,8 @@ char* leer_memoria(uint32_t dir_fisica, uint32_t tamanio){
 
 }
 
-char* escribir_memoria(uint32_t dir_fisica,uint32_t tamanio, char* contenido){
-	char* mensaje = string_from_format("%d|%d|%s",dir_fisica,tamanio,contenido);
+char* escribir_memoria(uint32_t pid,uint32_t dir_fisica,uint32_t tamanio, char* contenido){
+	char* mensaje = string_from_format("%d|%d|%d|%s",dir_fisica,tamanio,contenido);
 
 	int conexion = crear_conexion_memoria_cpu();
 	log_info(get_log(),"REQUEST ESCRIBIR: %s" , mensaje );

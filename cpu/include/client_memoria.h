@@ -50,7 +50,10 @@ void enviar_mensaje_memoria_cpu(char* mensaje, int socket_cliente,op_code codigo
 char* recibir_mensaje_memoria_cpu(int socket_cliente);
 void liberar_conexion_memoria_cpu(int socket_cliente);
 char* traducir_memoria(uint32_t pid,uint32_t segment, uint32_t page,uint32_t es_escritura);
-
+char* leer_memoria(uint32_t pid,uint32_t dir_fisica, uint32_t tamanio);
+char* escribir_memoria(uint32_t pid,uint32_t dir_fisica,uint32_t tamanio, char* contenido);
+char* finalizar_proceso(uint32_t pid,uint32_t segment);
+char* recibir_config_para_mmu();
 
 
 #endif /* CLIENT_MEMORIA_H_ */
