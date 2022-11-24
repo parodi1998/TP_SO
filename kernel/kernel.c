@@ -8,6 +8,7 @@ void inicializar_diccionario() {
     dictionary_put(colas,"READY_RR",queue_create());
     dictionary_put(colas,"EXECUTE",queue_create());
     dictionary_put(colas,"EXIT",queue_create());
+    dictionary_put(colas,"PANTALLA",queue_create());    
 }
 
 void destruir_diccionario() {
@@ -16,7 +17,22 @@ void destruir_diccionario() {
     queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"READY_RR"),free);
     queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"EXECUTE"),free);
     queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"EXIT"),free);
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"PANTALLA"),free);
     dictionary_destroy(colas);
+}
+
+void crear_semaforos_y_mutex_de_cola_block_dinamica(char* key) {
+    sem_t* mutex = malloc(sizeof(sem_t));
+    sem_t* contador = malloc(sizeof(sem_t));
+    sem_t* sem_hilo = malloc(sizeof(sem_t));
+
+    sem_init(mutex, SEM_NOT_SHARE_BETWEEN_PROCESS, 1); 
+	sem_init(contador, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
+	sem_init(sem_hilo, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+
+    dictionary_put(mutex_colas_block ,key, mutex);
+    dictionary_put(contador_colas_block, key, contador);
+    dictionary_put(sem_hilos_block, key, sem_hilo);
 }
 
 void inicializar_semaforos() {
@@ -48,6 +64,25 @@ void inicializar_semaforos() {
     // multiprogramacion
     uint32_t grado_multiprogramacion = atoi(config_kernel->grado_max_multiprogramacion);
     sem_init(&sem_grado_multiprogramacion, SEM_NOT_SHARE_BETWEEN_PROCESS, grado_multiprogramacion);
+
+    // block con diccionarios
+    contador_colas_block = dictionary_create();
+    sem_hilos_block = dictionary_create();
+    mutex_colas_block = dictionary_create();
+    crear_semaforos_y_mutex_de_cola_block_dinamica("PANTALLA");
+}
+
+void destruir_semaforos_y_mutex_de_cola_block_dinamica(char* key) {
+    sem_t* mutex_pointer = dictionary_get(mutex_colas_block ,key);
+	// sem_t mutex = *mutex_pointer;
+	sem_t* contador_pointer = dictionary_get(contador_colas_block, key);
+	//sem_t contador = *contador_pointer;
+	sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key);
+	//sem_t sem_hilo = *sem_hilo_pointer;
+
+    sem_destroy(mutex_pointer);
+    sem_destroy(contador_pointer);
+    sem_destroy(sem_hilo_pointer);
 }
 
 void destruir_semaforos() {
@@ -75,6 +110,12 @@ void destruir_semaforos() {
 
     sem_destroy(&sem_comienza_timer_quantum);
     sem_destroy(&sem_finaliza_timer_quantum);
+
+    // BLOCK
+    destruir_semaforos_y_mutex_de_cola_block_dinamica("PANTALLA");
+    dictionary_destroy(contador_colas_block);
+    dictionary_destroy(sem_hilos_block);
+    dictionary_destroy(mutex_colas_block);
 }
 
 void inicializar_planificadores() {
@@ -92,6 +133,9 @@ void inicializar_planificadores() {
 
     pthread_create(&hilo_cuenta_quantum, NULL, (void*)hilo_timer_contador_quantum, NULL);
 	pthread_detach(hilo_cuenta_quantum);
+
+    pthread_create(&hilo_block, NULL, (void*)hilo_planificador_block, (void*) "PANTALLA");
+	pthread_detach(hilo_block);
 }
 
 void inicializar_todo() {

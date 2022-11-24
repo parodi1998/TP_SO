@@ -40,6 +40,10 @@ void hilo_planificador_largo_plazo_new() {
 		// proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
 		// signal(mutex_comunicacion_kernel_memoria)
 
+		// pthread_mutex_lock(&mutex_analizando_interrupcion);
+		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
+		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
+		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
 		meter_proceso_en_ready(proceso);
 	}
 
@@ -130,6 +134,7 @@ void meter_proceso_en_ready_feedback(t_pcb* proceso) {
 }
 
 void meter_proceso_en_ready(t_pcb* proceso) {
+	// pthread_mutex_lock(&mutex_agregando_proceso_a_ready);
 	if(string_equals_ignore_case(config_kernel->algoritmo_planificacion,"FEEDBACK")) {
 		meter_proceso_en_ready_feedback(proceso);
 	} else if(string_equals_ignore_case(config_kernel->algoritmo_planificacion,"RR")) {
@@ -138,6 +143,7 @@ void meter_proceso_en_ready(t_pcb* proceso) {
 		meter_proceso_en_ready_fifo(proceso);
 	}
 	sem_wait(&sem_proceso_agregado_a_ready);
+	// pthread_mutex_unlock(&mutex_agregando_proceso_a_ready);
 	sem_post(&sem_corto_plazo_ready);
 }
 
@@ -148,6 +154,7 @@ t_pcb* sacar_proceso_de_ready_fifo() {
 	pthread_mutex_lock(&mutex_ready_fifo);
 	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
 	t_pcb* proceso = queue_pop(cola_ready_fifo);
+	proceso->puede_ser_interrumpido = false;
 	pthread_mutex_unlock(&mutex_ready_fifo);
 	pthread_mutex_unlock(&mutex_ready);
 
@@ -162,6 +169,7 @@ t_pcb* sacar_proceso_de_ready_rr() {
 	pthread_mutex_lock(&mutex_ready_rr);
 	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
 	t_pcb* proceso = queue_pop(cola_ready_rr);
+	proceso->puede_ser_interrumpido = true;
 	pthread_mutex_unlock(&mutex_ready_rr);
 	pthread_mutex_unlock(&mutex_ready);
 
@@ -190,8 +198,8 @@ t_pcb* sacar_proceso_de_ready() {
 
 void hilo_planificador_corto_plazo_ready() {
 	while(1) {
-		sem_wait(&sem_cpu_libre);
 		sem_wait(&sem_corto_plazo_ready);
+		sem_wait(&sem_cpu_libre);
 		t_pcb* proceso = sacar_proceso_de_ready();
 		sem_wait(&sem_proceso_sacado_de_ready);
 		meter_proceso_en_execute(proceso);
@@ -220,6 +228,21 @@ t_pcb* sacar_proceso_de_execute() {
 	return proceso;
 }
 
+void devolver_proceso_a_ready(t_pcb* proceso) {
+	// pthread_mutex_lock(&mutex_analizando_interrupcion);
+
+	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
+	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
+
+	if(queue_is_empty(cola_ready_fifo) && queue_is_empty(cola_ready_rr)) {
+		meter_proceso_en_execute(proceso);
+	} else {
+		meter_proceso_en_ready(proceso);
+		sem_post(&sem_cpu_libre);
+	}
+	// pthread_mutex_lock(&mutex_analizando_interrupcion);
+}
+
 void hilo_planificador_corto_plazo_execute() {
 	while(1) {
 		sem_wait(&sem_corto_plazo_execute);
@@ -228,18 +251,25 @@ void hilo_planificador_corto_plazo_execute() {
 
 		// send_proceso_a_cpu(proceso);				// recordar agregar mutex en las comunicaciones si es necesario
 		/*
-		if(tengo_que_iniciar_timer()) {
+		if(proceso->puede_ser_interrumpido) {
 			sem_post(&sem_comienza_timer_quantum);
 		}
 		*/
 
+		// Para el testo
 		// proceso = recv_proceso_de_cpu()			// esto deberia ser bloqueante
 		sem_post(&sem_comienza_timer_quantum);
 		sem_wait(&sem_finaliza_timer_quantum);		// creo que el sem finaliza no es necesario, aca lo use para sincro no mas
 
-		meter_proceso_en_exit(proceso);
-
-		sem_post(&sem_cpu_libre);
+		if(proceso->debe_ser_finalizado) {
+			meter_proceso_en_exit(proceso);
+			sem_post(&sem_cpu_libre);
+		} else if(proceso->debe_ser_bloqueado) {
+			meter_proceso_en_block(proceso, proceso->dispositivo_bloqueo);
+			sem_post(&sem_cpu_libre);
+		} else {
+			devolver_proceso_a_ready(proceso);
+		}
 	}
 }
 
@@ -258,5 +288,85 @@ void hilo_timer_contador_quantum() {
 
 		//imagino que esto podria estar en un hilo que se encargue solo de enviar la señal interrupt a cpu
 		sem_post(&sem_finaliza_timer_quantum);
+	}
+}
+
+/**
+ * Planificador de bloqueos 
+ */
+void meter_proceso_en_block(t_pcb* proceso, char* key_cola_de_bloqueo) {
+	sem_t* mutex_pointer = dictionary_get(mutex_colas_block ,key_cola_de_bloqueo);
+	//sem_t mutex = *mutex_pointer;
+	sem_t* contador_pointer = dictionary_get(contador_colas_block, key_cola_de_bloqueo);
+	//sem_t contador = *contador_pointer;
+	sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
+	//sem_t sem_hilo = *sem_hilo_pointer;
+	sem_wait(mutex_pointer);
+	actualizar_estado_proceso(logger, proceso, PCB_BLOCK);
+	t_queue* cola_block_dinamica = dictionary_get(colas,key_cola_de_bloqueo);
+	queue_push(cola_block_dinamica, proceso);
+	log_motivo_de_bloqueo(logger, proceso, key_cola_de_bloqueo);
+	sem_post(mutex_pointer);
+
+	sem_post(contador_pointer);
+	sem_post(sem_hilo_pointer);
+}
+
+t_pcb* sacar_proceso_de_block(char* key_cola_de_bloqueo) {
+	sem_t* mutex_pointer = dictionary_get(mutex_colas_block ,key_cola_de_bloqueo);
+	//sem_t mutex = *mutex_pointer;
+	sem_t* contador_pointer = dictionary_get(contador_colas_block, key_cola_de_bloqueo);
+	//sem_t contador = *contador_pointer;
+	sem_wait(contador_pointer);
+	sem_wait(mutex_pointer);
+	t_queue* cola_block_dinamica = dictionary_get(colas,key_cola_de_bloqueo);
+	t_pcb* proceso = queue_pop(cola_block_dinamica);
+	sem_post(mutex_pointer);
+
+	return proceso;
+}
+
+/*
+void hilo_planificador_block_consola_teclado() {
+	while(1) {
+		sem_wait(&sem_block_consola_teclado);
+		
+		t_pcb* proceso = sacar_proceso_de_block("TECLADO");
+
+		// enviar_mensaje_a_consola();
+		// esperar_respuesta_de_consola();
+
+		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
+		// pthread_mutex_lock(&mutex_analizando_interrupcion);
+		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
+		// meter_proceso_en_block(proceso, "BLOCK");
+		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
+	}
+}
+*/
+
+void hilo_planificador_block(void* args) {
+	char* key_cola_de_bloqueo = args;
+	while(1) {
+		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
+		//sem_t sem_hilo = *sem_hilo_pointer;
+		sem_wait(sem_hilo_pointer);
+		
+		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
+
+		proceso->debe_ser_finalizado = true;
+        proceso->debe_ser_bloqueado = false;
+
+		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		
+		sleep(quantum_in_seconds);
+
+		meter_proceso_en_ready(proceso);
+
+		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
+		// pthread_mutex_lock(&mutex_analizando_interrupcion);
+		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
+		// meter_proceso_en_ready(proceso);
+		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
 	}
 }
