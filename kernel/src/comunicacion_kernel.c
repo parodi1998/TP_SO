@@ -17,7 +17,7 @@ static void carga_tabla_segmentos_pcb( t_list** lista_a_cargar, t_list* segmento
 static void procesar_conexion(void* void_args) {
     t_procesar_conexion_args* args = (t_procesar_conexion_args*) void_args;
     t_log* logger = args->log;
-    int cliente_fd = args->fd;
+    size_t cliente_fd = args->fd;
     char* server_name = args->server_name;
     free(args);
 
@@ -42,7 +42,15 @@ static void procesar_conexion(void* void_args) {
             pcb_proceso->instrucciones = instrucciones;
             pcb_proceso->estado_anterior = PCB_NEW;
             pcb_proceso->estado_actual = PCB_NEW;
-            // pcb_proceso->consola_fd = cliente_fd;
+            pcb_proceso->consola_fd = cliente_fd;
+            pcb_proceso->debe_ser_finalizado = false;
+            pcb_proceso->debe_ser_bloqueado = true;             // cambiar esto a false
+            pcb_proceso->puede_ser_interrumpido = false;
+            pcb_proceso->fue_interrumpido = false;
+            pcb_proceso->registro_para_bloqueo = 0;
+            pcb_proceso->unidades_de_trabajo = 0;
+            pcb_proceso->dispositivo_bloqueo = string_new();
+            string_append(&pcb_proceso->dispositivo_bloqueo, "BLOCK"); // borrar esto despues
 
             meter_proceso_en_new(pcb_proceso);
             break;
@@ -69,7 +77,7 @@ static void procesar_conexion(void* void_args) {
 }
 
 int server_escuchar(t_log* logger, char* server_name, int server_socket) {
-    int cliente_socket = esperar_cliente(logger, server_name, server_socket);
+    size_t cliente_socket = esperar_cliente(logger, server_name, server_socket);
 
     if (cliente_socket != -1) {
         pthread_t hilo;

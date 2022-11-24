@@ -111,6 +111,9 @@ void actualizar_estado_proceso(t_log* logger, t_pcb* proceso, t_estado_pcb nuevo
 	log_proceso_cambio_de_estado(logger, proceso);
 }
 
+void log_motivo_de_bloqueo(t_log* logger, t_pcb* proceso, char* dispositivo) {
+    log_info(logger, "PID: <%d> - Bloqueado por: <%s>", proceso->id_proceso, dispositivo);
+}
 
 /**
  * Consola -> Kernel: Envio y recepcion de Instrucciones
@@ -267,7 +270,8 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 	size_t tamanio_instrucciones = calcular_tamanio_informacion_de_lista(pcb->instrucciones, cantidad_instrucciones);
     size_t cantidad_segmentos = list_size(pcb->tabla_segmentos);
 	size_t tamanio_segmentos = 2 * sizeof(size_t) * cantidad_segmentos;
-	size_t tamanio_pcb = 7 * sizeof(size_t) + 2 * sizeof(t_estado_pcb) + tamanio_instrucciones + tamanio_segmentos;
+	size_t tamanio_dispositivo_bloqueo = string_length(pcb->dispositivo_bloqueo)+1;
+	size_t tamanio_pcb = 11 * sizeof(size_t) + 4 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
 		sizeof(size_t) +  		    // tamanio total del pcb
@@ -277,9 +281,18 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
         sizeof(size_t) +		    // pcb.registro_BX 
         sizeof(size_t) +		    // pcb.registro_CX 
         sizeof(size_t) +		    // pcb.registro_DX
+        sizeof(size_t) +		    // pcb.consola_fd
         sizeof(size_t) +		    // cantidad segmentos
         sizeof(t_estado_pcb) +		// pcb.estado_anterior
         sizeof(t_estado_pcb) +      // pcb.estado_actual
+        sizeof(bool) +              // pcb.debe_ser_finalizado
+        sizeof(bool) +              // pcb.debe_ser_bloqueado
+        sizeof(bool) +              // pcb.puede_ser_interrumpido
+        sizeof(bool) +              // pcb.fue_interrumpido
+        sizeof(size_t) +            // pcb.registro_para_bloqueo
+        sizeof(size_t) +            // pcb.unidades_de_trabajo
+        sizeof(size_t) +            // tamanio_dispositivo_bloqueo
+        tamanio_dispositivo_bloqueo+// pcb.dispositivo_bloqueo
         tamanio_segmentos +         // 2 size_t * cantidad segmentos
 		sizeof(size_t) +		    // cantidad de instrucciones
 		tamanio_instrucciones;	    // (largo de instruccion + instruccion) * cantidad de instrucciones 
@@ -310,6 +323,33 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 
     memcpy(p,&pcb->registro_DX,sizeof(size_t)); // guardo el registro_DX del pcb
 	p += sizeof(size_t);
+
+    memcpy(p,&pcb->consola_fd,sizeof(size_t)); // guardo el fd consola del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->debe_ser_finalizado,sizeof(bool)); // guardo el estado debe_ser_finalizado del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->debe_ser_bloqueado,sizeof(bool)); // guardo el estado debe_ser_bloqueado del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->puede_ser_interrumpido,sizeof(bool)); // guardo el estado puede_ser_interrumpido del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->fue_interrumpido,sizeof(bool)); // guardo el estado fue_interrumpido del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->registro_para_bloqueo,sizeof(size_t)); // guardo el index del registro_para_bloqueo del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->unidades_de_trabajo,sizeof(size_t)); // guardo las unidades_de_trabajo para el bloqueo del pcb
+	p += sizeof(size_t);
+
+	memcpy(p,&tamanio_dispositivo_bloqueo,sizeof(size_t));
+	p += sizeof(size_t);
+
+	memcpy(p,pcb->dispositivo_bloqueo,tamanio_dispositivo_bloqueo);
+	p += tamanio_dispositivo_bloqueo;
 
     memcpy(p,&pcb->estado_anterior,sizeof(t_estado_pcb)); // guardo el estado anterior del pcb
 	p += sizeof(t_estado_pcb);
@@ -370,6 +410,36 @@ static void deserializar_pcb(void* stream, t_pcb** pcb) {
     memcpy(&pcb_aux->registro_DX, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
+    memcpy(&pcb_aux->consola_fd, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    memcpy(&pcb_aux->debe_ser_finalizado, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->debe_ser_bloqueado, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->puede_ser_interrumpido, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->fue_interrumpido, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->registro_para_bloqueo, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    memcpy(&pcb_aux->unidades_de_trabajo, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    size_t tamanio_dispositivo_bloqueo;
+    memcpy(&tamanio_dispositivo_bloqueo, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    char* dispositivo_bloqueo = malloc(tamanio_dispositivo_bloqueo);
+	memcpy(dispositivo_bloqueo, p, tamanio_dispositivo_bloqueo);
+    pcb_aux->dispositivo_bloqueo = dispositivo_bloqueo;
+	p += tamanio_dispositivo_bloqueo;
+    
     memcpy(&pcb_aux->estado_anterior, p, sizeof(t_estado_pcb));	
 	p += sizeof(t_estado_pcb);
 
