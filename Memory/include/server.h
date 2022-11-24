@@ -50,16 +50,16 @@ typedef struct
 
 pthread_t thread;
 
-void* recibir_buffer(int*, int);
+void* recibir_buffer_memory(int*, int);
 
-void iniciar_servidor(void);
-void esperar_cliente(int);
-void* recibir_mensaje(int socket_cliente, int* size);
-int recibir_operacion(int);
-void process_request(int cod_op, int cliente_fd);
-void serve_client(int *socket);
-void* serializar_paquete(t_paquete* paquete, int bytes);
-void devolver_mensaje(void* payload, int size, int socket_cliente,int op_code);
+void iniciar_servidor_memory(void);
+void esperar_cliente_memory(int);
+void* recibir_mensaje_memory(int socket_cliente, int* size);
+int recibir_operacion_memory(int);
+void process_request_memory(int cod_op, int cliente_fd);
+void serve_client_memory(int *socket);
+void* serializar_paquete_memory(t_paquete* paquete, int bytes);
+void devolver_mensaje_memory(void* payload, int size, int socket_cliente,int op_code);
 
 
 char* process_numeric_response(int32_t response);

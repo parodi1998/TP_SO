@@ -8,7 +8,7 @@
 #include "../include/memory_file_management.h"
 #include "../include/server.h"
 
-void iniciar_servidor(void)
+void iniciar_servidor_memory(void)
 {
 	log_info(get_logger(),"INICIANDO SERVIDOR..");
 	int socket_servidor;
@@ -39,10 +39,10 @@ void iniciar_servidor(void)
     freeaddrinfo(servinfo);
 
     while(1)
-    	esperar_cliente(socket_servidor);
+    	esperar_cliente_memory(socket_servidor);
 }
 
-void esperar_cliente(int socket_servidor)
+void esperar_cliente_memory(int socket_servidor)
 {
 	struct sockaddr_in dir_cliente;
 
@@ -50,27 +50,27 @@ void esperar_cliente(int socket_servidor)
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
+	pthread_create(&thread,NULL,(void*)serve_client_memory,&socket_cliente);
 	pthread_detach(thread);
 
 }
 
-void serve_client(int* socket)
+void serve_client_memory(int* socket)
 {
 	int cod_op;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1){
 		cod_op = -1;
 	}
-	process_request(cod_op, *socket);
+	process_request_memory(cod_op, *socket);
 }
 
-void process_request(int cod_op, int cliente_fd) {
+void process_request_memory(int cod_op, int cliente_fd) {
 	int size;
 	int op_code_response;
 	void* msg = NULL;
 	void* response = NULL;
 		switch (cod_op) {
-		msg = recibir_mensaje(cliente_fd, &size);
+		msg = recibir_mensaje_memory(cliente_fd, &size);
 		case CONFIG_CPU:
 			response = config_cpu();
 			size = sizeof(response);
@@ -97,12 +97,12 @@ void process_request(int cod_op, int cliente_fd) {
 			response = procesar_finalizar_proceso(msg,&size,&op_code_response);
 			break;
 		}
-		devolver_mensaje(response,size, cliente_fd,op_code_response);
+		devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 		free(msg);
 		free(response);
 }
 
-void* recibir_mensaje(int socket_cliente, int* size)
+void* recibir_mensaje_memory(int socket_cliente, int* size)
 {
 	void * buffer;
 
@@ -113,7 +113,7 @@ void* recibir_mensaje(int socket_cliente, int* size)
 	return buffer;
 }
 
-void* serializar_paquete(t_paquete* paquete, int bytes)
+void* serializar_paquete_memory(t_paquete* paquete, int bytes)
 {
 	void * magic = malloc(bytes);
 	int desplazamiento = 0;
@@ -125,7 +125,7 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 	return magic;
 }
 
-void devolver_mensaje(void* payload, int size, int socket_cliente,int op_code)
+void devolver_mensaje_memory(void* payload, int size, int socket_cliente,int op_code)
 {
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
@@ -137,7 +137,7 @@ void devolver_mensaje(void* payload, int size, int socket_cliente,int op_code)
 
 	int bytes = paquete->buffer->size + sizeof(int);
 
-	void* a_enviar = serializar_paquete(paquete, bytes);
+	void* a_enviar = serializar_paquete_memory(paquete, bytes);
 
 	send(socket_cliente, a_enviar, bytes, 0);
 
@@ -165,24 +165,26 @@ void* procesar_mensaje_iniciar_proceso(char* string,int* size_response,int* op_c
 }
 
 void* procesar_mensaje_leer(char* string,int* size_response,int* op_code){
-	//ENTRADA: <ADDRESS>|<SIZE>
+	//ENTRADA: <PID>|<ADDRESS>|<SIZE>
 	//SALIDA:<CONTENIDO>
 	char** array = string_split(string,"|");
-	uint32_t address = (volatile uint32_t) atoi( array[0]);
-	uint32_t size = (volatile uint32_t) atoi( array[1]);
+	uint32_t pid = (volatile uint32_t) atoi( array[0]);
+	uint32_t address = (volatile uint32_t) atoi( array[1]);
+	uint32_t size = (volatile uint32_t) atoi( array[2]);
 	*size_response = size;
 	*op_code = LEER;
-	return read_value_in_memory(address,size);
+	return read_value_in_memory(pid,address,size);
 }
 
 void* procesar_mensaje_escribir(char* string,int* size_response,int* op_code){
-	//ENTRADA:<ADDRESS>|<SIZE>|<VALUE>
+	//ENTRADA:<PID><ADDRESS>|<SIZE>|<VALUE>
 	//SALIDA: "OK"
 	char** array = string_split(string,"|");
-	uint32_t address = (volatile uint32_t) atoi( array[0]);
-	uint32_t size = (volatile uint32_t) atoi( array[1]);
+	uint32_t pid = (volatile uint32_t) atoi( array[0]);
+	uint32_t address = (volatile uint32_t) atoi( array[1]);
+	uint32_t size = (volatile uint32_t) atoi( array[2]);
 
-	save_value_in_memory(address,(void*) array[2],size);
+	save_value_in_memory(pid,address,(void*) array[3],size);
 	*op_code = OK;
 	*size_response = string_length("OK")+1;
 	return (void*)"OK";

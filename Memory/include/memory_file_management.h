@@ -58,9 +58,9 @@ void init_global_variables(void);
 void initialize_memory(void);
 void init_structs_and_lists(void);
 
-void save_value_in_memory(uint32_t address, void* value,uint32_t size);
-//int32_t write_value_in_pid(uint32_t pid, void* value, uint32_t size,uint32_t logical_address);
-void* read_value_in_memory(uint32_t address, uint32_t size);
+void save_value_in_memory(uint32_t pid,uint32_t address, void* value,uint32_t size);
+
+void* read_value_in_memory(uint32_t pid,uint32_t address, uint32_t size);
 void initialize_memory_file_management();
 void save_content_in_swap_file(uint32_t address, uint32_t size,uint32_t logical_address);
 void load_file_into_memory(uint32_t address, uint32_t size,uint32_t logical_address);

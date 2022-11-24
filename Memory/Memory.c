@@ -17,6 +17,6 @@
 int main(void) {
 	initialize_memory_configuration_manager();
 	initialize_memory_file_management();
-	iniciar_servidor();
+	iniciar_servidor_memory();
 	return EXIT_SUCCESS;
 }
