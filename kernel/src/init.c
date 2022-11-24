@@ -77,7 +77,7 @@ static void free_config_kernel() {
     free(config_kernel->puerto_cpu_interrupt);
     free(config_kernel->ip_escucha);
     free(config_kernel->puerto_escucha);
-    free(->nombre_escucha);
+    free(config_kernel->nombre_escucha);
     free(config_kernel->algoritmo_planificacion);
     free(config_kernel->grado_max_multiprogramacion);
     free(config_kernel->quantum_RR);

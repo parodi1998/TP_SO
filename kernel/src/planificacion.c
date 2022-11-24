@@ -296,11 +296,8 @@ void hilo_timer_contador_quantum() {
  */
 void meter_proceso_en_block(t_pcb* proceso, char* key_cola_de_bloqueo) {
 	sem_t* mutex_pointer = dictionary_get(mutex_colas_block ,key_cola_de_bloqueo);
-	//sem_t mutex = *mutex_pointer;
 	sem_t* contador_pointer = dictionary_get(contador_colas_block, key_cola_de_bloqueo);
-	//sem_t contador = *contador_pointer;
 	sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
-	//sem_t sem_hilo = *sem_hilo_pointer;
 	sem_wait(mutex_pointer);
 	actualizar_estado_proceso(logger_kernel_obligatorio, proceso, PCB_BLOCK);
 	t_queue* cola_block_dinamica = dictionary_get(colas,key_cola_de_bloqueo);
@@ -314,9 +311,7 @@ void meter_proceso_en_block(t_pcb* proceso, char* key_cola_de_bloqueo) {
 
 t_pcb* sacar_proceso_de_block(char* key_cola_de_bloqueo) {
 	sem_t* mutex_pointer = dictionary_get(mutex_colas_block ,key_cola_de_bloqueo);
-	//sem_t mutex = *mutex_pointer;
 	sem_t* contador_pointer = dictionary_get(contador_colas_block, key_cola_de_bloqueo);
-	//sem_t contador = *contador_pointer;
 	sem_wait(contador_pointer);
 	sem_wait(mutex_pointer);
 	t_queue* cola_block_dinamica = dictionary_get(colas,key_cola_de_bloqueo);
@@ -326,12 +321,37 @@ t_pcb* sacar_proceso_de_block(char* key_cola_de_bloqueo) {
 	return proceso;
 }
 
-/*
-void hilo_planificador_block_consola_teclado() {
+void hilo_planificador_block_io(void* args) {
+	char* key_cola_de_bloqueo = args;
 	while(1) {
-		sem_wait(&sem_block_consola_teclado);
+		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
+		sem_wait(sem_hilo_pointer);
 		
-		t_pcb* proceso = sacar_proceso_de_block("TECLADO");
+		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
+
+		if(string_equals_ignore_case(proceso->dispositivo_bloqueo,"DISCO")) {
+			proceso->dispositivo_bloqueo = "IMPRESORA";
+		} else {
+			proceso->debe_ser_finalizado = true;
+        	proceso->debe_ser_bloqueado = false;
+		}
+
+		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		
+		sleep(quantum_in_seconds);
+
+		meter_proceso_en_ready(proceso);
+	}
+}
+
+void hilo_planificador_block_pantalla() {
+	char* key_cola_de_bloqueo = "PANTALLA";
+	while(1) {
+		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
+		sem_wait(sem_hilo_pointer);
+		
+		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
+		//proceso->debe_ser_bloqueado = false;
 
 		// enviar_mensaje_a_consola();
 		// esperar_respuesta_de_consola();
@@ -341,32 +361,69 @@ void hilo_planificador_block_consola_teclado() {
 		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
 		// meter_proceso_en_block(proceso, "BLOCK");
 		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
-	}
-}
-*/
-
-void hilo_planificador_block(void* args) {
-	char* key_cola_de_bloqueo = args;
-	while(1) {
-		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
-		//sem_t sem_hilo = *sem_hilo_pointer;
-		sem_wait(sem_hilo_pointer);
-		
-		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
-
-		proceso->debe_ser_finalizado = true;
-        proceso->debe_ser_bloqueado = false;
+        proceso->debe_ser_bloqueado = true;
+		proceso->dispositivo_bloqueo = "DISCO";
 
 		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
 		
 		sleep(quantum_in_seconds);
 
 		meter_proceso_en_ready(proceso);
+	}
+}
+
+void hilo_planificador_block_teclado(void* args) {
+	char* key_cola_de_bloqueo = "TECLADO";
+	while(1) {
+		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
+		sem_wait(sem_hilo_pointer);
+		
+		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
+		proceso->debe_ser_bloqueado = false;
+
+		// enviar_mensaje_a_consola();
+		// esperar_respuesta_de_consola();
 
 		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
 		// pthread_mutex_lock(&mutex_analizando_interrupcion);
 		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
-		// meter_proceso_en_ready(proceso);
+		// meter_proceso_en_block(proceso, "BLOCK");
 		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
+		proceso->debe_ser_bloqueado = true;
+		proceso->dispositivo_bloqueo = "PAGE_FAULT";
+
+		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		
+		sleep(quantum_in_seconds);
+
+		meter_proceso_en_ready(proceso);
+	}
+}
+
+void hilo_planificador_block_page_fault(void* args) {
+	char* key_cola_de_bloqueo = "PAGE_FAULT";
+	while(1) {
+		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
+		sem_wait(sem_hilo_pointer);
+		
+		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
+		proceso->debe_ser_bloqueado = false;
+
+		// enviar_mensaje_a_consola();
+		// esperar_respuesta_de_consola();
+
+		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
+		// pthread_mutex_lock(&mutex_analizando_interrupcion);
+		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
+		// meter_proceso_en_block(proceso, "BLOCK");
+		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
+		proceso->debe_ser_bloqueado = true;
+		proceso->dispositivo_bloqueo = "IMPRESORA";
+
+		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		
+		sleep(quantum_in_seconds);
+
+		meter_proceso_en_ready(proceso);
 	}
 }

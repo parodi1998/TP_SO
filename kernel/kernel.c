@@ -3,12 +3,15 @@
 void inicializar_diccionario() {
     generador_pcb_id = 0;
     colas = dictionary_create();
+    tiempos_io = dictionary_create();
     dictionary_put(colas,"NEW",queue_create());
     dictionary_put(colas,"READY_FIFO",queue_create());
     dictionary_put(colas,"READY_RR",queue_create());
     dictionary_put(colas,"EXECUTE",queue_create());
     dictionary_put(colas,"EXIT",queue_create());
-    dictionary_put(colas,"PANTALLA",queue_create());    
+    dictionary_put(colas,"PANTALLA",queue_create());
+    dictionary_put(colas,"TECLADO",queue_create());
+    dictionary_put(colas,"PAGE_FAULT",queue_create());
 }
 
 void destruir_diccionario() {
@@ -18,7 +21,10 @@ void destruir_diccionario() {
     queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"EXECUTE"),free);
     queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"EXIT"),free);
     queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"PANTALLA"),free);
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"TECLADO"),free);
+    queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"PAGE_FAULT"),free);
     dictionary_destroy(colas);
+    dictionary_destroy(tiempos_io);
 }
 
 void crear_semaforos_y_mutex_de_cola_block_dinamica(char* key) {
@@ -70,6 +76,8 @@ void inicializar_semaforos() {
     sem_hilos_block = dictionary_create();
     mutex_colas_block = dictionary_create();
     crear_semaforos_y_mutex_de_cola_block_dinamica("PANTALLA");
+    crear_semaforos_y_mutex_de_cola_block_dinamica("TECLADO");
+    crear_semaforos_y_mutex_de_cola_block_dinamica("PAGE_FAULT");
 }
 
 void destruir_semaforos_y_mutex_de_cola_block_dinamica(char* key) {
@@ -113,6 +121,8 @@ void destruir_semaforos() {
 
     // BLOCK
     destruir_semaforos_y_mutex_de_cola_block_dinamica("PANTALLA");
+    destruir_semaforos_y_mutex_de_cola_block_dinamica("TECLADO");
+    destruir_semaforos_y_mutex_de_cola_block_dinamica("PAGE_FAULT");
     dictionary_destroy(contador_colas_block);
     dictionary_destroy(sem_hilos_block);
     dictionary_destroy(mutex_colas_block);
@@ -134,17 +144,47 @@ void inicializar_planificadores() {
     pthread_create(&hilo_cuenta_quantum, NULL, (void*)hilo_timer_contador_quantum, NULL);
 	pthread_detach(hilo_cuenta_quantum);
 
-    pthread_create(&hilo_block, NULL, (void*)hilo_planificador_block, (void*) "PANTALLA");
-	pthread_detach(hilo_block);
+    pthread_create(&hilo_block_pantalla, NULL, (void*)hilo_planificador_block_pantalla, NULL);
+	pthread_detach(hilo_block_pantalla);
+
+    pthread_create(&hilo_block_teclado, NULL, (void*)hilo_planificador_block_teclado, NULL);
+	pthread_detach(hilo_block_teclado);
+
+    pthread_create(&hilo_block_page_fault, NULL, (void*)hilo_planificador_block_page_fault, NULL);
+	pthread_detach(hilo_block_page_fault);
+}
+
+static void inicializar_estructuras_para_io_block_dinamica() {
+    for(int index = 0; index < list_size(config_kernel->dispositivos_IO); index++) {
+        char* dispositivo_io = list_get(config_kernel->dispositivos_IO, index);
+        char* tiempo_io = list_get(config_kernel->tiempos_IO, index);
+        dictionary_put(colas, dispositivo_io, queue_create());
+        dictionary_put(tiempos_io, dispositivo_io, tiempo_io);
+        crear_semaforos_y_mutex_de_cola_block_dinamica(dispositivo_io);
+
+        pthread_t* hilo_block_io = malloc(sizeof(pthread_t));
+        pthread_create(hilo_block_io, NULL, (void*)hilo_planificador_block_io, (void*) dispositivo_io);
+	    pthread_detach(*hilo_block_io);
+    } 
+}
+
+static void destruir_estructuras_para_io_block_dinamica() {
+    for(int index = 0; index < list_size(config_kernel->dispositivos_IO); index++) {
+        char* dispositivo_io = list_get(config_kernel->dispositivos_IO, index);
+        queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas, dispositivo_io), free);
+        destruir_semaforos_y_mutex_de_cola_block_dinamica(dispositivo_io);
+    }
 }
 
 void inicializar_todo() {
     inicializar_semaforos();
     inicializar_planificadores();
     inicializar_diccionario(); 
+    inicializar_estructuras_para_io_block_dinamica();
 }
 
 void destruir_todo() {
+    destruir_estructuras_para_io_block_dinamica();
     destruir_diccionario();
     destruir_semaforos();
 }

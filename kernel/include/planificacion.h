@@ -17,6 +17,7 @@ t_dictionary* colas;
 t_dictionary* contador_colas_block;
 t_dictionary* sem_hilos_block;
 t_dictionary* mutex_colas_block;
+t_dictionary* tiempos_io;
 
 // mutex
 pthread_mutex_t mutex_new;
@@ -49,7 +50,9 @@ pthread_t hilo_corto_plazo_ready;
 pthread_t hilo_corto_plazo_execute;
 pthread_t hilo_largo_plazo_exit;
 pthread_t hilo_cuenta_quantum;
-pthread_t hilo_block;
+pthread_t hilo_block_pantalla;
+pthread_t hilo_block_teclado;
+pthread_t hilo_block_page_fault;
 
 // Planificador largo plazo
 void meter_proceso_en_new(t_pcb* proceso);
@@ -81,6 +84,9 @@ void hilo_timer_contador_quantum();
 // Planificador de bloqueos
 void meter_proceso_en_block(t_pcb* proceso, char* key_cola_de_bloqueo);
 t_pcb* sacar_proceso_de_block(char* key_cola_de_bloqueo);
-void hilo_planificador_block(void* args);
+void hilo_planificador_block_io(void* args);
+void hilo_planificador_block_pantalla();
+void hilo_planificador_block_teclado();
+void hilo_planificador_block_page_fault();
 
 #endif

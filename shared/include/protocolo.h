@@ -32,6 +32,9 @@ typedef struct {
     size_t unidades_de_trabajo;
 } t_pcb;
 
+    //size_t segmento = proceso->page_fault_segmento;
+    //size_t pagina = proceso->page_fault_pagina;
+
 typedef struct {
     size_t tamanio_segmento;
     size_t id_tabla_paginas;

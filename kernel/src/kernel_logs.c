@@ -92,5 +92,17 @@ void actualizar_estado_proceso(t_log* logger, t_pcb* proceso, t_estado_pcb nuevo
 }
 
 void log_motivo_de_bloqueo(t_log* logger, t_pcb* proceso, char* dispositivo) {
-    log_info(logger, "PID: <%d> - Bloqueado por: <%s>", proceso->id_proceso, dispositivo);
+    size_t segmento = 0;
+    size_t pagina = 0;
+    //size_t segmento = proceso->page_fault_segmento;
+    //size_t pagina = proceso->page_fault_pagina;
+    if(string_equals_ignore_case(dispositivo,"PAGE_FAULT")) {
+        log_info(logger, "Page Fault PID: <%d> - Segmento: <%d> - Pagina: <%d>", proceso->id_proceso, segmento, pagina);
+    } else {
+        log_info(logger, "PID: <%d> - Bloqueado por: <%s>", proceso->id_proceso, dispositivo);
+    }
+}
+
+void log_proceso_desalojado_por_quantum(t_log* logger, t_pcb* proceso) {
+    log_info(logger, "PID: <%d> - Desalojado por fin de Quantum", proceso->id_proceso);
 }
