@@ -33,8 +33,8 @@ typedef struct {
     char* nombre_escucha;
     char* algoritmo_planificacion;
     char* grado_max_multiprogramacion;
-    char* dispositivos_IO;
-    char* tiempos_IO;
+    t_list* dispositivos_IO;
+    t_list* tiempos_IO;
     char* quantum_RR;
 } t_config_kernel;
 
