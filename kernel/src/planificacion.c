@@ -329,16 +329,14 @@ void hilo_planificador_block_io(void* args) {
 		
 		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
 
-		if(string_equals_ignore_case(proceso->dispositivo_bloqueo,"DISCO")) {
-			proceso->dispositivo_bloqueo = "IMPRESORA";
-		} else {
-			proceso->debe_ser_finalizado = true;
-        	proceso->debe_ser_bloqueado = false;
-		}
+		char* tiempo_io_string = dictionary_get(tiempos_io, key_cola_de_bloqueo);
+		size_t tiempo_io_en_milis = atoi(tiempo_io_string) * proceso->unidades_de_trabajo;
 
-		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		float io_block_in_seconds = tiempo_io_en_milis / 1000;
 		
-		sleep(quantum_in_seconds);
+		sleep(io_block_in_seconds);
+
+		proceso->debe_ser_bloqueado = false;
 
 		meter_proceso_en_ready(proceso);
 	}
