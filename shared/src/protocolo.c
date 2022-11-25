@@ -156,7 +156,7 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
     size_t cantidad_segmentos = list_size(pcb->tabla_segmentos);
 	size_t tamanio_segmentos = 2 * sizeof(size_t) * cantidad_segmentos;
 	size_t tamanio_dispositivo_bloqueo = string_length(pcb->dispositivo_bloqueo)+1;
-	size_t tamanio_pcb = 11 * sizeof(size_t) + 4 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
+	size_t tamanio_pcb = 13 * sizeof(size_t) + 4 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
 		sizeof(size_t) +  		    // tamanio total del pcb
@@ -177,6 +177,8 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
         sizeof(size_t) +            // pcb.registro_para_bloqueo
         sizeof(size_t) +            // pcb.unidades_de_trabajo
         sizeof(size_t) +            // tamanio_dispositivo_bloqueo
+        sizeof(size_t) +		    // pcb.page_fault_segmento
+        sizeof(size_t) +		    // pcb.page_fault_pagina
         tamanio_dispositivo_bloqueo+// pcb.dispositivo_bloqueo
         tamanio_segmentos +         // 2 size_t * cantidad segmentos
 		sizeof(size_t) +		    // cantidad de instrucciones
@@ -210,6 +212,12 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 	p += sizeof(size_t);
 
     memcpy(p,&pcb->consola_fd,sizeof(size_t)); // guardo el fd consola del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->page_fault_segmento,sizeof(size_t)); // guardo el page_fault_segmento del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->page_fault_pagina,sizeof(size_t)); // guardo el page_fault_pagina del pcb
 	p += sizeof(size_t);
 
     memcpy(p,&pcb->debe_ser_finalizado,sizeof(bool)); // guardo el estado debe_ser_finalizado del pcb
@@ -296,6 +304,12 @@ static void deserializar_pcb(void* stream, t_pcb** pcb) {
 	p += sizeof(size_t);
 
     memcpy(&pcb_aux->consola_fd, p, sizeof(size_t));	
+	p += sizeof(size_t);
+    
+    memcpy(&pcb_aux->page_fault_segmento, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    memcpy(&pcb_aux->page_fault_pagina, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
     memcpy(&pcb_aux->debe_ser_finalizado, p, sizeof(bool));	

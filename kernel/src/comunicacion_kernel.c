@@ -50,6 +50,8 @@ static void procesar_conexion(void* void_args) {
             pcb_proceso->registro_para_bloqueo = 0;
             pcb_proceso->unidades_de_trabajo = 0;
             pcb_proceso->dispositivo_bloqueo = string_new();
+            pcb_proceso->page_fault_segmento = 0;
+            pcb_proceso->page_fault_pagina = 0;
 
             meter_proceso_en_new(pcb_proceso);
             break;
