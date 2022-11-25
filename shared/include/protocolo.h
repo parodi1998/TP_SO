@@ -30,8 +30,8 @@ typedef struct {
     char* dispositivo_bloqueo;
     size_t registro_para_bloqueo;
     size_t unidades_de_trabajo;
-    site_t page_fault_segmento;
-    site_t page_fault_pagina;
+    size_t page_fault_segmento;
+    size_t page_fault_pagina;
 } t_pcb;
 
 typedef struct {
