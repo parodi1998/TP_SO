@@ -10,7 +10,6 @@ char* replacement_algorithm;
 uint32_t frames_per_process;
 uint32_t swap_delay_time;
 char* swap_file_path;
-char* log_file_path;
 uint32_t swap_size;
 
 t_config* CONFIG;
@@ -29,7 +28,6 @@ void initialize_memory_configuration_manager(){
     frames_per_process = (volatile uint32_t) config_get_int_value(CONFIG,"MARCOS_POR_PROCESO");
     swap_delay_time = (volatile uint32_t) config_get_int_value(CONFIG,"RETARDO_SWAP");
     swap_file_path = config_get_string_value(CONFIG,"PATH_SWAP");
-    log_file_path = config_get_string_value(CONFIG,"LOG_FILE");
     swap_size = (volatile uint32_t) config_get_int_value(CONFIG,"TAMANIO_SWAP");
     initialize_logger();
 }
@@ -61,16 +59,13 @@ char* swap_path(){
     return swap_file_path;
 }
 
-char* log_path(){
-	return log_file_path;
-}
 
 void free_memory_configuration_manager(){
     config_destroy(CONFIG);
 }
 
 void initialize_logger(){
-	logger = log_create(log_path(), "Memory", true, LOG_LEVEL_INFO);
+	logger = log_create("Memory.log", "Memory", true, LOG_LEVEL_INFO);
 }
 
 t_log* get_logger(){

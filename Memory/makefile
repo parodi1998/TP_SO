@@ -12,7 +12,7 @@ LINK = -lpthread -lcommons -lm
 CFLAGS = -c
 
 build: makefolder $(OBJ)
-	$(CC) -o $(OUTFILE) Memory.c $(OBJ) $(LINK)
+	$(CC) -o $(OUTFILE) $(OBJ) $(LINK)
 
 valgrind: build
 	valgrind --leak-check=full --show-leak-kinds=all --log-file=valgrind.log ./$(OUTFILE)

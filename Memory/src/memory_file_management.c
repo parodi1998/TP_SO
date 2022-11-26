@@ -193,7 +193,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 
 		list_add(new_table->pages, page);
 		log_info(LOGGER, "Se creo la pagina %d con frame %d para el PID %d", i,page->frame, pid);
-		log_info("PID: <%d> - Segmento: <%d> - TAMAÑO: <%d> paginas",pid,segment_ID,number_of_pages_to_create);
+		log_info(LOGGER,"PID: <%d> - Segmento: <%d> - TAMAÑO: <%d> paginas",pid,segment_ID,number_of_pages_to_create);
 		memcpy(MEMORY_BLOCK + page->frame * page_size_getter(),buffer_process + i * page_size_getter(), page_size_getter());
 		page->locked = false;
 	}

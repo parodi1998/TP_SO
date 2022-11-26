@@ -10,7 +10,6 @@
 
 void iniciar_servidor_memory(void)
 {
-	log_info(get_logger(),"INICIANDO SERVIDOR..");
 	int socket_servidor;
 
     struct addrinfo hints, *servinfo, *p;
@@ -58,9 +57,8 @@ void esperar_cliente_memory(int socket_servidor)
 void serve_client_memory(int* socket)
 {
 	int cod_op;
-	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1){
+	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	}
 	process_request_memory(cod_op, *socket);
 }
 
@@ -69,8 +67,8 @@ void process_request_memory(int cod_op, int cliente_fd) {
 	int op_code_response;
 	void* msg = NULL;
 	void* response = NULL;
+	msg = recibir_mensaje_memory(cliente_fd, &size);
 		switch (cod_op) {
-		msg = recibir_mensaje_memory(cliente_fd, &size);
 		case CONFIG_CPU:
 			response = config_cpu();
 			size = sizeof(response);
@@ -98,8 +96,6 @@ void process_request_memory(int cod_op, int cliente_fd) {
 			break;
 		}
 		devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
-		free(msg);
-		free(response);
 }
 
 void* recibir_mensaje_memory(int socket_cliente, int* size)
