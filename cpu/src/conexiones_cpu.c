@@ -1,7 +1,6 @@
-#include "../include/conexiones.h"
-#include "../include/config_cpu.h"
+#include "../include/conexiones_cpu.h"
+#include "../../shared/include/protocolo.h"
 
-#include <commons/collections/list.h>
 
 int kernel = 1;
 int interrumpir = 0;
@@ -89,10 +88,9 @@ t_contexto_ejecucion iniciar_proceso(t_pcb pcb1){
 
 	    //FUNCION DE PRUEBA
 
-
-	    	t_contexto_ejecucion  contexto_ejecucion;
+	       	t_contexto_ejecucion  contexto_ejecucion;
 	    	contexto_ejecucion.estado = OPTIMO;
-	    	contexto_ejecucion.instrucciones = pcb1.instrucciones;
+	    	//contexto_ejecucion.instrucciones = pcb1.instrucciones;
 	    	contexto_ejecucion.program_counter = pcb1.program_counter;
 	    	contexto_ejecucion.reg_general.ax = pcb1.registro_AX;
 	    	contexto_ejecucion.reg_general.bx = pcb1.registro_BX;
@@ -103,10 +101,10 @@ t_contexto_ejecucion iniciar_proceso(t_pcb pcb1){
 
 
 	   // 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
-	    	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion));
+	    //	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso));
+	    	seguir_instrucciones(&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso);
 
-
-	    pthread_join( thread2, NULL);
+	   // pthread_join( thread2, NULL);
 	    interrumpir = 1;
 	  // pthread_join( thread1, NULL);
 	   return contexto_ejecucion;
@@ -122,7 +120,6 @@ void ciclo_recibir_instruccines(){
 		//}
 		t_pcb pcb1; //SE OBTIENE
 
-			pcb1.estado = "OPTIMO";
 			pcb1.id_proceso = 5;
 			pcb1.instrucciones = "SET AX 2\nSET BX 4\nADD AX BX\nEXIT\n";
 			pcb1.program_counter = 1;
@@ -131,8 +128,13 @@ void ciclo_recibir_instruccines(){
 
 		t_contexto_ejecucion contexto = iniciar_proceso(pcb1);
 		//SE DEVUELVE contexto
-			alfa = pcb1.registro_AX;
-			error = 1;
+			pcb1.program_counter = contexto.program_counter;
+			pcb1.estado_anterior = pcb1.estado_actual;
+			pcb1.registro_AX = contexto.reg_general.ax;
+			pcb1.registro_BX = contexto.reg_general.bx;
+			pcb1.registro_CX = contexto.reg_general.cx;
+			pcb1.registro_DX = contexto.reg_general.dx;
+
 	}
 }
 

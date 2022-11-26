@@ -11,7 +11,7 @@ int i = 2;
 int tiempo_demora;
 int interrumpido = 0;
 char* lista_ope[6];
-registros* contexto;
+t_registros* registros;
 
 int tipo_operacion = -1;
 char* operando_1_NOMBRE = NULL;
@@ -20,6 +20,7 @@ int* operando_1_APUNTA = NULL;
 int* operando_2_APUNTA = NULL;
 
 char* io = NULL;
+char* io_registro = NULL;
 int unidades = 0;
 
 int continuar = 0;
@@ -30,6 +31,7 @@ void* inicializar()
 {
 	io = NULL;
 	unidades = 0;
+	io_registro = NULL;
 	continuar = 0;
 }
 int sePuedeConvertirEnInt(char* palabra){
@@ -46,23 +48,23 @@ int sePuedeConvertirEnInt(char* palabra){
     	return sePuede;
     }
 
-void* seguir_instrucciones(t_contexto_ejecucion* pcb_kernel){
+void* seguir_instrucciones(t_contexto_ejecucion* contexto, t_list* instrucciones, int pid){
 	inicializar();
 	int devolucion = OPTIMO;
 
 	todas_operaciones();
-	cantidadCaracteres_Lista = strlen(pcb_kernel->instrucciones);
-	contexto = &(pcb_kernel->reg_general);
+	//cantidadCaracteres_Lista = strlen(instrucciones);
+	registros = &(contexto->reg_general);
 	do {
-		devolucion = ciclo_instrucciones(pcb_kernel);
+		devolucion = ciclo_instrucciones(contexto, instrucciones, pid);
 
 	} while (devolucion == OPTIMO);
 
 
-	pcb_kernel->io_unidades = unidades;
-	pcb_kernel->io_dispositivo = io;
-	pcb_kernel->estado = devolucion;
-
+	contexto->io_unidades = unidades;
+	contexto->io_dispositivo = io;
+	contexto->estado = devolucion;
+	contexto->io_registro = io_registro;
 }
 
   //pthread_t id;
@@ -88,33 +90,41 @@ void* todas_operaciones(void){
 
 }
 
-void fetch(t_contexto_ejecucion* pcb_kernel, char** instruccion){
-	char instruccion_en_bruto[15];
-	int instruccion_buscada = pcb_kernel->program_counter;
-	char * busqueda = pcb_kernel->instrucciones;
-	int caracter = 0;
-	int limite = 1;
+void fetch(int numero_instruccion, t_list* instrucciones, char** instruccion){
 
-
-	while(limite < instruccion_buscada && caracter < cantidadCaracteres_Lista){
-
-		if (busqueda[caracter] == '\n'){
-			limite++;
-		}
-		caracter++;
+	t_list* instruct = instrucciones;
+	for (int i = 1; i < numero_instruccion; i++){
+		instruct->head  = instruct->head->next;
 	}
-	int caracter_ingresar = 0;
+	char* instruccion_en_bruto = instruct->head->data;
 
 
-
-	while(busqueda[caracter_ingresar + caracter] != '\n' && (caracter_ingresar + caracter) < cantidadCaracteres_Lista){
-
-			instruccion_en_bruto[caracter_ingresar] = busqueda[caracter_ingresar + caracter];
-
-			caracter_ingresar++;
-
-	}
-	instruccion_en_bruto[caracter_ingresar] = '\n';
+//	char instruccion_en_bruto[15];
+//	int instruccion_buscada = pcb_kernel->program_counter;
+//	char * busqueda = pcb_kernel->instrucciones;
+//	int caracter = 0;
+//	int limite = 1;
+//
+//
+//	while(limite < instruccion_buscada && caracter < cantidadCaracteres_Lista){
+//
+//		if (busqueda[caracter] == '\n'){
+//			limite++;
+//		}
+//		caracter++;
+//	}
+//	int caracter_ingresar = 0;
+//
+//
+//
+//	while(busqueda[caracter_ingresar + caracter] != '\n' && (caracter_ingresar + caracter) < cantidadCaracteres_Lista){
+//
+//			instruccion_en_bruto[caracter_ingresar] = busqueda[caracter_ingresar + caracter];
+//
+//			caracter_ingresar++;
+//
+//	}
+//	instruccion_en_bruto[caracter_ingresar] = '\n';
 	*instruccion = instruccion_en_bruto;
 
 
@@ -123,32 +133,40 @@ void fetch(t_contexto_ejecucion* pcb_kernel, char** instruccion){
 int* buscaOperando(char* nombre){
 
 	int numerico;
+
 	if (nombre[1] == 'X'){
 		switch(nombre[0]) {
 		  case 'A':
-		    return &contexto->ax;
+		    return &registros->ax;
 		    break;
 		  case 'B':
-		    return &contexto->bx;
+		    return &registros->bx;
 		    break;
 		  case 'C':
-			return &contexto->cx;
+			return &registros->cx;
 		    break;
 		  case 'D':
-			return &contexto->dx;
+			return &registros->dx;
 		    break;
 			}
 		}
+
 	sscanf(nombre, "%d", &numerico);
 
 return numerico;
 }
 
 //void accederMemoria(operando* op){
-void accederMemoria(int* op){
-	//CAMBIAR LUEGO
-	//op->apunta = contexto->ax;
-	op = contexto->ax;
+void accederMemoria(int pid, t_list* tlb){
+	switch(tipo_operacion){
+	case MOV_IN: operando_2_APUNTA = traducir_direccion_logica(pid, tlb, operando_2_APUNTA);
+		break;
+	case MOV_OUT: operando_1_APUNTA = traducir_direccion_logica(pid, tlb, operando_1_APUNTA);
+		break;
+	default: sleep(1000);
+		break;
+
+	}
 }
 
 int comparacion(char* valor1, char* valor2){
@@ -166,9 +184,7 @@ int comparacion(char* valor1, char* valor2){
 
 }
 
-
-
-void decodificar (char* instruccion_en_bruto){
+void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
 
 	int a = strlen(instruccion_en_bruto);
 	char atributo_1[7];
@@ -237,14 +253,10 @@ void decodificar (char* instruccion_en_bruto){
 	operando_1_NOMBRE = atributo_2;
 	operando_2_NOMBRE = atributo_3;
 
-	int accede_Memoria = 0;
-
 	operando_1_APUNTA = buscaOperando(operando_1_NOMBRE);
 	operando_2_APUNTA = buscaOperando(operando_2_NOMBRE);
 
-	if (accede_Memoria == 0){
-		sleep(tiempo_demora);
-	}
+	accederMemoria(pid, la_tbl);
 
 
 }
@@ -273,10 +285,26 @@ int ins_add(void){
 
 }
 
+int ins_mov_in(void){
+
+	return OPTIMO;
+}
+
+int ins_mov_out(void){
+	return OPTIMO;
+}
+
 int ins_io(void){
 
 	io = operando_1_NOMBRE;
-	unidades = operando_2_APUNTA;
+	if (operando_2_NOMBRE[1] == 'X'){
+		io_registro = operando_2_NOMBRE;
+		unidades = &operando_2_APUNTA;
+	}
+	else
+	{
+		unidades = operando_2_APUNTA;
+	}
 
 	return BLOQUEO;
 }
@@ -299,6 +327,12 @@ int ejecutar(void){
 		break;
 	case ADD:
 		estado = ins_add();
+		break;
+	case MOV_IN:
+		estado = ins_mov_in();
+		break;
+	case MOV_OUT:
+		estado = ins_mov_out();
 		break;
 	case IO:
 		estado = ins_io();
@@ -330,18 +364,18 @@ int check_interrupt(int devuelve){
 }
 
 
-int ciclo_instrucciones(t_contexto_ejecucion* pcb_kernel)
+int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, int pid)
 {
 
 	int devuelve = OPTIMO;
 
 	//fetch
 	char *instruccion_en_bruto;
-	fetch(pcb_kernel, &instruccion_en_bruto);
+	fetch(contexto->program_counter, instrucciones, &instruccion_en_bruto);
 
 
 	//decodificar
-	decodificar(instruccion_en_bruto);
+	decodificar(instruccion_en_bruto, contexto->tabla_segmentos, pid);
 
 	//ejecutar
 	devuelve = ejecutar();
@@ -350,7 +384,7 @@ int ciclo_instrucciones(t_contexto_ejecucion* pcb_kernel)
 	devuelve = check_interrupt(devuelve);
 
 	//actualizar ciclo
-	pcb_kernel->program_counter ++;
+	contexto->program_counter ++;
 
 	return devuelve;
 

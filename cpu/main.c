@@ -10,10 +10,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "include/conexiones.h"
 #include "include/instrucciones.h"
 #include "include/config_cpu.h"
 #include "include/client_memoria.h"
+#include "include/conexiones_cpu.h"
 #include "include/tlb.h"
 #include "include/mmu.h"
 

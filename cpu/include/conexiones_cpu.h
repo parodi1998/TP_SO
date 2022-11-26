@@ -12,9 +12,14 @@
 #include "../include/server.h"
 #include "../include/client.h"
 
+
 #include "../include/client_memoria.h"
 #include "../include/instrucciones.h"
+#include "../include/conexiones_cpu.h"
 
+#include "../include/config_cpu.h"
+
+#include <commons/collections/list.h>
 
 
 t_log* iniciar_logger(void);

@@ -16,6 +16,7 @@
 #include<netdb.h>
 #include<string.h>
 #include<commons/string.h>
+#include "../../shared/include/protocolo.h"
 
 typedef enum
 {
@@ -31,22 +32,22 @@ typedef enum
 	PAGE_FAULT,
 	OK,
 	ERROR
-}op_code;
+}op_code_memoria;
+
+//typedef struct
+//{
+//	int size;
+//	void* stream;
+//} t_buffer;
 
 typedef struct
 {
-	int size;
-	void* stream;
-} t_buffer;
-
-typedef struct
-{
-	op_code codigo_operacion;
+	op_code_memoria codigo_operacion;
 	t_buffer* buffer;
-} t_paquete;
+} t_paquete_memoria;
 
 int crear_conexion_memoria_cpu();
-void enviar_mensaje_memoria_cpu(char* mensaje, int socket_cliente,op_code codigo_operacion);
+void enviar_mensaje_memoria_cpu(char* mensaje, int socket_cliente,op_code_memoria codigo_operacion);
 char* recibir_mensaje_memoria_cpu(int socket_cliente);
 void liberar_conexion_memoria_cpu(int socket_cliente);
 char* traducir_memoria(uint32_t pid,uint32_t segment, uint32_t page,uint32_t es_escritura);

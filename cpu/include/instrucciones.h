@@ -19,6 +19,7 @@
 #include "client.h"
 #include <commons/collections/list.h>
 #include "utils.h"
+#include "mmu.h"
 
 enum tipo_instruccion{
 	SET,
@@ -42,12 +43,12 @@ typedef struct operando{
 	int* apunta;
 } operando;
 
-typedef struct registros{
+typedef struct t_registros{
 	int ax;
 	int bx;
 	int cx;
 	int dx;
-} registros;
+} t_registros;
 
 typedef struct lista_instrucciones{
 	int id;
@@ -62,26 +63,15 @@ typedef struct{
 } t_segmento;
 
 typedef struct {
-	char* instrucciones;
 	int program_counter;
-	registros reg_general;
+	t_registros reg_general;
 	char * io_dispositivo;
 	int io_unidades;
 	int estado;
+	char* io_registro;
 	t_list* tabla_segmentos;
 } t_contexto_ejecucion;
 
-typedef struct t_pcb{
-	uint32_t id_proceso;
-	char* instrucciones;
-	uint32_t program_counter;
-	uint32_t registro_AX;
-	uint32_t registro_BX;
-	uint32_t registro_CX;
-	uint32_t registro_DX;
-	uint32_t tabla_segmentos;
-	char* estado;
-} t_pcb;
 
 typedef struct lista_operaciones{
 	int t_instruccion;
@@ -96,27 +86,24 @@ typedef struct instruccion{
 
 
 void* funcion_hilo(void*);
-void* seguir_instrucciones(t_contexto_ejecucion*);
-//char* fetch(t_contexto_ejecucion*);
+void* seguir_instrucciones(t_contexto_ejecucion*, t_list*,  int);
+void fetch(int, t_list*, char**);
 void* todas_operaciones(void);
 
 
 int decodificaOperando(operando*);
-//void accederMemoria(operando*);
-void accederMemoria(int*);
-//int llamaMemoria(int*, char*);
+void accederMemoria(int, t_list*);
 int* operandoBusca(char*);
-//instruccion decodificar(char*);
-void decodificar(char*);
-//int ejecutar(instruccion*);
+void decodificar(char*, t_list*, int);
 int ejecutar(void);
-//int ins_set(instruccion*);
 int ins_set(void);
 int ins_add(void);
-void ins_mov_in(instruccion);
+int ins_mov_in(void);
+int ins_mov_out(void);
 int ins_io(void);
 int  ins_exit(void);
 int check_interrupt(int);
-int ciclo_instrucciones(t_contexto_ejecucion*);
+int ciclo_instrucciones(t_contexto_ejecucion*,  t_list*, int);
+void* inicializar(void);
 
 #endif /* INSTRUCCIONES_H_ */

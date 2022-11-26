@@ -68,7 +68,7 @@ char* recibir_config_para_mmu(){
 
 
 
-void* serializar_paquete_memoria_cpu(t_paquete* paquete, int bytes)
+void* serializar_paquete_memoria_cpu(t_paquete_memoria* paquete, int bytes)
 {
 	void * magic = malloc(bytes);
 	int desplazamiento = 0;
@@ -108,9 +108,9 @@ int crear_conexion_memoria_cpu()
 }
 
 //TODO
-void enviar_mensaje_memoria_cpu(char* mensaje, int socket_cliente,op_code codigo_operacion)
+void enviar_mensaje_memoria_cpu(char* mensaje, int socket_cliente,op_code_memoria codigo_operacion)
 {
-	t_paquete* paquete = malloc(sizeof(t_paquete));
+	t_paquete_memoria* paquete = malloc(sizeof(t_paquete_memoria));
 
 		paquete->codigo_operacion = codigo_operacion;
 		paquete->buffer = malloc(sizeof(t_buffer));
