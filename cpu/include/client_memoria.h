@@ -55,6 +55,6 @@ char* leer_memoria(uint32_t pid,uint32_t dir_fisica, uint32_t tamanio);
 char* escribir_memoria(uint32_t pid,uint32_t dir_fisica,uint32_t tamanio, char* contenido);
 char* finalizar_proceso(uint32_t pid,uint32_t segment);
 char* recibir_config_para_mmu();
-
+int get_conexion_memoria();
 
 #endif /* CLIENT_MEMORIA_H_ */

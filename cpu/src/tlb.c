@@ -18,8 +18,6 @@ pthread_mutex_t mutexTLB;
 int32_t TIEMPO_TLB;
 int32_t PUNTERO_FIFO;
 
-t_log* LOGGER_1;
-
 int32_t ENTRADAS_TLB;
 char* REEMPLAZO_TLB;
 
@@ -28,10 +26,9 @@ void init_tlb() {
 	TLB = list_create();
 	TIEMPO_TLB = 0;
 	PUNTERO_FIFO = 0;
-	LOGGER_1 = get_log();
 	ENTRADAS_TLB = get_entradas_tlb();
 	REEMPLAZO_TLB = get_reemplazo_tlb();
-	log_info(LOGGER_1, "TLB inicializada correctamente");
+	log_info(get_log(), "TLB inicializada correctamente");
 
 }
 

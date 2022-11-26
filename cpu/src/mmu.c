@@ -12,11 +12,15 @@ uint32_t TAM_MAX_SEGMENTO;
 
 void iniciar_mmu(){
 	char* config_string = recibir_config_para_mmu();
-	char** parts = string_split("|",config_string);
+	char** parts = string_split(config_string,"|");
 	CANT_ENTRADAS_POR_TABLA = (volatile uint32_t) atoi( parts[0]);
 	TAMANIO_PAGINA = (volatile uint32_t) atoi( parts[1]);
-	free(config_string);
 	TAM_MAX_SEGMENTO = CANT_ENTRADAS_POR_TABLA * TAMANIO_PAGINA;
+	free(parts);
+	free(config_string);
+	log_info(get_log(),"CONECTADO A MEMORIA, SOCKET: %d",get_conexion_memoria());
+	log_info(get_log(),"MMU INICIADA CORRECTAMENTE");
+
 }
 
 

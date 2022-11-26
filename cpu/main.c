@@ -22,6 +22,7 @@ int main(void) {
 	iniciar_config_cpu();
 	init_tlb();
 	iniciar_mmu();
+	log_info(get_log(),"INICIANDO CPU");
 	start();
 
 }
