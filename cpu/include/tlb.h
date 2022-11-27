@@ -35,9 +35,7 @@ typedef struct
 
 void init_tlb();
 void update_fifo_pointer();
-void update_lru();
 void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) ;
-void find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura);
 void finalize_process_tlb(int32_t pid);
 
 #endif /* TLB_H_ */

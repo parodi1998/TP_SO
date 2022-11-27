@@ -14,7 +14,7 @@ char* leer_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t dir_fi
 }
 
 char* escribir_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t dir_fisica,uint32_t tamanio, char* contenido){
-	char* mensaje = string_from_format("%d|%d|%d|%s",dir_fisica,tamanio,contenido);
+	char* mensaje = string_from_format("%d|%d|%d|%s",pid,dir_fisica,tamanio,contenido);
 
 	log_info(logger,"REQUEST ESCRIBIR: %s" , mensaje );
 	enviar_mensaje_memoria(mensaje,socket_cliente,ESCRIBIR);
@@ -36,7 +36,7 @@ char* traducir_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t se
 }
 
 char* finalizar_proceso_memoria(int socket_cliente,t_log* logger,uint32_t pid){
-	char* mensaje = string_from_format("%d|%d",pid);
+	char* mensaje = string_from_format("%d",pid);
 
 	log_info(logger,"REQUEST FINALIZAR_PROCESO: %s" , mensaje );
 	enviar_mensaje_memoria(mensaje,socket_cliente,FINALIZAR_PROCESO);
@@ -70,7 +70,7 @@ char* page_fault_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t 
 	char* mensaje = string_from_format("%d|%d|%d",pid,segment,page);
 
 	log_info(logger,"REQUEST PAGE_FAULT: %s" , mensaje );
-	enviar_mensaje_memoria(mensaje,socket_cliente,PAGE_FAULT);
+	enviar_mensaje_memoria(mensaje,socket_cliente,PAGE_FAULT_MEMORIA);
 	char* rta = recibir_mensaje_memoria(socket_cliente);
 	log_info(logger,"RESPUESTA PAGE_FAULT: %s" , rta );
 	free(mensaje);

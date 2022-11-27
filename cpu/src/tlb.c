@@ -17,17 +17,19 @@ pthread_mutex_t mutexTLB;
 
 int32_t TIEMPO_TLB;
 int32_t PUNTERO_FIFO;
+int32_t PUNTERO_LRU;
 
 int32_t ENTRADAS_TLB;
 char* REEMPLAZO_TLB;
 
-int SOCKET_CLIENTE;
-void init_tlb(int socket_cliente) {
-	SOCKET_CLIENTE = socket_cliente;
+int TLB_MISS =-1;
+
+void init_tlb() {
 	SEGMENT_TABLE = list_create();
 	TLB = list_create();
 	TIEMPO_TLB = 0;
 	PUNTERO_FIFO = 0;
+	PUNTERO_LRU = 0;
 	ENTRADAS_TLB = get_entradas_tlb();
 	REEMPLAZO_TLB = get_reemplazo_tlb();
 	log_info(get_log(), "TLB inicializada correctamente");
@@ -47,15 +49,13 @@ int32_t consult_tlb(int32_t pid, int32_t segment, int32_t page){
 
 		//actualizo el tiempo de consulta y retorno frame
 		if(record != NULL){
-			update_lru();
-			record->last_use = 0;
+			record->last_use = PUNTERO_LRU++;
 
 			return record->frame;
 
 		}
 		//no encontré,
-		update_lru();
-		return -1;
+		return TLB_MISS;
 
 }
 
@@ -77,7 +77,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 			record->segment = segment;
 			record->page = page;
 			record->frame = frame;
-			record->last_use = 0;
+			record->last_use = PUNTERO_LRU++;
 
 			list_add(TLB,(void*) record);
 			return;
@@ -88,9 +88,8 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 		if(REEMPLAZO_TLB == "LRU"){
 
 			bool sort_by_lru(t_tlb_entry* record_aux1,t_tlb_entry* record_aux2 ){
-						return record_aux1->last_use > record_aux2->last_use;
+						return record_aux1->last_use < record_aux2->last_use;
 			}
-			update_lru();
 			t_list* list_sorted_by_time = list_sorted(TLB,(void*) sort_by_lru);
 			victim = list_get(list_sorted_by_time,0);
 
@@ -98,7 +97,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 			victim->segment = segment;
 			victim->page = page;
 			victim->frame = frame;
-			victim->last_use =0;
+			victim->last_use =PUNTERO_LRU++;
 
 			list_destroy(list_sorted_by_time);
 		}else{
@@ -107,7 +106,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 			victim->segment = segment;
 			victim->page = page;
 			victim->frame = frame;
-			victim->last_use =0;
+			victim->last_use =PUNTERO_LRU++;
 
 			update_fifo_pointer();
 
@@ -115,9 +114,8 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 
 
 	}else{
-		update_lru();
 		record->frame = frame;
-		record->last_use = 0;
+		record->last_use = PUNTERO_LRU++;
 	}
 
 
@@ -132,40 +130,6 @@ void update_fifo_pointer(){
 	if(PUNTERO_FIFO == (ENTRADAS_TLB -1) ){
 		PUNTERO_FIFO =0;
 	}
-}
-
-void update_lru(){
-	t_tlb_entry* record;
-	for(int i=0;i<ENTRADAS_TLB;i++){
-		record = list_get(TLB,i);
-
-		record->last_use++;
-	}
-}
-
-void find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura) {
-
-char* response_from_module = traducir_memoria(SOCKET_CLIENTE,get_log(),pid,segment,page,es_escritura);
-
-
-char** parts = string_split(response_from_module, "|");
-
-//verifico si hubo page fault
-if (parts[0] == "1") {
-	//hubo pagefault
-
-	/*
-	 * devolver el contexto de ejecución al Kernel sin actualizar el valor del program counter.
-	 * Deberemos indicarle al Kernel qué segmento y número de página
-	 * fueron los que generaron el page fault para que éste resuelva el mismo.
-	 *
-	 */
-} else {
-	int32_t frame = atoi(parts[0]);
-	//actualizo tlb
-	update_tlb(pid,segment,page,frame);
-}
-
 }
 
 void finalize_process_tlb(int32_t pid){
