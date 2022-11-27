@@ -6,7 +6,7 @@
  */
 #include "../include/tlb.h"
 #include "../include/config_cpu.h"
-#include "../include/client_memoria.h"
+#include "../../shared/include/client_memoria.h"
 
 t_list* SEGMENT_TABLE;
 
@@ -21,7 +21,9 @@ int32_t PUNTERO_FIFO;
 int32_t ENTRADAS_TLB;
 char* REEMPLAZO_TLB;
 
-void init_tlb() {
+int SOCKET_CLIENTE;
+void init_tlb(int socket_cliente) {
+	SOCKET_CLIENTE = socket_cliente;
 	SEGMENT_TABLE = list_create();
 	TLB = list_create();
 	TIEMPO_TLB = 0;
@@ -143,7 +145,7 @@ void update_lru(){
 
 void find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura) {
 
-char* response_from_module = traducir_memoria(pid,segment,page,es_escritura);
+char* response_from_module = traducir_memoria(SOCKET_CLIENTE,get_log(),pid,segment,page,es_escritura);
 
 
 char** parts = string_split(response_from_module, "|");

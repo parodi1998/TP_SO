@@ -2,24 +2,27 @@
 
 #include "../include/mmu.h"
 #include "../include/tlb.h"
-#include "../include/client_memoria.h"
+#include "../../shared/include/client_memoria.h"
 #include "../include/instrucciones.h"
 
 uint32_t TAMANIO_PAGINA;
 uint32_t CANT_ENTRADAS_POR_TABLA;
 uint32_t TAM_MAX_SEGMENTO;
+int CONEXION_MEMORIA;
 
 
 void iniciar_mmu(){
-	char* config_string = recibir_config_para_mmu();
+	CONEXION_MEMORIA = crear_conexion_memoria(get_ip_memoria(), get_puerto_memoria());
+	log_info(get_log(),"CONECTADO A MEMORIA, SOCKET: %d",CONEXION_MEMORIA);
+	char* config_string = recibir_config_para_mmu(CONEXION_MEMORIA,get_log());
 	char** parts = string_split(config_string,"|");
 	CANT_ENTRADAS_POR_TABLA = (volatile uint32_t) atoi( parts[0]);
 	TAMANIO_PAGINA = (volatile uint32_t) atoi( parts[1]);
 	TAM_MAX_SEGMENTO = CANT_ENTRADAS_POR_TABLA * TAMANIO_PAGINA;
 	free(parts);
 	free(config_string);
-	log_info(get_log(),"CONECTADO A MEMORIA, SOCKET: %d",get_conexion_memoria());
 	log_info(get_log(),"MMU INICIADA CORRECTAMENTE");
+	init_tlb(CONEXION_MEMORIA);
 
 }
 

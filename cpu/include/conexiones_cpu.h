@@ -13,7 +13,6 @@
 #include "../include/client.h"
 
 
-#include "../include/client_memoria.h"
 #include "../include/instrucciones.h"
 #include "../include/conexiones_cpu.h"
 

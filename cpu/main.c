@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include "include/instrucciones.h"
 #include "include/config_cpu.h"
-#include "include/client_memoria.h"
 #include "include/conexiones_cpu.h"
 #include "include/tlb.h"
 #include "include/mmu.h"
@@ -20,7 +19,6 @@
 int main(void) {
 	puts("ENCENDIDOS");
 	iniciar_config_cpu();
-	init_tlb();
 	iniciar_mmu();
 	log_info(get_log(),"INICIANDO CPU");
 	start();
