@@ -34,7 +34,14 @@ bool cargar_config(t_config_consola* config_consola, char* path) {
     }
 }
 
+static void free_config_consola() {
+    free(config_consola->ip_kernel);
+    free(config_consola->puerto_kernel);
+    free(config_consola->tiempo_pantalla);
+    list_destroy_and_destroy_elements(config_consola->segmentos, free);
+}
+
 void terminar_programa() {
     log_destroy(logger);
-    free(config_consola);
+    free_config_consola();
 }

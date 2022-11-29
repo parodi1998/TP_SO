@@ -21,7 +21,7 @@ typedef struct {
     char* tiempo_pantalla;
 } t_config_consola;
 
-t_log* logger;
-t_config_consola* config_consola;
+extern t_log* logger;
+extern t_config_consola* config_consola;
 
 #endif

@@ -17,6 +17,9 @@
 #define LOGGER_FILE "kernel.log"
 #define LOGGER_NAME "KERNEL"
 
+#define LOGGER_FILE_AUX "kernel_aux.log"
+#define LOGGER_NAME_AUX "KERNEL_AUX"
+
 #define CONFIG_FILE "kernel.config"
 
 typedef struct {
@@ -30,8 +33,8 @@ typedef struct {
     char* nombre_escucha;
     char* algoritmo_planificacion;
     char* grado_max_multiprogramacion;
-    char* dispositivos_IO;
-    char* tiempos_IO;
+    t_list* dispositivos_IO;
+    t_list* tiempos_IO;
     char* quantum_RR;
 } t_config_kernel;
 
@@ -41,7 +44,8 @@ typedef struct {
     char* server_name;
 } t_procesar_conexion_args;
 
-t_log* logger;
-t_config_kernel* config_kernel;
+extern t_log* logger;
+extern t_log* logger_kernel_obligatorio;
+extern t_config_kernel* config_kernel;
 
 #endif

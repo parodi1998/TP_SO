@@ -1,118 +1,6 @@
 #include "../include/protocolo.h"
 
 /**
- * Funciones utiles
- */
-
-char* convertir_estado_pcb_a_string(t_estado_pcb estado) {
-    char* estado_string = string_new();
-    switch(estado) {
-        case PCB_NEW:
-            string_append(&estado_string, "NEW");
-            break;
-        case PCB_READY:
-            string_append(&estado_string, "READY");
-            break;
-        case PCB_EXECUTE:
-            string_append(&estado_string, "EXECUTE");
-            break;
-        case PCB_BLOCK:
-            string_append(&estado_string, "BLOCK");
-            break;
-        case PCB_EXIT:
-            string_append(&estado_string, "EXIT");
-            break;     
-        default:
-            string_append(&estado_string, "UNKNOWN");
-            break;  
-    }
-    return estado_string;
-}
-
-void log_list_of_chars(t_log* logger, t_list* list) {
-    size_t size = list_size(list);
-    for(size_t i = 0; i < size; i++) {
-        char* item = list_get(list,i);
-        log_info(logger,item);
-    }
-}
-
-void log_pcb(t_log* logger, t_pcb* pcb) {
-    log_info(logger, "Imprimiendo PCB en logger");
-    log_info(logger, "PCB -> ID: %d", pcb->id_proceso);
-    log_info(logger, "PCB -> PC: %d", pcb->program_counter);
-    log_info(logger, "PCB -> ESTADO_ANTERIOR: %s", convertir_estado_pcb_a_string(pcb->estado_anterior));
-    log_info(logger, "PCB -> ESTADO_ACTUAL: %s", convertir_estado_pcb_a_string(pcb->estado_actual));
-    log_info(logger, "PCB -> INSTRUCCIONES:");
-    log_list_of_chars(logger, pcb->instrucciones);
-    log_info(logger, "PCB -> SEGMENTOS: No logro imprimirlos bien todavia");
-    size_t size = list_size(pcb->tabla_segmentos);
-    for(size_t i = 0; i < size; i++) {
-        t_pcb_segmentos* item = list_get(pcb->tabla_segmentos,i);
-        log_info(logger,"Segmento %d tamanio %d id_tabla_paginas %d", i, *item, *(item+sizeof(size_t)));
-    }
-}
-
-static char* lista_de_pids(t_list* procesos) {
-    
-    void* pid_as_string(void* proceso) {
-        t_pcb* p = proceso;
-        return (void*) string_itoa(p->id_proceso);
-    }
-
-    t_list* pids_list = list_map(procesos,pid_as_string);
-    char* pids_string = string_new();
-
-    for(uint32_t index = 0; index < list_size(pids_list); index++) {
-            char* pid = list_get(pids_list,index);
-            if(index == list_size(pids_list) - 1) {
-                string_append_with_format(&pids_string, "%s",pid);
-            } else {
-                string_append_with_format(&pids_string, "%s,",pid);
-            }   
-        }
-
-    free(pids_list);
-    return pids_string;
-}
-
-/**
- * Logs obligatiorios
- */
-
-void log_proceso_en_new(t_log* logger, t_pcb* proceso) {
-    log_info(logger, "Se crea el proceso <%d> en NEW", proceso->id_proceso);
-}
-
-void log_procesos_en_ready(t_log* logger, t_list* procesos_fifo, t_list* procesos_rr, char* algoritmo) {
-    if(string_equals_ignore_case(algoritmo,"FEEDBACK")) {
-		log_info(logger, "Cola Ready <%s>: [%s] [%s]", algoritmo, lista_de_pids(procesos_rr), lista_de_pids(procesos_fifo));
-	} else if(string_equals_ignore_case(algoritmo,"RR")) {
-        log_info(logger, "Cola Ready <%s>: [%s]", algoritmo, lista_de_pids(procesos_rr));
-	} else {
-        log_info(logger, "Cola Ready <%s>: [%s]", algoritmo, lista_de_pids(procesos_fifo));
-    }
-}
-
-void log_proceso_cambio_de_estado(t_log* logger, t_pcb* proceso) {
-    int id = proceso->id_proceso;
-    char* estado_anterior = convertir_estado_pcb_a_string(proceso->estado_anterior);
-    char* estado_actual = convertir_estado_pcb_a_string(proceso->estado_actual);
-    log_info(logger, "PID: <%d> - Estado Anterior: <%s> - Estado Actual: <%s>", id, estado_anterior, estado_actual);
-    free(estado_anterior);
-    free(estado_actual);
-}
-
-void actualizar_estado_proceso(t_log* logger, t_pcb* proceso, t_estado_pcb nuevo_estado) {
-	t_estado_pcb estado_aux;
-	estado_aux = proceso->estado_actual;
-	proceso->estado_actual = nuevo_estado;
-	proceso->estado_anterior = estado_aux;
-	log_proceso_cambio_de_estado(logger, proceso);
-}
-
-
-/**
  * Consola -> Kernel: Envio y recepcion de Instrucciones
  * */
 static size_t calcular_tamanio_informacion_de_lista(t_list* lista, size_t size_lista) {
@@ -267,7 +155,8 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 	size_t tamanio_instrucciones = calcular_tamanio_informacion_de_lista(pcb->instrucciones, cantidad_instrucciones);
     size_t cantidad_segmentos = list_size(pcb->tabla_segmentos);
 	size_t tamanio_segmentos = 2 * sizeof(size_t) * cantidad_segmentos;
-	size_t tamanio_pcb = 7 * sizeof(size_t) + 2 * sizeof(t_estado_pcb) + tamanio_instrucciones + tamanio_segmentos;
+	size_t tamanio_dispositivo_bloqueo = string_length(pcb->dispositivo_bloqueo)+1;
+	size_t tamanio_pcb = 13 * sizeof(size_t) + 4 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
 		sizeof(size_t) +  		    // tamanio total del pcb
@@ -277,9 +166,20 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
         sizeof(size_t) +		    // pcb.registro_BX 
         sizeof(size_t) +		    // pcb.registro_CX 
         sizeof(size_t) +		    // pcb.registro_DX
+        sizeof(size_t) +		    // pcb.consola_fd
         sizeof(size_t) +		    // cantidad segmentos
         sizeof(t_estado_pcb) +		// pcb.estado_anterior
         sizeof(t_estado_pcb) +      // pcb.estado_actual
+        sizeof(bool) +              // pcb.debe_ser_finalizado
+        sizeof(bool) +              // pcb.debe_ser_bloqueado
+        sizeof(bool) +              // pcb.puede_ser_interrumpido
+        sizeof(bool) +              // pcb.fue_interrumpido
+        sizeof(size_t) +            // pcb.registro_para_bloqueo
+        sizeof(size_t) +            // pcb.unidades_de_trabajo
+        sizeof(size_t) +            // tamanio_dispositivo_bloqueo
+        sizeof(size_t) +		    // pcb.page_fault_segmento
+        sizeof(size_t) +		    // pcb.page_fault_pagina
+        tamanio_dispositivo_bloqueo+// pcb.dispositivo_bloqueo
         tamanio_segmentos +         // 2 size_t * cantidad segmentos
 		sizeof(size_t) +		    // cantidad de instrucciones
 		tamanio_instrucciones;	    // (largo de instruccion + instruccion) * cantidad de instrucciones 
@@ -310,6 +210,39 @@ static void* serializar_pcb(size_t* size, t_pcb* pcb) {
 
     memcpy(p,&pcb->registro_DX,sizeof(size_t)); // guardo el registro_DX del pcb
 	p += sizeof(size_t);
+
+    memcpy(p,&pcb->consola_fd,sizeof(size_t)); // guardo el fd consola del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->page_fault_segmento,sizeof(size_t)); // guardo el page_fault_segmento del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->page_fault_pagina,sizeof(size_t)); // guardo el page_fault_pagina del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->debe_ser_finalizado,sizeof(bool)); // guardo el estado debe_ser_finalizado del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->debe_ser_bloqueado,sizeof(bool)); // guardo el estado debe_ser_bloqueado del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->puede_ser_interrumpido,sizeof(bool)); // guardo el estado puede_ser_interrumpido del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->fue_interrumpido,sizeof(bool)); // guardo el estado fue_interrumpido del pcb
+	p += sizeof(bool);
+
+    memcpy(p,&pcb->registro_para_bloqueo,sizeof(size_t)); // guardo el index del registro_para_bloqueo del pcb
+	p += sizeof(size_t);
+
+    memcpy(p,&pcb->unidades_de_trabajo,sizeof(size_t)); // guardo las unidades_de_trabajo para el bloqueo del pcb
+	p += sizeof(size_t);
+
+	memcpy(p,&tamanio_dispositivo_bloqueo,sizeof(size_t));
+	p += sizeof(size_t);
+
+	memcpy(p,pcb->dispositivo_bloqueo,tamanio_dispositivo_bloqueo);
+	p += tamanio_dispositivo_bloqueo;
 
     memcpy(p,&pcb->estado_anterior,sizeof(t_estado_pcb)); // guardo el estado anterior del pcb
 	p += sizeof(t_estado_pcb);
@@ -370,6 +303,42 @@ static void deserializar_pcb(void* stream, t_pcb** pcb) {
     memcpy(&pcb_aux->registro_DX, p, sizeof(size_t));	
 	p += sizeof(size_t);
 
+    memcpy(&pcb_aux->consola_fd, p, sizeof(size_t));	
+	p += sizeof(size_t);
+    
+    memcpy(&pcb_aux->page_fault_segmento, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    memcpy(&pcb_aux->page_fault_pagina, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    memcpy(&pcb_aux->debe_ser_finalizado, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->debe_ser_bloqueado, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->puede_ser_interrumpido, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->fue_interrumpido, p, sizeof(bool));	
+	p += sizeof(bool);
+
+    memcpy(&pcb_aux->registro_para_bloqueo, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    memcpy(&pcb_aux->unidades_de_trabajo, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    size_t tamanio_dispositivo_bloqueo;
+    memcpy(&tamanio_dispositivo_bloqueo, p, sizeof(size_t));	
+	p += sizeof(size_t);
+
+    char* dispositivo_bloqueo = malloc(tamanio_dispositivo_bloqueo);
+	memcpy(dispositivo_bloqueo, p, tamanio_dispositivo_bloqueo);
+    pcb_aux->dispositivo_bloqueo = dispositivo_bloqueo;
+	p += tamanio_dispositivo_bloqueo;
+    
     memcpy(&pcb_aux->estado_anterior, p, sizeof(t_estado_pcb));	
 	p += sizeof(t_estado_pcb);
 
