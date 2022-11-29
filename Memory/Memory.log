@@ -1,0 +1,106 @@
+[INFO] 21:11:37:384 Memory/(5929:5929): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:11:37:392 Memory/(5929:5929): Estructuras administrativas inicializadas
+[INFO] 21:11:37:411 Memory/(5929:5929): SWAP FILE CREATED
+[INFO] 21:11:37:411 Memory/(5929:5929): INICIANDO SERVIDOR..
+[INFO] 21:11:48:686 Memory/(6322:6322): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:11:48:687 Memory/(6322:6322): Estructuras administrativas inicializadas
+[INFO] 21:11:48:690 Memory/(6322:6322): SWAP FILE CREATED
+[INFO] 21:11:48:690 Memory/(6322:6322): INICIANDO SERVIDOR..
+[INFO] 21:12:11:513 Memory/(6357:6357): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:12:11:514 Memory/(6357:6357): Estructuras administrativas inicializadas
+[INFO] 21:12:11:538 Memory/(6357:6357): SWAP FILE CREATED
+[INFO] 21:12:11:538 Memory/(6357:6357): INICIANDO SERVIDOR..
+[INFO] 21:15:13:967 Memory/(6563:6563): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:15:13:969 Memory/(6563:6563): Estructuras administrativas inicializadas
+[INFO] 21:15:13:978 Memory/(6563:6563): SWAP FILE CREATED
+[INFO] 21:15:13:978 Memory/(6563:6563): INICIANDO SERVIDOR..
+[INFO] 21:15:36:424 Memory/(6563:6604): PID: 1 - Acción: ESCRIBIR - Dirección física: 60
+[INFO] 21:16:15:822 Memory/(6640:6640): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:16:15:823 Memory/(6640:6640): Estructuras administrativas inicializadas
+[INFO] 21:16:15:829 Memory/(6640:6640): SWAP FILE CREATED
+[INFO] 21:16:15:829 Memory/(6640:6640): INICIANDO SERVIDOR..
+[INFO] 21:16:35:204 Memory/(6640:6669): PID: 1 - Acción: ESCRIBIR - Dirección física: 60
+[INFO] 21:17:24:840 Memory/(6736:6736): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:17:24:842 Memory/(6736:6736): Estructuras administrativas inicializadas
+[INFO] 21:17:24:846 Memory/(6736:6736): SWAP FILE CREATED
+[INFO] 21:17:24:846 Memory/(6736:6736): INICIANDO SERVIDOR..
+[INFO] 21:17:40:178 Memory/(6736:6757): PID: 1 - Acción: ESCRIBIR - Dirección física: 60
+[INFO] 21:18:04:427 Memory/(6809:6809): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:18:04:428 Memory/(6809:6809): Estructuras administrativas inicializadas
+[INFO] 21:18:04:431 Memory/(6809:6809): SWAP FILE CREATED
+[INFO] 21:18:04:431 Memory/(6809:6809): INICIANDO SERVIDOR..
+[INFO] 21:18:11:757 Memory/(6809:6829): PID: 1 - Acción: ESCRIBIR - Dirección física: 60
+[INFO] 21:18:27:801 Memory/(6809:6849): PID: 1 - Acción: ESCRIBIR - Dirección física: 60
+[INFO] 21:18:41:053 Memory/(6809:6883): PID: 1 - Acción: LEER - Dirección física: 60
+[INFO] 21:19:35:047 Memory/(6936:6936): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:19:35:048 Memory/(6936:6936): Estructuras administrativas inicializadas
+[INFO] 21:19:35:078 Memory/(6936:6936): SWAP FILE CREATED
+[INFO] 21:19:35:078 Memory/(6936:6936): INICIANDO SERVIDOR..
+[INFO] 21:19:45:487 Memory/(6936:6967): Se encontro espacio libre para el PID 1, SEGMENTO 1
+[INFO] 21:19:45:488 Memory/(6936:6967): Se reserva el frame 0 para el pid 1
+[INFO] 21:19:45:488 Memory/(6936:6967): Se reserva el frame 1 para el pid 1
+[INFO] 21:19:45:488 Memory/(6936:6967): Se reserva el frame 2 para el pid 1
+[INFO] 21:19:45:488 Memory/(6936:6967): Se reserva el frame 3 para el pid 1
+[INFO] 21:19:45:488 Memory/(6936:6967): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 21:19:45:488 Memory/(6936:6967): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:19:45:488 Memory/(6936:6967): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 21:19:45:488 Memory/(6936:6967): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:19:45:488 Memory/(6936:6967): Se crea la tabla de paginas ID: 0  al PID: 1, SEGMENTO 1
+[INFO] 21:20:10:850 Memory/(6936:7011): PID: 1 - Acción: ESCRIBIR - Dirección física: 60
+[INFO] 21:20:48:259 Memory/(7051:7051): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:20:48:261 Memory/(7051:7051): Estructuras administrativas inicializadas
+[INFO] 21:20:48:270 Memory/(7051:7051): SWAP FILE CREATED
+[INFO] 21:20:48:270 Memory/(7051:7051): INICIANDO SERVIDOR..
+[INFO] 21:21:18:771 Memory/(7315:7315): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:21:18:772 Memory/(7315:7315): Estructuras administrativas inicializadas
+[INFO] 21:21:18:775 Memory/(7315:7315): SWAP FILE CREATED
+[INFO] 21:21:18:776 Memory/(7315:7315): INICIANDO SERVIDOR..
+[INFO] 21:21:28:244 Memory/(7315:7331): Se encontro espacio libre para el PID 1, SEGMENTO 1
+[INFO] 21:21:28:244 Memory/(7315:7331): Se reserva el frame 0 para el pid 1
+[INFO] 21:21:28:244 Memory/(7315:7331): Se reserva el frame 1 para el pid 1
+[INFO] 21:21:28:244 Memory/(7315:7331): Se reserva el frame 2 para el pid 1
+[INFO] 21:21:28:244 Memory/(7315:7331): Se reserva el frame 3 para el pid 1
+[INFO] 21:21:28:244 Memory/(7315:7331): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 21:21:28:244 Memory/(7315:7331): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:21:28:244 Memory/(7315:7331): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 21:21:28:244 Memory/(7315:7331): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:21:28:244 Memory/(7315:7331): Se crea la tabla de paginas ID: 0  al PID: 1, SEGMENTO 1
+[INFO] 21:22:49:270 Memory/(7395:7395): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:22:49:273 Memory/(7395:7395): Estructuras administrativas inicializadas
+[INFO] 21:22:49:282 Memory/(7395:7395): SWAP FILE CREATED
+[INFO] 21:22:49:282 Memory/(7395:7395): INICIANDO SERVIDOR..
+[INFO] 21:23:04:596 Memory/(7395:7442): Se encontro espacio libre para el PID 1, SEGMENTO 1
+[INFO] 21:23:04:596 Memory/(7395:7442): Se reserva el frame 0 para el pid 1
+[INFO] 21:23:04:597 Memory/(7395:7442): Se reserva el frame 1 para el pid 1
+[INFO] 21:23:04:597 Memory/(7395:7442): Se reserva el frame 2 para el pid 1
+[INFO] 21:23:04:597 Memory/(7395:7442): Se reserva el frame 3 para el pid 1
+[INFO] 21:23:04:597 Memory/(7395:7442): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 21:23:04:597 Memory/(7395:7442): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:23:04:598 Memory/(7395:7442): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 21:23:04:598 Memory/(7395:7442): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:23:04:598 Memory/(7395:7442): Se crea la tabla de paginas ID: 0  al PID: 1, SEGMENTO 1
+[INFO] 21:25:23:562 Memory/(7530:7530): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:25:23:564 Memory/(7530:7530): Estructuras administrativas inicializadas
+[INFO] 21:25:23:596 Memory/(7530:7530): SWAP FILE CREATED
+[INFO] 21:25:23:596 Memory/(7530:7530): INICIANDO SERVIDOR..
+[INFO] 21:25:36:777 Memory/(7924:7924): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 21:25:36:781 Memory/(7924:7924): Estructuras administrativas inicializadas
+[INFO] 21:25:36:842 Memory/(7924:7924): SWAP FILE CREATED
+[INFO] 21:25:36:843 Memory/(7924:7924): INICIANDO SERVIDOR..
+[INFO] 21:26:01:369 Memory/(7924:7967): Se encontro espacio libre para el PID 1, SEGMENTO 1
+[INFO] 21:26:01:370 Memory/(7924:7967): Se reserva el frame 0 para el pid 1
+[INFO] 21:26:01:370 Memory/(7924:7967): Se reserva el frame 1 para el pid 1
+[INFO] 21:26:01:370 Memory/(7924:7967): Se reserva el frame 2 para el pid 1
+[INFO] 21:26:01:370 Memory/(7924:7967): Se reserva el frame 3 para el pid 1
+[INFO] 21:26:01:370 Memory/(7924:7967): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 21:26:01:370 Memory/(7924:7967): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:26:01:370 Memory/(7924:7967): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 21:26:01:370 Memory/(7924:7967): PID: <1> - Segmento: <1> - TAMAÑO: <2> paginas
+[INFO] 21:26:01:370 Memory/(7924:7967): Se crea la tabla de paginas ID: 0  al PID: 1, SEGMENTO 1
+[INFO] 21:26:09:692 Memory/(7924:7997): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 21:26:09:692 Memory/(7924:7997): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 21:26:09:692 Memory/(7924:7997): Se encontro frame libre para la pagina 1 -- PID 1 -- FRAME: 0
+[INFO] 21:26:09:692 Memory/(7924:7997): PID: <1> - Página: <1> - Marco: <0>
+[INFO] 21:26:21:607 Memory/(7924:8011): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 21:26:21:607 Memory/(7924:8011): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 21:26:21:607 Memory/(7924:8011): PID: <1> - Página: <1> - Marco: <0>
