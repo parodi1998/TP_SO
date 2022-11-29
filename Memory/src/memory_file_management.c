@@ -6,7 +6,7 @@
 void* MEMORY_BLOCK;
 t_log* LOGGER;
 char* PATH_SWAP_BASE;
-FILE* SWAP_FILE;
+int SWAP_FILE;
 void* MEMORY_BLOCK_SECONDARY;
 int TABLE_ID_GENERATOR = 0;
 
@@ -270,7 +270,7 @@ int32_t finalize_process(uint32_t pid) {
 					frame_swap->is_free = true;
 					pthread_mutex_unlock(&mutex_frames_swap);
 				}
-					log_info(LOGGER, "[Proceso %d, Segmento %d]Se libera frame nro %d",pid, page->segment, page->id, frame->id);
+					log_info(LOGGER, "[Proceso %d, Segmento %d]Se libera frame nro %d",pid, page->segment, frame->id);
 			}
 		}
 
