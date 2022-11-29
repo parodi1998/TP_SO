@@ -120,6 +120,11 @@ int crear_conexion_memoria(char* IP, char* PORT)
 	return socket_cliente;
 }
 
+bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto, int* fd_memoria) {
+	*fd_memoria = crear_conexion(logger,"MEMORIA", ip, puerto);
+	return *fd_memoria != 0;
+}
+
 void enviar_mensaje_memoria(char* mensaje, int socket_cliente,op_code_memoria codigo_operacion)
 {
 	t_paquete_memoria* paquete = malloc(sizeof(t_paquete_memoria));

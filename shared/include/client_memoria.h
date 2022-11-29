@@ -17,6 +17,7 @@
 #include<commons/string.h>
 #include<commons/log.h>
 #include "../include/protocolo.h"
+#include "../include/sockets.h"
 
 typedef enum
 {
@@ -42,6 +43,7 @@ typedef struct
 } t_paquete_memoria;
 
 int crear_conexion_memoria(char* ip, char* port);
+bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto, int* fd_memoria);
 void enviar_mensaje_memoria(char* mensaje, int socket_cliente,op_code_memoria codigo_operacion);
 char* recibir_mensaje_memoria(int socket_cliente);
 void eliminar_paquete_memoria(t_paquete_memoria* paquete);

@@ -13,6 +13,7 @@
 #include "../../shared/include/protocolo.h"
 #include "../../shared/include/server_utils.h"
 #include "../../shared/include/shared_commons.h"
+#include "../../shared/include/client_memoria.h"
 
 #define LOGGER_FILE "kernel.log"
 #define LOGGER_NAME "KERNEL"

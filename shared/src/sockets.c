@@ -100,18 +100,3 @@ void liberar_conexion(int* socket_cliente) {
     close(*socket_cliente);
     *socket_cliente = -1;
 }
-
-bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto,int* fd_mod3) {
-	*fd_mod3 = crear_conexion(logger,"MEMORIA", ip, puerto );
-
-	log_error(logger,"El ip en grar conexiones es: %s",ip);
-	log_error(logger,"El puerto en grar conexiones es: %s",puerto);
-	log_error(logger,"El socket  en generar conexiones cpu es: %d",fd_mod3);
-
-	return *fd_mod3 != 0;
-}
-
-bool generar_conexiones_cpu(t_log* logger, char* ip, char* puerto, int* fd_mod3) {
-    *fd_mod3 = crear_conexion(logger,"CPU", ip, puerto );
-    return *fd_mod3 != 0;
-}

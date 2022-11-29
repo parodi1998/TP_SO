@@ -1,5 +1,9 @@
 #include "include/kernel.h"
 
+int fd_memoria = 0;
+int fd_cpu_dispatch;
+int fd_cpu_interrupt;
+
 t_dictionary* colas;
 t_dictionary* contador_colas_block;
 t_dictionary* sem_hilos_block;
@@ -240,18 +244,11 @@ int main(int argc, char** argv){
         return EXIT_SUCCESS;
     }
 
-    /*
-    int fd_cpu_dispatch = 0;
-    if (!generar_conexiones_cpu(logger, config_kernel->ip_cpu, config_kernel->puerto_cpu_dispatch, &fd_cpu_dispatch)) {
-    		terminar_programa();
-    		return EXIT_FAILURE;
+    if(!generar_conexion_kernel_a_memoria(logger, config_kernel->ip_memoria, config_kernel->puerto_memoria, &fd_memoria)) {
+        log_error(logger,"No se pudo generar la conexion con el modulo memoria");
+        terminar_programa();
+        return EXIT_FAILURE;
     }
-    int fd_cpu_interrupt = 0;
-    if (!generar_conexiones_cpu(logger, config_kernel->ip_cpu, config_kernel->puerto_cpu_interrupt, &fd_cpu_interrupt)) {
-      		terminar_programa();
-      		return EXIT_FAILURE;
-     }
-*/
 
     int kernel_server_fd = 0;
     if(!iniciar_kernel(&kernel_server_fd)) {

@@ -12,6 +12,10 @@ typedef enum {
     PLANIFICADOR_FEEDBACK
 } t_tipo_planificador;
 
+extern int fd_memoria;
+extern int fd_cpu_dispatch;
+extern int fd_cpu_interrupt;
+
 // diccionario de colas
 extern t_dictionary* colas;
 extern t_dictionary* contador_colas_block;
