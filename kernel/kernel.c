@@ -1,5 +1,49 @@
 #include "include/kernel.h"
 
+t_dictionary* colas;
+t_dictionary* contador_colas_block;
+t_dictionary* sem_hilos_block;
+t_dictionary* mutex_colas_block;
+t_dictionary* tiempos_io;
+
+pthread_mutex_t mutex_new;
+pthread_mutex_t mutex_ready;
+pthread_mutex_t mutex_ready_fifo;
+pthread_mutex_t mutex_ready_rr;
+pthread_mutex_t mutex_execute;
+pthread_mutex_t mutex_exit;
+
+sem_t contador_new;
+sem_t contador_ready_fifo;
+sem_t contador_ready_rr;
+sem_t contador_execute;
+sem_t contador_exit;
+sem_t sem_largo_plazo_new;
+sem_t sem_corto_plazo_ready;
+sem_t sem_corto_plazo_execute;
+sem_t sem_largo_plazo_exit;
+sem_t sem_cpu_libre;
+sem_t sem_comienza_timer_quantum;
+sem_t sem_finaliza_timer_quantum;
+sem_t sem_proceso_agregado_a_ready;
+sem_t sem_proceso_sacado_de_ready;
+sem_t sem_grado_multiprogramacion;
+
+pthread_t hilo_largo_plazo_new;
+pthread_t hilo_corto_plazo_ready;
+pthread_t hilo_corto_plazo_execute;
+pthread_t hilo_largo_plazo_exit;
+pthread_t hilo_cuenta_quantum;
+pthread_t hilo_block_pantalla;
+pthread_t hilo_block_teclado;
+pthread_t hilo_block_page_fault;
+
+uint32_t generador_pcb_id;
+
+t_log* logger;
+t_log* logger_kernel_obligatorio;
+t_config_kernel* config_kernel;
+
 void inicializar_diccionario() {
     generador_pcb_id = 0;
     colas = dictionary_create();

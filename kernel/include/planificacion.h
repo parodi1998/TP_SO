@@ -13,46 +13,46 @@ typedef enum {
 } t_tipo_planificador;
 
 // diccionario de colas
-t_dictionary* colas;
-t_dictionary* contador_colas_block;
-t_dictionary* sem_hilos_block;
-t_dictionary* mutex_colas_block;
-t_dictionary* tiempos_io;
+extern t_dictionary* colas;
+extern t_dictionary* contador_colas_block;
+extern t_dictionary* sem_hilos_block;
+extern t_dictionary* mutex_colas_block;
+extern t_dictionary* tiempos_io;
 
 // mutex
-pthread_mutex_t mutex_new;
-pthread_mutex_t mutex_ready;
-pthread_mutex_t mutex_ready_fifo;
-pthread_mutex_t mutex_ready_rr;
-pthread_mutex_t mutex_execute;
-pthread_mutex_t mutex_exit;
+extern pthread_mutex_t mutex_new;
+extern pthread_mutex_t mutex_ready;
+extern pthread_mutex_t mutex_ready_fifo;
+extern pthread_mutex_t mutex_ready_rr;
+extern pthread_mutex_t mutex_execute;
+extern pthread_mutex_t mutex_exit;
 
 // semaforos contadores
-sem_t contador_new;
-sem_t contador_ready_fifo;
-sem_t contador_ready_rr;
-sem_t contador_execute;
-sem_t contador_exit;
-sem_t sem_largo_plazo_new;
-sem_t sem_corto_plazo_ready;
-sem_t sem_corto_plazo_execute;
-sem_t sem_largo_plazo_exit;
-sem_t sem_cpu_libre;
-sem_t sem_comienza_timer_quantum;
-sem_t sem_finaliza_timer_quantum;
-sem_t sem_proceso_agregado_a_ready;
-sem_t sem_proceso_sacado_de_ready;
-sem_t sem_grado_multiprogramacion;
+extern sem_t contador_new;
+extern sem_t contador_ready_fifo;
+extern sem_t contador_ready_rr;
+extern sem_t contador_execute;
+extern sem_t contador_exit;
+extern sem_t sem_largo_plazo_new;
+extern sem_t sem_corto_plazo_ready;
+extern sem_t sem_corto_plazo_execute;
+extern sem_t sem_largo_plazo_exit;
+extern sem_t sem_cpu_libre;
+extern sem_t sem_comienza_timer_quantum;
+extern sem_t sem_finaliza_timer_quantum;
+extern sem_t sem_proceso_agregado_a_ready;
+extern sem_t sem_proceso_sacado_de_ready;
+extern sem_t sem_grado_multiprogramacion;
 
 // hilos
-pthread_t hilo_largo_plazo_new;
-pthread_t hilo_corto_plazo_ready;
-pthread_t hilo_corto_plazo_execute;
-pthread_t hilo_largo_plazo_exit;
-pthread_t hilo_cuenta_quantum;
-pthread_t hilo_block_pantalla;
-pthread_t hilo_block_teclado;
-pthread_t hilo_block_page_fault;
+extern pthread_t hilo_largo_plazo_new;
+extern pthread_t hilo_corto_plazo_ready;
+extern pthread_t hilo_corto_plazo_execute;
+extern pthread_t hilo_largo_plazo_exit;
+extern pthread_t hilo_cuenta_quantum;
+extern pthread_t hilo_block_pantalla;
+extern pthread_t hilo_block_teclado;
+extern pthread_t hilo_block_page_fault;
 
 // Planificador largo plazo
 void meter_proceso_en_new(t_pcb* proceso);

@@ -44,8 +44,8 @@ typedef struct {
     char* server_name;
 } t_procesar_conexion_args;
 
-t_log* logger;
-t_log* logger_kernel_obligatorio;
-t_config_kernel* config_kernel;
+extern t_log* logger;
+extern t_log* logger_kernel_obligatorio;
+extern t_config_kernel* config_kernel;
 
 #endif

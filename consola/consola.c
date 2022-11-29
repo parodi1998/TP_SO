@@ -1,5 +1,8 @@
 #include "include/consola.h"
 
+t_log* logger;
+t_config_consola* config_consola;
+
 int main(int argc, char** argv){
 
     iniciar_programa();
