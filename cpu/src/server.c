@@ -51,9 +51,9 @@ printf("error en accept()\n");
 exit(-1);
 }
 send(fd2, "Bienvenido a mi servidor.\n", 26, 0);
-liberar_conexion_cpu_kernel(fd2);
+liberar_conexion_cpu_kernel(&fd2);
 }
-liberar_conexion_cpu_kernel(fd);
+liberar_conexion_cpu_kernel(&fd);
 }
 else{
 printf("No se ingresó el puerto  por parámetro\n");

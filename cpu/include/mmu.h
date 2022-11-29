@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <commons/collections/list.h>
+#include "tlb.h"
 
 int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t dir_logica);
 void iniciar_mmu();

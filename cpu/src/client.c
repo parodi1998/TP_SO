@@ -52,7 +52,7 @@ struct addrinfo hints, *servinfo;
 //server.sin_family = AF_INET;
 server.sin_family = 1;
 //server.sin_port = htons(puerto);
-server.sin_port = htons(puerto_in);
+server.sin_port = htons(*puerto_in);
 server.sin_addr = *((struct in_addr *)he->h_addr);
 bzero(&(server.sin_zero),8);
 int longitud_del_cliente;
@@ -78,7 +78,7 @@ longitud_del_cliente = sizeof(server);
 	  printf("Veamos qué valor acepta");
 	  for (int ij = 0; ij < 10000; ij++)
 	  {
-		  printf("/n Probando, %d /n", ij);
+		  printf("\n Probando, %d \n", ij);
 		  if(connect(ij, servinfo->ai_addr, servinfo->ai_addrlen) > -1)
 		  {
 			  printf("  Socket Encontrado: %d", ij);
@@ -86,7 +86,7 @@ longitud_del_cliente = sizeof(server);
 		  }
 		  else
 		  {
-			  printf("/n Lo siento, no es: &d, ", ij);
+			  printf("\n Lo siento, no es: %d, ", ij);
 		  }
 		  close(ij);
 	  }

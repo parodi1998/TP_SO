@@ -38,4 +38,6 @@ void update_fifo_pointer();
 void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) ;
 void finalize_process_tlb(int32_t pid);
 
+int32_t consult_tlb(int32_t pid, int32_t segment, int32_t page);
+
 #endif /* TLB_H_ */
