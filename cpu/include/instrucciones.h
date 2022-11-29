@@ -9,6 +9,7 @@
 #define INSTRUCCIONES_H_
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h>
 #include<pthread.h>
 #include<commons/log.h>
 #include<commons/string.h>
@@ -105,5 +106,8 @@ int  ins_exit(void);
 int check_interrupt(int);
 int ciclo_instrucciones(t_contexto_ejecucion*,  t_list*, int);
 void* inicializar(void);
+
+void interrumpe(void);
+void buscaOperando(char*, int**);
 
 #endif /* INSTRUCCIONES_H_ */

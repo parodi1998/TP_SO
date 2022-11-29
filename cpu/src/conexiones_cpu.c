@@ -102,7 +102,9 @@ t_contexto_ejecucion iniciar_proceso(t_pcb pcb1){
 
 	   // 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
 	    //	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso));
-	    	seguir_instrucciones(&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso);
+	    	// Te cambio esta linea porque estas pasando los segmentos, pero esperas instrucciones
+			// seguir_instrucciones(&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso);
+			seguir_instrucciones(&contexto_ejecucion, pcb1.instrucciones, pcb1.id_proceso);
 
 	   // pthread_join( thread2, NULL);
 	    interrumpir = 1;
@@ -121,7 +123,13 @@ void ciclo_recibir_instruccines(){
 		t_pcb pcb1; //SE OBTIENE
 
 			pcb1.id_proceso = 5;
-			pcb1.instrucciones = "SET AX 2\nSET BX 4\nADD AX BX\nEXIT\n";
+			// Hago un cambio para que no tire warning el make
+			//pcb1.instrucciones = "SET AX 2\nSET BX 4\nADD AX BX\nEXIT\n";
+			pcb1.instrucciones = list_create();
+			list_add(pcb1.instrucciones, "SET AX 2"); // el \n ya se lo saco yo cuando leo el archivo
+			list_add(pcb1.instrucciones, "SET BX 4");
+			list_add(pcb1.instrucciones, "ADD AX BX");
+			list_add(pcb1.instrucciones, "EXIT");
 			pcb1.program_counter = 1;
 			pcb1.registro_AX = 0;
 			pcb1.registro_BX = 0;

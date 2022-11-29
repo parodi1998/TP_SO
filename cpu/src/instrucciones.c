@@ -92,6 +92,8 @@ void* todas_operaciones(void){
 
 void fetch(int numero_instruccion, t_list* instrucciones, char** instruccion){
 
+	// Aca en vez de todo el for podes hacer esto:
+	// char* instruccion_en_bruto = list_get(insturcciones, numero_instruccion);
 	t_list* instruct = instrucciones;
 	for (int i = 1; i < numero_instruccion; i++){
 		instruct->head  = instruct->head->next;
@@ -130,40 +132,43 @@ void fetch(int numero_instruccion, t_list* instrucciones, char** instruccion){
 
 }
 
-int* buscaOperando(char* nombre){
+void buscaOperando(char* nombre, int** numerico){
 
-	int numerico;
+	int* numerico_aux;
 
 	if (nombre[1] == 'X'){
 		switch(nombre[0]) {
 		  case 'A':
-		    return &registros->ax;
+		    *numerico = &registros->ax;
 		    break;
 		  case 'B':
-		    return &registros->bx;
+		    *numerico = &registros->bx;
 		    break;
 		  case 'C':
-			return &registros->cx;
+			*numerico = &registros->cx;
 		    break;
 		  case 'D':
-			return &registros->dx;
+			*numerico = &registros->dx;
 		    break;
 			}
 		}
 
-	sscanf(nombre, "%d", &numerico);
+	sscanf(nombre, "%d", numerico_aux);
 
-return numerico;
+	*numerico = numerico_aux;
 }
 
 //void accederMemoria(operando* op){
 void accederMemoria(int pid, t_list* tlb){
 	switch(tipo_operacion){
-	case MOV_IN: operando_2_APUNTA = traducir_direccion_logica(pid, tlb, operando_2_APUNTA);
+	case MOV_IN: 
+		*operando_2_APUNTA = traducir_direccion_logica(pid, tlb, *operando_2_APUNTA);
 		break;
-	case MOV_OUT: operando_1_APUNTA = traducir_direccion_logica(pid, tlb, operando_1_APUNTA);
+	case MOV_OUT: 
+		*operando_1_APUNTA = traducir_direccion_logica(pid, tlb, *operando_1_APUNTA);
 		break;
-	default: sleep(1000);
+	default: 
+		sleep(1000);
 		break;
 
 	}
@@ -253,8 +258,8 @@ void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
 	operando_1_NOMBRE = atributo_2;
 	operando_2_NOMBRE = atributo_3;
 
-	operando_1_APUNTA = buscaOperando(operando_1_NOMBRE);
-	operando_2_APUNTA = buscaOperando(operando_2_NOMBRE);
+	buscaOperando(operando_1_NOMBRE, &operando_1_APUNTA);
+	buscaOperando(operando_2_NOMBRE, &operando_2_APUNTA);
 
 	accederMemoria(pid, la_tbl);
 
@@ -262,7 +267,10 @@ void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
 }
 
 //int ins_set(instruccion* instruct){
-	int ins_set(void){
+// Revisar aca que logica se estaba buscando:
+// aca estas diciendo: el contenido de lo apuntado por operando_1_APUNTA es igual a operando_2_APUNTA, que es un puntero.
+// En teoria esto esta mal, porque estas haciendo int = int*
+int ins_set(void){
 	*operando_1_APUNTA = operando_2_APUNTA;
 
 	return OPTIMO;
@@ -278,6 +286,7 @@ int ins_add2(int* a, int* b){
 	return c;
 }
 
+// Lo mismo de arriba, pero esta vez int* = int. No lo puedo corregir porque no se cual era la idea original.
 int ins_add(void){
 	operando_2_APUNTA = ins_add2(operando_1_APUNTA, operando_2_APUNTA);
 
@@ -294,6 +303,7 @@ int ins_mov_out(void){
 	return OPTIMO;
 }
 
+// Lo mismo de arriba, pero ahora es un int = int** por el &. En el else, es un int = int*
 int ins_io(void){
 
 	io = operando_1_NOMBRE;
