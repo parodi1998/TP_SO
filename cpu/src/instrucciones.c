@@ -10,7 +10,6 @@
 int i = 2;
 int tiempo_demora;
 int interrumpido = 0;
-char* lista_ope[6];
 t_registros* registros;
 
 int tipo_operacion = -1;
@@ -57,9 +56,8 @@ void* seguir_instrucciones(t_contexto_ejecucion* contexto, t_list* instrucciones
 	registros = &(contexto->reg_general);
 	do {
 		devolucion = ciclo_instrucciones(contexto, instrucciones, pid);
-
 	} while (devolucion == OPTIMO);
-
+	
 
 	contexto->io_unidades = unidades;
 	contexto->io_dispositivo = io;
@@ -78,84 +76,37 @@ void* seguir_instrucciones(t_contexto_ejecucion* contexto, t_list* instrucciones
 //  pthread_join(id, (void**)&ptr);
 
 
-
-void* todas_operaciones(void){
-
-	lista_ope[SET] = "SET____";
-	lista_ope[ADD] = "ADD____";
-	lista_ope[MOV_IN] = "MOV_IN_";
-	lista_ope[MOV_OUT] = "MOV_OUT";
-	lista_ope[IO] = "I/O____";
-	lista_ope[EXIT] = "EXIT___";
-
-}
-
 void fetch(int numero_instruccion, t_list* instrucciones, char** instruccion){
 
-	// Aca en vez de todo el for podes hacer esto:
-	// char* instruccion_en_bruto = list_get(insturcciones, numero_instruccion);
-	t_list* instruct = instrucciones;
-	for (int i = 1; i < numero_instruccion; i++){
-		instruct->head  = instruct->head->next;
-	}
-	char* instruccion_en_bruto = instruct->head->data;
-
-
-//	char instruccion_en_bruto[15];
-//	int instruccion_buscada = pcb_kernel->program_counter;
-//	char * busqueda = pcb_kernel->instrucciones;
-//	int caracter = 0;
-//	int limite = 1;
-//
-//
-//	while(limite < instruccion_buscada && caracter < cantidadCaracteres_Lista){
-//
-//		if (busqueda[caracter] == '\n'){
-//			limite++;
-//		}
-//		caracter++;
-//	}
-//	int caracter_ingresar = 0;
-//
-//
-//
-//	while(busqueda[caracter_ingresar + caracter] != '\n' && (caracter_ingresar + caracter) < cantidadCaracteres_Lista){
-//
-//			instruccion_en_bruto[caracter_ingresar] = busqueda[caracter_ingresar + caracter];
-//
-//			caracter_ingresar++;
-//
-//	}
-//	instruccion_en_bruto[caracter_ingresar] = '\n';
+	char* instruccion_en_bruto = list_get(instrucciones, numero_instruccion);
+	
 	*instruccion = instruccion_en_bruto;
-
-
 }
 
-void buscaOperando(char* nombre, int** numerico){
+int* buscaOperando(char* nombre){
 
-	int* numerico_aux;
+	int numerico;
 
 	if (nombre[1] == 'X'){
 		switch(nombre[0]) {
 		  case 'A':
-		    *numerico = &registros->ax;
+		    return &registros->ax;
 		    break;
 		  case 'B':
-		    *numerico = &registros->bx;
+		    return &registros->bx;
 		    break;
 		  case 'C':
-			*numerico = &registros->cx;
+			return &registros->cx;
 		    break;
 		  case 'D':
-			*numerico = &registros->dx;
+			return &registros->dx;
 		    break;
 			}
 		}
 
-	sscanf(nombre, "%d", numerico_aux);
+	sscanf(nombre, "%d", &numerico);
 
-	*numerico = numerico_aux;
+return numerico;
 }
 
 //void accederMemoria(operando* op){
@@ -168,7 +119,7 @@ void accederMemoria(int pid, t_list* tlb){
 		*operando_1_APUNTA = traducir_direccion_logica(pid, tlb, *operando_1_APUNTA);
 		break;
 	default: 
-		sleep(1000);
+		sleep((float)(get_retardo_instruccion()/1000));
 		break;
 
 	}
@@ -191,79 +142,52 @@ int comparacion(char* valor1, char* valor2){
 
 void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
 
-	int a = strlen(instruccion_en_bruto);
-	char atributo_1[7];
-	char atributo_2[10];
-	char atributo_3[10];
-	int buscador = 1;
+	char* nombre_instruccion;
+	char* parametro_1;
+	char* parametro_2;
 
-	int i2 = 0;
-	int j = 0;
-	int k = 0;
-	char letra;
-	for (int i = 0; i < a; i++){
-				if (  (instruccion_en_bruto[i] == ' ') || (instruccion_en_bruto[i] == '\n') )
-				{
-					buscador++;
-				}
-				else
-				{
-					letra = instruccion_en_bruto[i];
+	char** instruccion_separada = string_split(instruccion_en_bruto, " ");
 
-					switch(buscador){
-					 case 1:
-						 if (letra != '\0'){
-							 atributo_1[i] = letra;
-						 i2++;
-						 }
-						 break;
-					 case 2:
-						 atributo_2[j] = letra;
-						 j++;
-						 break;
-					 case 3:
-						 atributo_3[k] = letra;
-						 k++;
-					break;
-					}
-				}
-			}
+	int cantidad_atributos = string_array_size(instruccion_separada);
 
-	if(i2 <= 6){
-		for(i2; i2<=6; i2++){
-			atributo_1[i2]= '_';
-		}
-	}
-	if(j <= 9){
-		for(j; j<=9; j++){
-			atributo_2[j]= ' ';
-		}
-	}
-	if(k <= 9){
-		for(k; k<=9; k++){
-			atributo_3[k]= ' ';
-		}
-	}
-	tipo_operacion = -1;
-
-	for (int l = SET; l <= EXIT; l++){
-		if (comparacion(atributo_1, lista_ope[l]) == 0){
-			tipo_operacion = l;
+	switch(cantidad_atributos) {
+		case 1:
+			nombre_instruccion = string_array_pop(instruccion_separada);
 			break;
-		}
+		case 2:
+			parametro_1 = string_array_pop(instruccion_separada);
+			nombre_instruccion = string_array_pop(instruccion_separada);
+			break;
+		case 3:
+			parametro_2 = string_array_pop(instruccion_separada);
+			parametro_1 = string_array_pop(instruccion_separada);
+			nombre_instruccion = string_array_pop(instruccion_separada);
+			break;
 	}
 
+	if(string_equals_ignore_case(nombre_instruccion,"SET")) {
+		tipo_operacion = SET;
+	} else if(string_equals_ignore_case(nombre_instruccion,"ADD")) {
+		tipo_operacion = ADD;
+	} else if(string_equals_ignore_case(nombre_instruccion,"MOV_IN")) {
+		tipo_operacion = MOV_IN;
+	} else if(string_equals_ignore_case(nombre_instruccion,"MOV_OUT")) {
+		tipo_operacion = MOV_OUT;
+	} else if(string_equals_ignore_case(nombre_instruccion,"I/O")) {
+		tipo_operacion = IO;
+	} else if(string_equals_ignore_case(nombre_instruccion,"EXIT")) {
+		tipo_operacion = EXIT;
+	} else {
+		tipo_operacion = -1;
+	}
 
+	operando_1_NOMBRE = parametro_1;
+	operando_2_NOMBRE = parametro_2;
 
-	operando_1_NOMBRE = atributo_2;
-	operando_2_NOMBRE = atributo_3;
-
-	buscaOperando(operando_1_NOMBRE, &operando_1_APUNTA);
-	buscaOperando(operando_2_NOMBRE, &operando_2_APUNTA);
+	operando_1_APUNTA = buscaOperando(operando_1_NOMBRE);
+	operando_2_APUNTA = buscaOperando(operando_2_NOMBRE);
 
 	accederMemoria(pid, la_tbl);
-
-
 }
 
 //int ins_set(instruccion* instruct){
@@ -329,8 +253,7 @@ int ejecutar(void){
 
 	//int opera = instruct->operacion;
 	//switch(opera){
-
-
+	
 	switch(tipo_operacion){
 	case SET:
 		estado = ins_set();
@@ -383,7 +306,6 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 	char *instruccion_en_bruto;
 	fetch(contexto->program_counter, instrucciones, &instruccion_en_bruto);
 
-
 	//decodificar
 	decodificar(instruccion_en_bruto, contexto->tabla_segmentos, pid);
 
@@ -395,7 +317,7 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 
 	//actualizar ciclo
 	contexto->program_counter ++;
-
+	
 	return devuelve;
 
 

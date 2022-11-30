@@ -13,10 +13,11 @@
 #include "../include/client.h"
 
 
-#include "../include/instrucciones.h"
-#include "../include/conexiones_cpu.h"
+#include "instrucciones.h"
+#include "conexiones_cpu.h"
 
-#include "../include/config_cpu.h"
+#include "config_cpu.h"
+#include "../../shared/include/protocolo.h"
 
 #include <commons/collections/list.h>
 
@@ -27,5 +28,6 @@ void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
 int start(void);
 int crearConexionAuxiliar(char* ip, int puerto, t_log* logger);
+t_contexto_ejecucion iniciar_proceso(t_pcb*);
 
 #endif /* CONEXIONES_H_ */

@@ -21,6 +21,7 @@
 #include <commons/collections/list.h>
 #include "utils.h"
 #include "mmu.h"
+#include "config_cpu.h"
 
 enum tipo_instruccion{
 	SET,
@@ -108,6 +109,6 @@ int ciclo_instrucciones(t_contexto_ejecucion*,  t_list*, int);
 void* inicializar(void);
 
 void interrumpe(void);
-void buscaOperando(char*, int**);
+int* buscaOperando(char*);
 
 #endif /* INSTRUCCIONES_H_ */
