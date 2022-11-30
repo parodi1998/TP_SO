@@ -90,7 +90,6 @@ typedef struct instruccion{
 void* funcion_hilo(void*);
 void* seguir_instrucciones(t_contexto_ejecucion*, t_list*,  int);
 void fetch(int, t_list*, char**);
-void* todas_operaciones(void);
 
 
 int decodificaOperando(operando*);

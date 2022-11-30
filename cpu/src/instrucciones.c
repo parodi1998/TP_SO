@@ -50,8 +50,7 @@ int sePuedeConvertirEnInt(char* palabra){
 void* seguir_instrucciones(t_contexto_ejecucion* contexto, t_list* instrucciones, int pid){
 	inicializar();
 	int devolucion = OPTIMO;
-
-	todas_operaciones();
+	
 	//cantidadCaracteres_Lista = strlen(instrucciones);
 	registros = &(contexto->reg_general);
 	do {
