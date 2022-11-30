@@ -32,6 +32,8 @@ sem_t sem_finaliza_timer_quantum;
 sem_t sem_proceso_agregado_a_ready;
 sem_t sem_proceso_sacado_de_ready;
 sem_t sem_grado_multiprogramacion;
+sem_t sem_sincro_cargar_segmentos_en_memoria;
+sem_t sem_sincro_finalizar_pcb_en_memoria;
 
 pthread_t hilo_largo_plazo_new;
 pthread_t hilo_corto_plazo_ready;
@@ -90,6 +92,8 @@ void crear_semaforos_y_mutex_de_cola_block_dinamica(char* key) {
 }
 
 void inicializar_semaforos() {
+    sem_init(&sem_sincro_cargar_segmentos_en_memoria, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_sincro_finalizar_pcb_en_memoria, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     // new
 	pthread_mutex_init(&mutex_new, NULL);
 	sem_init(&contador_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
@@ -142,6 +146,9 @@ void destruir_semaforos_y_mutex_de_cola_block_dinamica(char* key) {
 }
 
 void destruir_semaforos() {
+    sem_destroy(&sem_sincro_cargar_segmentos_en_memoria);
+    sem_destroy(&sem_sincro_finalizar_pcb_en_memoria);
+
     pthread_mutex_destroy(&mutex_new);
     sem_destroy(&contador_new);
     sem_destroy(&sem_largo_plazo_new);

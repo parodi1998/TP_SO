@@ -47,6 +47,8 @@ extern sem_t sem_finaliza_timer_quantum;
 extern sem_t sem_proceso_agregado_a_ready;
 extern sem_t sem_proceso_sacado_de_ready;
 extern sem_t sem_grado_multiprogramacion;
+extern sem_t sem_sincro_cargar_segmentos_en_memoria;
+extern sem_t sem_sincro_finalizar_pcb_en_memoria;
 
 // hilos
 extern pthread_t hilo_largo_plazo_new;

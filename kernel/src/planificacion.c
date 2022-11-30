@@ -34,11 +34,14 @@ void hilo_planificador_largo_plazo_new() {
 		sem_wait(&sem_grado_multiprogramacion);
 		
 		t_pcb* proceso = sacar_proceso_de_new();
-		
-		// wait(mutex_comunicacion_kernel_memoria)
-		// send_proceso_a_memoria(proceso)				// memoria inicializa sus estructuras necesarias
-		// proceso = esperar_proceso_de_memoria()		// obtenemos el indice de la tabla de paginas de cada segmento
-		// signal(mutex_comunicacion_kernel_memoria)
+
+		for(int index = 0; index < list_size(proceso->tabla_segmentos); index++) {
+
+			t_pcb_segmentos* segmento = list_get(proceso->tabla_segmentos, index);
+			char* id_tabla_pagina_string = iniciar_segmento_memoria(fd_memoria, &sem_sincro_cargar_segmentos_en_memoria, logger, proceso->id_proceso, index, segmento->tamanio_segmento);
+			segmento->id_tabla_paginas = atoi(id_tabla_pagina_string);
+			sem_wait(&sem_sincro_cargar_segmentos_en_memoria);
+		}
 
 		// pthread_mutex_lock(&mutex_analizando_interrupcion);
 		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
@@ -77,7 +80,8 @@ void hilo_planificador_largo_plazo_exit() {
 		
 		t_pcb* proceso = sacar_proceso_de_exit();
 
-		// wait_memoria_liberar(proceso);
+		char* rta = finalizar_proceso_memoria(fd_memoria, &sem_sincro_finalizar_pcb_en_memoria, logger, proceso->id_proceso);
+		sem_wait(&sem_sincro_finalizar_pcb_en_memoria);
 		// wait_consola_finalizar(proceso);
 		liberar_pcb(proceso);
 		sem_post(&sem_grado_multiprogramacion);
@@ -248,6 +252,7 @@ void hilo_planificador_corto_plazo_execute() {
 		sem_wait(&sem_corto_plazo_execute);
 
 		t_pcb* proceso = sacar_proceso_de_execute();
+		proceso->debe_ser_finalizado = true;
 
 		// send_proceso_a_cpu(proceso);				// recordar agregar mutex en las comunicaciones si es necesario
 		/*

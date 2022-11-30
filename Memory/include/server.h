@@ -48,7 +48,6 @@ typedef struct
 	t_buffer* buffer;
 } t_paquete;
 
-pthread_t thread;
 
 void* recibir_buffer_memory(int*, int);
 

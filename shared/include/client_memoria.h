@@ -16,24 +16,25 @@
 #include<string.h>
 #include<commons/string.h>
 #include<commons/log.h>
+#include<semaphore.h>
 #include "../include/protocolo.h"
 #include "../include/sockets.h"
 
 typedef enum
 {
 	CONFIG_CPU,
-		INICIAR_PROCESO,
-		TRADUCIR,
-		ESCRIBIR,
-		LEER,
-		SUSPENDER_PROCESO,
-		RESTAURAR_PROCESO,
-		FINALIZAR_PROCESO,
-		TRADUCCION_EXITOSA,
-		PAGE_FAULT_MEMORIA,
-		OK,
-		ERROR
-}op_code_memoria;
+	INICIAR_PROCESO,
+	TRADUCIR,
+	ESCRIBIR,
+	LEER,
+	SUSPENDER_PROCESO,
+	RESTAURAR_PROCESO,
+	FINALIZAR_PROCESO,
+	TRADUCCION_EXITOSA,
+	PAGE_FAULT_MEMORIA,
+	OK,
+	ERROR
+} op_code_memoria;
 
 
 typedef struct
@@ -50,8 +51,8 @@ void eliminar_paquete_memoria(t_paquete_memoria* paquete);
 void liberar_conexion_memoria(int socket_cliente);
 
 char* page_fault_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t segment, uint32_t page);
-char* finalizar_proceso_memoria(int socket_cliente,t_log* logger,uint32_t pid);
-char* iniciar_segmento_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t segmento, uint32_t tamanio);
+char* finalizar_proceso_memoria(int socket_cliente, sem_t* sincro, t_log* logger,uint32_t pid);
+char* iniciar_segmento_memoria(int socket_cliente, sem_t* sincro, t_log* logger,uint32_t pid,uint32_t segmento, uint32_t tamanio);
 
 char* traducir_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t segment, uint32_t page,uint32_t es_escritura);
 char* leer_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t dir_fisica, uint32_t tamanio);

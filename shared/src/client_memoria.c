@@ -35,7 +35,7 @@ char* traducir_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t se
 	return rta;
 }
 
-char* finalizar_proceso_memoria(int socket_cliente,t_log* logger,uint32_t pid){
+char* finalizar_proceso_memoria(int socket_cliente, sem_t* sincro, t_log* logger,uint32_t pid){
 	char* mensaje = string_from_format("%d",pid);
 
 	log_info(logger,"REQUEST FINALIZAR_PROCESO: %s" , mensaje );
@@ -43,6 +43,7 @@ char* finalizar_proceso_memoria(int socket_cliente,t_log* logger,uint32_t pid){
 	char* rta = recibir_mensaje_memoria(socket_cliente);
 	log_info(logger,"RESPUESTA FINALIZAR_PROCESO: %s" , rta );
 	free(mensaje);
+	sem_post(sincro);
 	return rta;
 }
 
@@ -54,7 +55,7 @@ char* recibir_config_para_mmu(int socket_cliente, t_log* logger){
 	return rta;
 }
 
-char* iniciar_segmento_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t segmento, uint32_t tamanio){
+char* iniciar_segmento_memoria(int socket_cliente, sem_t* sincro, t_log* logger,uint32_t pid,uint32_t segmento, uint32_t tamanio){
 	char* mensaje = string_from_format("%d|%d|%d",pid,segmento,tamanio);
 
 	log_info(logger,"REQUEST INICIAR_SEGMENTO: %s" , mensaje );
@@ -62,6 +63,7 @@ char* iniciar_segmento_memoria(int socket_cliente,t_log* logger,uint32_t pid,uin
 	char* rta = recibir_mensaje_memoria(socket_cliente);
 	log_info(logger,"RESPUESTA INICIAR_SEGMENTO: %s" , rta );
 	free(mensaje);
+	sem_post(sincro);
 	return rta;
 
 }

@@ -49,6 +49,8 @@ void esperar_cliente_memory(int socket_servidor)
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
+	pthread_t thread;
+
 	pthread_create(&thread,NULL,(void*)serve_client_memory,&socket_cliente);
 	pthread_detach(thread);
 
@@ -56,10 +58,13 @@ void esperar_cliente_memory(int socket_servidor)
 
 void serve_client_memory(int* socket)
 {
-	int cod_op;
-	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
-		cod_op = -1;
-	process_request_memory(cod_op, *socket);
+	while(*socket != -1) {
+		int cod_op;
+		if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
+			cod_op = -1;
+		process_request_memory(cod_op, *socket);
+	}
+	
 }
 
 void process_request_memory(int cod_op, int cliente_fd) {
