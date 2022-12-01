@@ -127,6 +127,16 @@ bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto, in
 	return *fd_memoria != 0;
 }
 
+bool generar_conexion_kernel_a_cpu_dispatch(t_log* logger, char* ip, char* puerto, int* fd_cpu_dispatch) {
+	*fd_cpu_dispatch = crear_conexion(logger,"CPU_DISPATCH", ip, puerto);
+	return *fd_cpu_dispatch != 0;
+}
+
+bool generar_conexion_kernel_a_cpu_interrupt(t_log* logger, char* ip, char* puerto, int* fd_cpu_interrupt) {
+	*fd_cpu_interrupt = crear_conexion(logger,"CPU_INTERRUPT", ip, puerto);
+	return *fd_cpu_interrupt != 0;
+}
+
 void enviar_mensaje_memoria(char* mensaje, int socket_cliente,op_code_memoria codigo_operacion)
 {
 	t_paquete_memoria* paquete = malloc(sizeof(t_paquete_memoria));

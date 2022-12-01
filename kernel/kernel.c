@@ -1,8 +1,8 @@
 #include "include/kernel.h"
 
 int fd_memoria = 0;
-int fd_cpu_dispatch;
-int fd_cpu_interrupt;
+int fd_cpu_dispatch = 0;
+int fd_cpu_interrupt = 0;
 
 t_dictionary* colas;
 t_dictionary* contador_colas_block;
@@ -257,9 +257,21 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
+    if(!generar_conexion_kernel_a_cpu_dispatch(logger, config_kernel->ip_cpu, config_kernel->puerto_cpu_dispatch, &fd_cpu_dispatch)) {
+        log_error(logger,"No se pudo generar la conexion con cpu dispatch");
+        terminar_programa();
+        return EXIT_FAILURE;
+    }
+
+    if(!generar_conexion_kernel_a_cpu_interrupt(logger, config_kernel->ip_cpu, config_kernel->puerto_cpu_interrupt, &fd_cpu_interrupt)) {
+        log_error(logger,"No se pudo generar la conexion con cpu interrupt");
+        terminar_programa();
+        return EXIT_FAILURE;
+    }
+
     int kernel_server_fd = 0;
     if(!iniciar_kernel(&kernel_server_fd)) {
-        log_error(logger,"No se pudo generar iniciar el proceso kernel");
+        log_error(logger,"No se pudo iniciar kernel como servidor");
         terminar_programa();
         return EXIT_FAILURE;
     }

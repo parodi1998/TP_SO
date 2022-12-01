@@ -45,6 +45,8 @@ typedef struct
 
 int crear_conexion_memoria(char* ip, char* port);
 bool generar_conexion_kernel_a_memoria(t_log* logger, char* ip, char* puerto, int* fd_memoria);
+bool generar_conexion_kernel_a_cpu_dispatch(t_log* logger, char* ip, char* puerto, int* fd_cpu_dispatch);
+bool generar_conexion_kernel_a_cpu_interrupt(t_log* logger, char* ip, char* puerto, int* fd_cpu_interrupt);
 void enviar_mensaje_memoria(char* mensaje, int socket_cliente,op_code_memoria codigo_operacion);
 char* recibir_mensaje_memoria(int socket_cliente);
 void eliminar_paquete_memoria(t_paquete_memoria* paquete);
