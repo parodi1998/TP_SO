@@ -72,35 +72,49 @@ void process_request_memory(int cod_op, int cliente_fd) {
 	int op_code_response;
 	void* msg = NULL;
 	void* response = NULL;
-	msg = recibir_mensaje_memory(cliente_fd, &size);
 		switch (cod_op) {
 		case CONFIG_CPU:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = config_cpu();
 			size = sizeof(response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		case INICIAR_PROCESO:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_mensaje_iniciar_proceso(msg,&size,&op_code_response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		case TRADUCIR:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_traducir_direccion(msg,&size,&op_code_response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		case ESCRIBIR:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_mensaje_escribir(msg,&size,&op_code_response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		case LEER:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_mensaje_leer(msg,&size,&op_code_response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		case SWAP_PAGE:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_swapping(msg,&size,&op_code_response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		case SUSPENDER_PROCESO:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_suspender_proceso(msg,&size,&op_code_response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		case FINALIZAR_PROCESO:
+			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_finalizar_proceso(msg,&size,&op_code_response);
+			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			break;
 		}
-		devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 }
 
 void* recibir_mensaje_memory(int socket_cliente, int* size)
