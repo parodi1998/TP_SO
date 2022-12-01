@@ -11,6 +11,7 @@ uint32_t frames_per_process;
 uint32_t swap_delay_time;
 char* swap_file_path;
 uint32_t swap_size;
+char* IP;
 
 t_config* CONFIG;
 
@@ -29,6 +30,7 @@ void initialize_memory_configuration_manager(){
     swap_delay_time = (volatile uint32_t) config_get_int_value(CONFIG,"RETARDO_SWAP");
     swap_file_path = config_get_string_value(CONFIG,"PATH_SWAP");
     swap_size = (volatile uint32_t) config_get_int_value(CONFIG,"TAMANIO_SWAP");
+    IP = config_get_string_value(CONFIG,"IP_MEMORIA");
     initialize_logger();
 }
 char* port_getter(){
@@ -74,4 +76,8 @@ t_log* get_logger(){
 
 uint32_t swap_size_getter(){
 	return swap_size;
+}
+
+char* get_ip(){
+	return IP;
 }

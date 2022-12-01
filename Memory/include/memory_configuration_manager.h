@@ -22,5 +22,6 @@ void free_memory_configuration_manager();
 void initialize_logger();
 t_log* get_logger();
 uint32_t swap_size_getter();
+char* get_ip();
 
 #endif /*MEMORY_CONFIGURATION_MANAGER_H_*/

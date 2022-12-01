@@ -19,7 +19,7 @@ void iniciar_servidor_memory(void)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    getaddrinfo("127.0.0.1", port_getter(), &hints, &servinfo);
+    getaddrinfo(get_ip(), port_getter(), &hints, &servinfo);
 
     for (p=servinfo; p != NULL; p = p->ai_next)
     {
