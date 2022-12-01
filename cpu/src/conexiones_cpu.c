@@ -147,7 +147,7 @@ void ciclo_recibir_instruccines(){
 	int error = 0;
 	int recibir_instrucciones;
 	while (error == 0){
-	//	recibir_instrucciones = cpu_conexion_server(2, get_puerto_memoria_dispatch);
+	//	recibir_instrucciones = cpu_conexion_server(2, get_puerto_escucha_dispatch);
 		//if (recibir_instrucciones < 0){
 			//error = 1;
 		//}
