@@ -21,6 +21,8 @@ void iniciar_servidor_memory(void)
 
     getaddrinfo("127.0.0.1", port_getter(), &hints, &servinfo);
 
+	bool conecto = false;
+
     for (p=servinfo; p != NULL; p = p->ai_next)
     {
         if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
@@ -30,7 +32,14 @@ void iniciar_servidor_memory(void)
             close(socket_servidor);
             continue;
         }
+		conecto = true;
         break;
+    }
+
+	if(!conecto) {
+        free(servinfo);
+		log_info(get_logger(),"No se pude levantar memoria como servidor");
+        return;
     }
 
 	listen(socket_servidor, SOMAXCONN);
