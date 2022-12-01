@@ -18,6 +18,8 @@
 
 int fd_server_cpu_dispatch;
 int fd_server_cpu_interrupt;
+int fd_client_kernel_dispatch;
+int fd_client_kernel_interrupt;
 
 int main(void) {
 	puts("ENCENDIDOS");
@@ -38,7 +40,15 @@ int main(void) {
         // terminar_programa(); deberia llamarse a una funcion que libere toda la memoria de loggers, configs, listas, giladas
         return EXIT_FAILURE;
     }
-	
-	log_info(get_log(),"INICIANDO CPU");
-	start();
+
+	fd_client_kernel_dispatch = esperar_cliente(get_log(), "CPU_DISPATCH", fd_server_cpu_dispatch);
+	fd_client_kernel_interrupt = esperar_cliente(get_log(), "CPU_INTERRUPT", fd_server_cpu_interrupt);
+
+	if (fd_client_kernel_dispatch != -1 && fd_client_kernel_interrupt != -1) {
+		log_info(get_log(),"INICIANDO CPU");
+		start();
+	}
+
+	log_info(get_log(),"FINALIZANDO CPU");
+	return 0;
 }
