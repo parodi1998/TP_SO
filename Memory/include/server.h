@@ -19,7 +19,6 @@
 #include<pthread.h>
 #include<commons/string.h>
 
-
 typedef enum
 {
 	CONFIG_CPU,
@@ -52,6 +51,8 @@ typedef struct
 void* recibir_buffer_memory(int*, int);
 
 void iniciar_servidor_memory(void);
+bool iniciar_server_memoria(int* fd);
+int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto);
 void esperar_cliente_memory(int);
 void* recibir_mensaje_memory(int socket_cliente, int* size);
 int recibir_operacion_memory(int);

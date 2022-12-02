@@ -8,46 +8,70 @@
 #include "../include/memory_file_management.h"
 #include "../include/server.h"
 
-void iniciar_servidor_memory(void)
-{
-	int socket_servidor;
+int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto) {
+    int socket_servidor;
+    struct addrinfo hints, *servinfo;
 
-    struct addrinfo hints, *servinfo, *p;
-
+    // Inicializando hints
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    getaddrinfo(get_ip(), port_getter(), &hints, &servinfo);
+    // Recibe los addrinfo
+    getaddrinfo(ip, puerto, &hints, &servinfo);
 
-	bool conecto = false;
+    bool conecto = false;
 
-    for (p=servinfo; p != NULL; p = p->ai_next)
-    {
-        if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+    // Itera por cada addrinfo devuelto
+    for (struct addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
+        socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        if (socket_servidor == -1) // fallo de crear socket
             continue;
 
         if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
+            // Si entra aca fallo el bind
             close(socket_servidor);
             continue;
         }
-		conecto = true;
+        // Ni bien conecta uno nos vamos del for
+        conecto = true;
         break;
     }
 
-	if(!conecto) {
+    if(!conecto) {
         free(servinfo);
-		log_info(get_logger(),"No se pude levantar memoria como servidor");
-        return;
+        return 0;
     }
 
-	listen(socket_servidor, SOMAXCONN);
+    listen(socket_servidor, SOMAXCONN); // Escuchando (hasta SOMAXCONN conexiones simultaneas)
+
+    // Aviso al logger
+    log_info(logger, "Escuchando en %s:%s (%s)\n", ip, puerto, name);
 
     freeaddrinfo(servinfo);
 
-    while(1)
-    	esperar_cliente_memory(socket_servidor);
+    return socket_servidor;
+}
+
+bool iniciar_server_memoria(int* fd) {
+     *fd = iniciar_servidor(get_logger(), "MEMORIA", get_ip(), port_getter());
+    return fd != 0;
+}
+
+void iniciar_servidor_memory(void)
+{
+	int socket_servidor = 0;
+
+	if(!iniciar_server_memoria(&socket_servidor)) {
+        log_error(get_logger(),"No se iniciar el server memoria");
+        // terminar_programa(); deberia llamarse a una funcion que libere toda la memoria de loggers, configs, listas, giladas
+        return;
+    } else {
+		while(1)
+    		esperar_cliente_memory(socket_servidor);
+	}
+  
 }
 
 void esperar_cliente_memory(int socket_servidor)

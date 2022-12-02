@@ -254,7 +254,11 @@ void hilo_planificador_corto_plazo_execute() {
 		t_pcb* proceso = sacar_proceso_de_execute();
 		proceso->debe_ser_finalizado = true;
 
-		// send_proceso_a_cpu(proceso);				// recordar agregar mutex en las comunicaciones si es necesario
+		if(!send_pcb(fd_cpu_dispatch, proceso)) {
+			log_error(logger,"Hubo un error enviando el proceso al cpu");
+		} else {
+			log_info(logger,"El proceso fue enviado a cpu para ejecutar");
+		}
 		/*
 		if(proceso->puede_ser_interrumpido) {
 			sem_post(&sem_comienza_timer_quantum);
