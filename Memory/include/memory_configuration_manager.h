@@ -18,10 +18,11 @@ char* algorithm();
 uint32_t swap_time();
 uint32_t frames_per_table_getter();
 char* swap_path();
-void free_memory_configuration_manager();
 void initialize_logger();
 t_log* get_logger();
 uint32_t swap_size_getter();
 char* get_ip();
+void destroy_config();
+void destroy_logger();
 
 #endif /*MEMORY_CONFIGURATION_MANAGER_H_*/
