@@ -61,11 +61,6 @@ char* swap_path(){
     return swap_file_path;
 }
 
-
-void free_memory_configuration_manager(){
-    config_destroy(CONFIG);
-}
-
 void initialize_logger(){
 	logger = log_create("Memory.log", "Memory", true, LOG_LEVEL_INFO);
 }
@@ -80,4 +75,12 @@ uint32_t swap_size_getter(){
 
 char* get_ip(){
 	return IP;
+}
+
+void destroy_config(){
+	config_destroy(CONFIG);
+}
+
+void destroy_logger(){
+	log_destroy(logger);
 }

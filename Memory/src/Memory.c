@@ -19,5 +19,7 @@ int main(void) {
 	initialize_memory_file_management();
 	log_info(get_logger(),"INICIANDO SERVIDOR..");
 	iniciar_servidor_memory();
+	end_memory_module();
+
 	return EXIT_SUCCESS;
 }

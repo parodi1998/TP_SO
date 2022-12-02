@@ -106,7 +106,7 @@ int  ins_exit(void);
 int check_interrupt(int);
 int ciclo_instrucciones(t_contexto_ejecucion*,  t_list*, int);
 void* inicializar(void);
-
+int unidades_en_registro(int*);
 void interrumpe(void);
 int* buscaOperando(char*);
 
