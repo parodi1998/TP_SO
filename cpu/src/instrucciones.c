@@ -18,6 +18,7 @@ char* operando_2_NOMBRE = NULL;
 int* operando_1_APUNTA = NULL;
 int* operando_2_APUNTA = NULL;
 
+
 char* io = NULL;
 char* io_registro = NULL;
 int unidades = 0;
@@ -28,8 +29,8 @@ int cantidadCaracteres_Lista;
 
 void* inicializar()
 {
-	io = NULL;
 	unidades = 0;
+	io = NULL;
 	io_registro = NULL;
 	continuar = 0;
 }
@@ -47,12 +48,15 @@ int sePuedeConvertirEnInt(char* palabra){
     	return sePuede;
     }
 
+
+
 void* seguir_instrucciones(t_contexto_ejecucion* contexto, t_list* instrucciones, int pid){
 	inicializar();
 	int devolucion = OPTIMO;
 	
 	//cantidadCaracteres_Lista = strlen(instrucciones);
 	registros = &(contexto->reg_general);
+
 	do {
 		devolucion = ciclo_instrucciones(contexto, instrucciones, pid);
 	} while (devolucion == OPTIMO);
@@ -64,15 +68,7 @@ void* seguir_instrucciones(t_contexto_ejecucion* contexto, t_list* instrucciones
 	contexto->io_registro = io_registro;
 }
 
-  //pthread_t id;
 
-  //int j = 1;
-  //pthread_create(&id, NULL, funcion_hilo, &j);
-
-  //int* ptr;
-
-  // Wait for foo() and retrieve value in ptr;
-//  pthread_join(id, (void**)&ptr);
 
 
 void fetch(int numero_instruccion, t_list* instrucciones, char** instruccion){
@@ -118,7 +114,7 @@ void accederMemoria(int pid, t_list* tlb){
 		*operando_1_APUNTA = traducir_direccion_logica(pid, tlb, *operando_1_APUNTA);
 		break;
 	default: 
-		sleep((float)(get_retardo_instruccion()/1000));
+	sleep((float)(get_retardo_instruccion()/1000));
 		break;
 
 	}
@@ -140,7 +136,7 @@ int comparacion(char* valor1, char* valor2){
 }
 
 void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
-
+	tipo_operacion = 0;
 	char* nombre_instruccion;
 	char* parametro_1;
 	char* parametro_2;
@@ -148,21 +144,30 @@ void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
 	char** instruccion_separada = string_split(instruccion_en_bruto, " ");
 
 	int cantidad_atributos = string_array_size(instruccion_separada);
-
-	switch(cantidad_atributos) {
+	for (int ciclo = cantidad_atributos; ciclo > 0; ciclo = ciclo - 1)
+	{
+		switch(ciclo)
+		{
 		case 1:
 			nombre_instruccion = string_array_pop(instruccion_separada);
 			break;
 		case 2:
-			parametro_1 = string_array_pop(instruccion_separada);
-			nombre_instruccion = string_array_pop(instruccion_separada);
+			operando_1_NOMBRE = string_array_pop(instruccion_separada);
+			operando_1_APUNTA = buscaOperando(operando_1_NOMBRE);
 			break;
 		case 3:
-			parametro_2 = string_array_pop(instruccion_separada);
-			parametro_1 = string_array_pop(instruccion_separada);
-			nombre_instruccion = string_array_pop(instruccion_separada);
+			operando_2_NOMBRE = string_array_pop(instruccion_separada);
+			operando_2_APUNTA = buscaOperando(operando_2_NOMBRE);
 			break;
+		default:
+			ciclo = 0;
+			tipo_operacion = -1;
+		}
 	}
+
+
+if (tipo_operacion == 0){
+
 
 	if(string_equals_ignore_case(nombre_instruccion,"SET")) {
 		tipo_operacion = SET;
@@ -179,12 +184,7 @@ void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
 	} else {
 		tipo_operacion = -1;
 	}
-
-	operando_1_NOMBRE = parametro_1;
-	operando_2_NOMBRE = parametro_2;
-
-	operando_1_APUNTA = buscaOperando(operando_1_NOMBRE);
-	operando_2_APUNTA = buscaOperando(operando_2_NOMBRE);
+}
 
 	accederMemoria(pid, la_tbl);
 }
@@ -226,16 +226,23 @@ int ins_mov_out(void){
 	return OPTIMO;
 }
 
+int unidades_en_registro (int* registro_buscado){
+	int unidades_encontradas = *registro_buscado;
+	return unidades_encontradas;
+}
+
 // Lo mismo de arriba, pero ahora es un int = int** por el &. En el else, es un int = int*
 int ins_io(void){
 
 	io = operando_1_NOMBRE;
 	if (operando_2_NOMBRE[1] == 'X'){
 		io_registro = operando_2_NOMBRE;
-		unidades = &operando_2_APUNTA;
+		unidades = unidades_en_registro(operando_2_APUNTA);
+
 	}
 	else
 	{
+		io_registro = NULL;
 		unidades = operando_2_APUNTA;
 	}
 
@@ -252,7 +259,6 @@ int ejecutar(void){
 
 	//int opera = instruct->operacion;
 	//switch(opera){
-	
 	switch(tipo_operacion){
 	case SET:
 		estado = ins_set();
@@ -321,3 +327,4 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 
 
 }
+
