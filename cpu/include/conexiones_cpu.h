@@ -9,8 +9,8 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<semaphore.h>
-#include "../include/server.h"
-#include "../include/client.h"
+#include "server.h"
+#include "client.h"
 
 
 #include "instrucciones.h"

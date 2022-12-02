@@ -5,7 +5,7 @@ char* reemplazo_tlb;
 int retardo_instruccion;
 char* ip_memoria;
 char* puerto_memoria;
-char* puerto_memoria_dispatch;
+char* puerto_escucha_dispatch;
 char* puerto_escucha_interrupt;
 char* log_path;
 
@@ -24,7 +24,7 @@ void iniciar_config_cpu(void){
 	retardo_instruccion = config_get_int_value(CONFIG,"RETARDO_INSTRUCCION");
 	ip_memoria =  config_get_string_value(CONFIG,"IP_MEMORIA");
 	puerto_memoria = config_get_string_value(CONFIG,"PUERTO_MEMORIA");
-	puerto_memoria_dispatch = config_get_string_value(CONFIG,"PUERTO_ESCUCHA_DISPATCH");
+	puerto_escucha_dispatch = config_get_string_value(CONFIG,"PUERTO_ESCUCHA_DISPATCH");
 	puerto_escucha_interrupt = config_get_string_value(CONFIG,"PUERTO_ESCUCHA_INTERRUPT");
 	log_path = config_get_string_value(CONFIG,"LOG_PATH");
 
@@ -57,8 +57,8 @@ char* get_ip_memoria(){
 char* get_puerto_memoria(){
 	return puerto_memoria;
 }
-char* get_puerto_memoria_dispatch(){
-	return puerto_memoria_dispatch;
+char* get_puerto_escucha_dispatch(){
+	return puerto_escucha_dispatch;
 }
 char* get_puerto_escucha_interrupt(){
 	return puerto_escucha_interrupt;

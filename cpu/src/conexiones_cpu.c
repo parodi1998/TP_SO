@@ -147,7 +147,7 @@ void ciclo_recibir_instruccines(){
 	int error = 0;
 	int recibir_instrucciones;
 	while (error == 0){
-	//	recibir_instrucciones = cpu_conexion_server(2, get_puerto_memoria_dispatch);
+	//	recibir_instrucciones = cpu_conexion_server(2, get_puerto_escucha_dispatch);
 		//if (recibir_instrucciones < 0){
 			//error = 1;
 		//}
@@ -159,35 +159,10 @@ void ciclo_recibir_instruccines(){
 
 int start()
 {
-	int conexion_Memoria;
-	int conexion_Kernel_Dispatch;
-	int conexion_Kernel_Interrupt;
+	// creo hilo de interrupt
 
-	char* valor;
-//	t_log* logger;
-
-	/* ---------------- LOGGING ---------------- */
-	//if (logger = get_log() <= 0){
-	//	printf("nop");
-	//	return -2;
-	//}
-	//else
-//	{
-	//CONECTAR A MEMORIA
-	//log_info(logger, "Cargar memoria");
-
-
-	char* mensajeEnviar = "Acá voy";
-	char* mensajeRecibido;
-
-
-	int regreso;
-//CONECTAR A KERNEL
-
+	// creo hilo de dispatch
 
 	ciclo_recibir_instruccines();
-
-//	log_destroy(logger); //BORRAR LUEGO
 	return alfa;
 }
-//}

@@ -62,3 +62,12 @@ return 0;
 }
 
 
+bool iniciar_server_cpu_dispatch(int* fd) {
+     *fd = iniciar_servidor(get_log(), "CPU_DISPATCH", "127.0.0.1", get_puerto_escucha_dispatch());
+    return fd != 0;
+}
+
+bool iniciar_server_cpu_interrupt(int* fd) {
+     *fd = iniciar_servidor(get_log(), "CPU_INTERRUPT", "127.0.0.1", get_puerto_escucha_interrupt());
+    return fd != 0;
+}
