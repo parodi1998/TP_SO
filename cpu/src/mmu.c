@@ -41,6 +41,10 @@ bool iniciar_mmu(){
 	return true;
 }
 
+int get_socket(){
+	return CONEXION_MEMORIA;
+}
+
 
 int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t dir_logica){
 	//RETORNA LA DIR_FISICA
