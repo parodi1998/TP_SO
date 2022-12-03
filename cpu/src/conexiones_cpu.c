@@ -101,8 +101,6 @@ t_contexto_ejecucion iniciar_proceso(t_pcb* pcb1){
 
 	log_info(get_log(),"ya cargue el contexto");
 
-
-			
 	// 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
 	//	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso));
 	seguir_instrucciones(&contexto_ejecucion, pcb1->instrucciones, pcb1->id_proceso);
@@ -114,50 +112,21 @@ t_contexto_ejecucion iniciar_proceso(t_pcb* pcb1){
 	return contexto_ejecucion;
 }
 
-static t_pcb* crear_pcb_prueba() {
-	t_list* instrucciones = list_create();
-	list_add(instrucciones, "SET AX 2"); // el \n ya se lo saco yo cuando leo el archivo
-	list_add(instrucciones, "SET BX 4");
-	list_add(instrucciones, "ADD AX BX");
-	list_add(instrucciones, "EXIT");
-
-	t_pcb* pcb_proceso = malloc(sizeof(t_pcb));
-	pcb_proceso->id_proceso = 0;
-	pcb_proceso->program_counter = 0;
-	//carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
-	pcb_proceso->registro_AX = 0;
-	pcb_proceso->registro_BX = 0;
-	pcb_proceso->registro_CX = 0;
-	pcb_proceso->registro_DX = 0;
-	pcb_proceso->instrucciones = instrucciones;
-	pcb_proceso->estado_anterior = PCB_NEW;
-	pcb_proceso->estado_actual = PCB_NEW;
-	pcb_proceso->consola_fd = 0;
-	pcb_proceso->debe_ser_finalizado = false;
-	pcb_proceso->debe_ser_bloqueado = false;
-	pcb_proceso->puede_ser_interrumpido = false;
-	pcb_proceso->fue_interrumpido = false;
-	pcb_proceso->registro_para_bloqueo = 0;
-	pcb_proceso->unidades_de_trabajo = 0;
-	pcb_proceso->dispositivo_bloqueo = string_new();
-	pcb_proceso->page_fault_segmento = 0;
-	pcb_proceso->page_fault_pagina = 0;
-
-	return pcb_proceso;
-}
-
-void ciclo_recibir_instruccines(){
-	int error = 0;
-	int recibir_instrucciones;
-	while (error == 0){
-	//	recibir_instrucciones = cpu_conexion_server(2, get_puerto_escucha_dispatch);
-		//if (recibir_instrucciones < 0){
-			//error = 1;
-		//}
-		t_pcb* pcb1 = crear_pcb_prueba(); 
-		
-		t_contexto_ejecucion contexto = iniciar_proceso(pcb1);
-	}
+static void actualizar_pcb(t_contexto_ejecucion contexto, t_pcb* proceso) {
+	proceso->program_counter = contexto.program_counter;
+	switch (contexto.estado) {
+			case BLOQUEO:
+                break;
+			case INTERRUPCION:
+                break;
+			case PAGE_DEFAULT:
+                break;
+			case FINALIZADO:
+				proceso->debe_ser_finalizado = true;
+                break;
+			default:
+				break; 
+		}
 }
 
 void comunicacion_cpu_kernel_distpach() {
@@ -165,24 +134,28 @@ void comunicacion_cpu_kernel_distpach() {
 	op_code cod_op;
 	t_list* instrucciones;
     t_list* segmentos;
+	t_contexto_ejecucion contexto;
 
 	while(fd_client_kernel_dispatch != -1) {
 		
 
-		if(recv(fd_client_kernel_dispatch, &cod_op, sizeof(op_code), 0) != sizeof(op_code)== -1) {
-			log_info(get_log(),"antes de llamar a iniciar proceso");
-			t_contexto_ejecucion contexto = iniciar_proceso(proceso);
-			// wait(termino de cargar contexto)
-			// send_contexto(fd_client_kernel_dispatch, contexto);
-		}
+		if(recv(fd_client_kernel_dispatch, &cod_op, sizeof(op_code), MSG_WAITALL) == -1)
+			cod_op = -1;
 
 		switch (cod_op) {
 			case PCB_KERNEL:
 				if(!recv_pcb(get_log(), fd_client_kernel_dispatch, &proceso)) {
                     log_error(get_log(),"Hubo un error al recibir el proceso de kernel");
                 } else {
-					log_info(get_log(),"recibi el pcb ok");
-					log_info(get_log(),"PID: %d", proceso->id_proceso);
+					contexto = iniciar_proceso(proceso);
+					// estaria bueno meter un wait
+					actualizar_pcb(contexto, proceso);
+					// estaria bueno meter un wait
+					if(!send_pcb(get_log(), fd_client_kernel_dispatch, proceso)) {
+						log_error(get_log(),"Hubo un error enviando el proceso al kernel");
+					} else {
+						log_info(get_log(),"El proceso fue enviado a kernel");
+					}
 				}
                 break;
 			default:

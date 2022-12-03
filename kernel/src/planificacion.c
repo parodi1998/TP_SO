@@ -260,26 +260,43 @@ void hilo_planificador_corto_plazo_execute() {
 		} else {
 			log_info(logger,"El proceso fue enviado a cpu para ejecutar");
 		}
-		/*
+		
 		if(proceso->puede_ser_interrumpido) {
 			sem_post(&sem_comienza_timer_quantum);
 		}
-		*/
+		
+		t_pcb* proceso_recibido;
 
-		// Para el testo
-		// proceso = recv_proceso_de_cpu()			// esto deberia ser bloqueante
-		sem_post(&sem_comienza_timer_quantum);
-		sem_wait(&sem_finaliza_timer_quantum);		// creo que el sem finaliza no es necesario, aca lo use para sincro no mas
+		op_code cod_op;
+		recv(fd_cpu_dispatch, &cod_op, sizeof(op_code), MSG_WAITALL);
 
-		if(proceso->debe_ser_finalizado) {
-			meter_proceso_en_exit(proceso);
-			sem_post(&sem_cpu_libre);
-		} else if(proceso->debe_ser_bloqueado) {
-			meter_proceso_en_block(proceso, proceso->dispositivo_bloqueo);
-			sem_post(&sem_cpu_libre);
+		log_info(logger,"op_code %d", cod_op);
+
+		if(!recv_pcb(logger, fd_cpu_dispatch, &proceso_recibido)) {
+            log_error(logger,"Hubo un error al recibir el proceso de kernel");
+			char* rta = finalizar_proceso_memoria(fd_memoria, &sem_sincro_finalizar_pcb_en_memoria, logger, proceso->id_proceso);
+			sem_wait(&sem_sincro_finalizar_pcb_en_memoria);
 		} else {
-			devolver_proceso_a_ready(proceso);
+			log_info(logger,"El proceso volvio de cpu con exito");
+			log_info(logger,"PC actualizado: %d", proceso_recibido->program_counter);
+
+			liberar_pcb(proceso);
+
+			if(proceso_recibido->debe_ser_finalizado) {
+				meter_proceso_en_exit(proceso_recibido);
+				sem_post(&sem_cpu_libre);
+			} else if(proceso_recibido->debe_ser_bloqueado) {
+				meter_proceso_en_block(proceso_recibido, proceso_recibido->dispositivo_bloqueo);
+				sem_post(&sem_cpu_libre);
+			} else {
+				devolver_proceso_a_ready(proceso_recibido);
+			}
 		}
+
+		// sem_post(&sem_comienza_timer_quantum);
+		// sem_wait(&sem_finaliza_timer_quantum);		// creo que el sem finaliza no es necesario, aca lo use para sincro no mas
+
+		
 	}
 }
 
