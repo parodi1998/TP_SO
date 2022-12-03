@@ -18,7 +18,8 @@ char* operando_2_NOMBRE = NULL;
 int* operando_1_APUNTA = NULL;
 int* operando_2_APUNTA = NULL;
 
-
+int direccion_logica = 0;
+int direccion_fisica = 0;
 char* io = NULL;
 char* io_registro = NULL;
 int unidades = 0;
@@ -108,13 +109,17 @@ return numerico;
 void accederMemoria(int pid, t_list* tlb){
 	switch(tipo_operacion){
 	case MOV_IN: 
-		*operando_2_APUNTA = traducir_direccion_logica(pid, tlb, *operando_2_APUNTA);
+		log_info(get_log(),"antes de traducir memoria en mov in");
+		sscanf(operando_2_NOMBRE, "%d", &direccion_logica);
+		direccion_fisica = traducir_direccion_logica(pid, tlb, direccion_logica);
+		log_info(get_log(),"despues de traducir memoria en mov in: %d", direccion_fisica);
 		break;
 	case MOV_OUT: 
-		*operando_1_APUNTA = traducir_direccion_logica(pid, tlb, *operando_1_APUNTA);
+		sscanf(operando_1_NOMBRE, "%d", &direccion_logica);
+		direccion_fisica = traducir_direccion_logica(pid, tlb, direccion_logica);
 		break;
 	default: 
-	sleep((float)(get_retardo_instruccion()/1000));
+	//sleep((float)(get_retardo_instruccion()/1000));
 		break;
 
 	}
@@ -216,8 +221,14 @@ int ins_add(void){
 
 int ins_mov_in(int pid){
 	//registro en parametro 1 = lo que haya en la direccion fisica guardada en el parámetro 2
-	int valor_recibido = atoi(leer_memoria(get_socket(),get_log(),pid,*operando_2_APUNTA,sizeof(int)));
+
+	log_info(get_log(),"ESTÁ POR EMPEZAR EL MOV IN");
+
+	char* valor_leido = leer_memoria(get_socket(),get_log(),pid, direccion_fisica,sizeof(int));
+	int valor_recibido;// = atoi(valor_leido);
 	//RECIBIR
+
+	log_info(get_log(),"TERMINÓ EL MOV IN, VALO RECIBIDO: %s", valor_leido);
 	if (valor_recibido > 0)
 	{
 		*operando_1_APUNTA = valor_recibido;
@@ -233,11 +244,14 @@ int ins_mov_in(int pid){
 }
 
 int ins_mov_out(int pid){
-	
+	log_info(get_log(),"ESTÁ POR EMPEZAR EL MOV OUT");
 	//guarda en memoria en la dir fisica del parametro 1= lo que haya en el registro del parámetro 2
-	char* valor_a_guardar = string_itoa(unidades_en_registro(operando_2_APUNTA));
+	int valor_a_pasar = unidades_en_registro(operando_2_APUNTA);
+	char* valor_a_guardar = string_itoa(valor_a_pasar);
+
 	//FUNCION PARA GUARDAR valor_a_guardar
-	escribir_memoria(get_socket(),get_log(),pid,*operando_1_APUNTA,sizeof(valor_a_guardar),valor_a_guardar);
+	escribir_memoria(get_socket(),get_log(),pid, direccion_fisica,sizeof(valor_a_guardar),valor_a_guardar);
+	log_info(get_log(),"TERMINÓ EL MOV OUT");
 	return OPTIMO;
 }
 
