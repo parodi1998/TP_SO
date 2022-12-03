@@ -2,8 +2,8 @@
 
 static void carga_tabla_segmentos_pcb( t_list** lista_a_cargar, t_list* segmentos) {
     t_list* tabla_segmentos = list_create();
-    size_t index;
-    size_t size = list_size(segmentos);
+    uint32_t index;
+    uint32_t size = list_size(segmentos);
     for(index = 0; index < size; index++) {
         char* segmento = list_get(segmentos,index);
         t_pcb_segmentos* segmento_pcb = malloc(sizeof(t_pcb_segmentos));
@@ -17,7 +17,7 @@ static void carga_tabla_segmentos_pcb( t_list** lista_a_cargar, t_list* segmento
 static void procesar_conexion(void* void_args) {
     t_procesar_conexion_args* args = (t_procesar_conexion_args*) void_args;
     t_log* logger = args->log;
-    size_t cliente_fd = args->fd;
+    uint32_t cliente_fd = args->fd;
     char* server_name = args->server_name;
     free(args);
 
@@ -59,7 +59,7 @@ static void procesar_conexion(void* void_args) {
 
         switch (codigo) {
             case INSTRUCCIONES_Y_SEGMENTOS:
-                if(!recv_instrucciones_y_segmentos(cliente_fd, &instrucciones, &segmentos)) {
+                if(!recv_instrucciones_y_segmentos(logger, cliente_fd, &instrucciones, &segmentos)) {
                     log_error(logger,"Hubo un error al recuperar la lista de instrucciones y segmentos");
                 }
                 break;
@@ -78,7 +78,7 @@ static void procesar_conexion(void* void_args) {
 }
 
 int server_escuchar(t_log* logger, char* server_name, int server_socket) {
-    size_t cliente_socket = esperar_cliente(logger, server_name, server_socket);
+    uint32_t cliente_socket = esperar_cliente(logger, server_name, server_socket);
 
     if (cliente_socket != -1) {
         pthread_t hilo;

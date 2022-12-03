@@ -3,6 +3,7 @@
 #include "../include/mmu.h"
 #include "../include/tlb.h"
 #include "../../shared/include/client_memoria.h"
+#include "../../shared/include/sockets.h"
 #include "../include/config_cpu.h"
 #include "../include/instrucciones.h"
 
@@ -14,8 +15,18 @@ int CONEXION_MEMORIA;
 int SEGMENTATION_FAULT = -2;
 int PAGE_FAULT = -1;
 
-void iniciar_mmu(){
-	CONEXION_MEMORIA = crear_conexion_memoria(get_ip_memoria(), get_puerto_memoria());
+static bool conectar_cpu_a_memoria(int* fd) {
+    *fd = crear_conexion(get_log(), "CPU_CLIENTE_MEMORIA", get_ip_memoria(),  get_puerto_memoria());
+    return fd != 0;
+}
+
+bool iniciar_mmu(){
+
+	CONEXION_MEMORIA = 0;
+	if(!conectar_cpu_a_memoria(&CONEXION_MEMORIA)) {
+        return false;
+    }
+
 	log_info(get_log(),"CONECTADO A MEMORIA, SOCKET: %d",CONEXION_MEMORIA);
 	char* config_string = recibir_config_para_mmu(CONEXION_MEMORIA,get_log());
 	char** parts = string_split(config_string,"|");
@@ -27,6 +38,7 @@ void iniciar_mmu(){
 	log_info(get_log(),"MMU INICIADA CORRECTAMENTE");
 	init_tlb(CONEXION_MEMORIA);
 
+	return true;
 }
 
 

@@ -228,7 +228,7 @@ t_pcb* sacar_proceso_de_execute() {
 	t_queue* cola_execute = dictionary_get(colas,"EXECUTE");
 	t_pcb* proceso = queue_pop(cola_execute);
 	pthread_mutex_unlock(&mutex_execute);
-	
+	sem_post(&sem_sacar_de_execute);
 	return proceso;
 }
 
@@ -252,9 +252,10 @@ void hilo_planificador_corto_plazo_execute() {
 		sem_wait(&sem_corto_plazo_execute);
 
 		t_pcb* proceso = sacar_proceso_de_execute();
+		sem_wait(&sem_sacar_de_execute);
 		proceso->debe_ser_finalizado = true;
 
-		if(!send_pcb(fd_cpu_dispatch, proceso)) {
+		if(!send_pcb(logger, fd_cpu_dispatch, proceso)) {
 			log_error(logger,"Hubo un error enviando el proceso al cpu");
 		} else {
 			log_info(logger,"El proceso fue enviado a cpu para ejecutar");
@@ -339,7 +340,7 @@ void hilo_planificador_block_io(void* args) {
 		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
 
 		char* tiempo_io_string = dictionary_get(tiempos_io, key_cola_de_bloqueo);
-		size_t tiempo_io_en_milis = atoi(tiempo_io_string) * proceso->unidades_de_trabajo;
+		uint32_t tiempo_io_en_milis = atoi(tiempo_io_string) * proceso->unidades_de_trabajo;
 
 		float io_block_in_seconds = tiempo_io_en_milis / 1000;
 		

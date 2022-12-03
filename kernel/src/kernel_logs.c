@@ -92,10 +92,10 @@ void actualizar_estado_proceso(t_log* logger, t_pcb* proceso, t_estado_pcb nuevo
 }
 
 void log_motivo_de_bloqueo(t_log* logger, t_pcb* proceso, char* dispositivo) {
-    size_t segmento = 0;
-    size_t pagina = 0;
-    //size_t segmento = proceso->page_fault_segmento;
-    //size_t pagina = proceso->page_fault_pagina;
+    uint32_t segmento = 0;
+    uint32_t pagina = 0;
+    //uint32_t segmento = proceso->page_fault_segmento;
+    //uint32_t pagina = proceso->page_fault_pagina;
     if(string_equals_ignore_case(dispositivo,"PAGE_FAULT")) {
         log_info(logger, "Page Fault PID: <%d> - Segmento: <%d> - Pagina: <%d>", proceso->id_proceso, segmento, pagina);
     } else {

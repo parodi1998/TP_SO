@@ -50,6 +50,8 @@ extern sem_t sem_grado_multiprogramacion;
 extern sem_t sem_sincro_cargar_segmentos_en_memoria;
 extern sem_t sem_sincro_finalizar_pcb_en_memoria;
 
+extern sem_t sem_sacar_de_execute;
+
 // hilos
 extern pthread_t hilo_largo_plazo_new;
 extern pthread_t hilo_corto_plazo_ready;

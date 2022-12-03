@@ -7,6 +7,9 @@ int interrumpir = 0;
 sem_t* comunicacion_kernel;
 int alfa = 0;
 
+pthread_t hilo_dispatch;
+pthread_t hilo_interrupt;
+
 char * concatenar(char* palabra1, char* palabra2)
 {
 	 char *palabraFinal = string_new();
@@ -81,34 +84,34 @@ void esperarInterrupcion(){
 }
 
 t_contexto_ejecucion iniciar_proceso(t_pcb* pcb1){
-	pthread_t thread1, thread2;
-	   int  iret1, iret2;
+	//pthread_t thread1, thread2;
+	//int  iret1, iret2;
 
-	   /* Create independent threads each of which will execute function */
+	/* Create independent threads each of which will execute function */
 
-	    //FUNCION DE PRUEBA
-	       	t_contexto_ejecucion  contexto_ejecucion;
-	    	contexto_ejecucion.estado = OPTIMO;
-	    	//contexto_ejecucion.instrucciones = pcb1.instrucciones;
-	    	contexto_ejecucion.program_counter = pcb1->program_counter;
-	    	contexto_ejecucion.reg_general.ax = pcb1->registro_AX;
-	    	contexto_ejecucion.reg_general.bx = pcb1->registro_BX;
-	    	contexto_ejecucion.reg_general.cx = pcb1->registro_CX;
-	    	contexto_ejecucion.reg_general.dx = pcb1->registro_DX;
+	//FUNCION DE PRUEBA
+	t_contexto_ejecucion contexto_ejecucion;
+	contexto_ejecucion.estado = OPTIMO;
+	//contexto_ejecucion.instrucciones = pcb1.instrucciones;
+	contexto_ejecucion.program_counter = pcb1->program_counter;
+	contexto_ejecucion.reg_general.ax = pcb1->registro_AX;
+	contexto_ejecucion.reg_general.bx = pcb1->registro_BX;
+	contexto_ejecucion.reg_general.cx = pcb1->registro_CX;
+	contexto_ejecucion.reg_general.dx = pcb1->registro_DX;
 
+	log_info(get_log(),"ya cargue el contexto");
 
 
 			
-	   // 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
-	    //	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso));
-	    	// Te cambio esta linea porque estas pasando los segmentos, pero esperas instrucciones
-			// seguir_instrucciones(&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso);
-			seguir_instrucciones(&contexto_ejecucion, pcb1->instrucciones, pcb1->id_proceso);
+	// 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
+	//	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso));
+	seguir_instrucciones(&contexto_ejecucion, pcb1->instrucciones, pcb1->id_proceso);
 
+	log_info(get_log(),"contexto_ejecucion.program_counter: %d", contexto_ejecucion.program_counter);
 	   // pthread_join( thread2, NULL);
-	    interrumpir = 1;
+	interrumpir = 1;
 	  // pthread_join( thread1, NULL);
-	   return contexto_ejecucion;
+	return contexto_ejecucion;
 }
 
 static t_pcb* crear_pcb_prueba() {
@@ -157,12 +160,45 @@ void ciclo_recibir_instruccines(){
 	}
 }
 
+void comunicacion_cpu_kernel_distpach() {
+	t_pcb* proceso;
+	op_code cod_op;
+	t_list* instrucciones;
+    t_list* segmentos;
+
+	while(fd_client_kernel_dispatch != -1) {
+		
+
+		if(recv(fd_client_kernel_dispatch, &cod_op, sizeof(op_code), 0) != sizeof(op_code)== -1) {
+			log_info(get_log(),"antes de llamar a iniciar proceso");
+			t_contexto_ejecucion contexto = iniciar_proceso(proceso);
+			// wait(termino de cargar contexto)
+			// send_contexto(fd_client_kernel_dispatch, contexto);
+		}
+
+		switch (cod_op) {
+			case PCB_KERNEL:
+				if(!recv_pcb(get_log(), fd_client_kernel_dispatch, &proceso)) {
+                    log_error(get_log(),"Hubo un error al recibir el proceso de kernel");
+                } else {
+					log_info(get_log(),"recibi el pcb ok");
+					log_info(get_log(),"PID: %d", proceso->id_proceso);
+				}
+                break;
+			default:
+				break; 
+		}
+	}
+}
+
 int start()
 {
-	// creo hilo de interrupt
+	//pthread_create(&hilo_interrupt, NULL, (void*) procesar_conexion, NULL);
+    //pthread_detach(hilo_interrupt);
 
-	// creo hilo de dispatch
+	pthread_create(&hilo_dispatch, NULL, (void*) comunicacion_cpu_kernel_distpach, NULL);
+    pthread_join(hilo_dispatch, NULL);
 
-	ciclo_recibir_instruccines();
-	return alfa;
+	//ciclo_recibir_instruccines();
+	//return alfa;
 }

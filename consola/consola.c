@@ -47,7 +47,7 @@ int main(int argc, char** argv){
     fclose(programa_con_instrucciones);
 
     // No se que onda, pero si saco esta linea que sigue, no se mandan bien las instrucciones
-    size_t cant_inst = list_size(instrucciones);
+    uint32_t cant_inst = list_size(instrucciones);
 
     // conectarse al kernel y enviar informacion
     int fd = 0;
@@ -59,7 +59,7 @@ int main(int argc, char** argv){
 
     t_list* segmentos = config_consola->segmentos;
 
-    if(!send_instrucciones_y_segmentos(fd, instrucciones, segmentos)) {
+    if(!send_instrucciones_y_segmentos(logger, fd, instrucciones, segmentos)) {
         log_error(logger,"Hubo un error enviando la informacion al kernel");
     } else {
         log_info(logger,"La informacion fue enviada con exito al kernel");

@@ -21,12 +21,17 @@
 
 #include <commons/collections/list.h>
 
+extern int fd_server_cpu_dispatch;
+extern int fd_server_cpu_interrupt;
+extern int fd_client_kernel_dispatch;
+extern int fd_client_kernel_interrupt; 
 
 t_log* iniciar_logger(void);
 void leer_consola();
 void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
-int start(void);
+int start();
+void comunicacion_cpu_kernel_distpach();
 int crearConexionAuxiliar(char* ip, int puerto, t_log* logger);
 t_contexto_ejecucion iniciar_proceso(t_pcb*);
 
