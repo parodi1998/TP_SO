@@ -214,13 +214,14 @@ int ins_add(void){
 
 }
 
-int ins_mov_in(void){
+int ins_mov_in(int pid){
 	//registro en parametro 1 = lo que haya en la direccion fisica guardada en el parámetro 2
-	int valor_recibido = 100;
+	int valor_recibido = atoi(leer_memoria(get_socket(),get_log(),pid,*operando_2_APUNTA,sizeof(int)));
 	//RECIBIR
 	if (valor_recibido > 0)
 	{
 		*operando_1_APUNTA = valor_recibido;
+	
 		return OPTIMO;
 	}
 	else
@@ -231,10 +232,12 @@ int ins_mov_in(void){
 
 }
 
-int ins_mov_out(void){
+int ins_mov_out(int pid){
+	
 	//guarda en memoria en la dir fisica del parametro 1= lo que haya en el registro del parámetro 2
-	int valor_a_guardar = unidades_en_registro(operando_2_APUNTA);
+	char* valor_a_guardar = string_itoa(unidades_en_registro(operando_2_APUNTA));
 	//FUNCION PARA GUARDAR valor_a_guardar
+	escribir_memoria(get_socket(),get_log(),pid,*operando_1_APUNTA,sizeof(valor_a_guardar),valor_a_guardar);
 	return OPTIMO;
 }
 
@@ -266,7 +269,7 @@ int  ins_exit(void){
 }
 
 //int ejecutar(instruccion* instruct){
-int ejecutar(void){
+int ejecutar(int pid){
 	int estado = OPTIMO;
 
 	//int opera = instruct->operacion;
@@ -279,10 +282,10 @@ int ejecutar(void){
 		estado = ins_add();
 		break;
 	case MOV_IN:
-		estado = ins_mov_in();
+		estado = ins_mov_in(pid);
 		break;
 	case MOV_OUT:
-		estado = ins_mov_out();
+		estado = ins_mov_out(pid);
 		break;
 	case IO:
 		estado = ins_io();
@@ -327,7 +330,7 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 	decodificar(instruccion_en_bruto, contexto->tabla_segmentos, pid);
 
 	//ejecutar
-	devuelve = ejecutar();
+	devuelve = ejecutar(pid);
 
 	//check interrupt
 	devuelve = check_interrupt(devuelve);
