@@ -37,6 +37,7 @@ enum tipo_devolucion{
 	OPTIMO,
 	BLOQUEO,
 	INTERRUPCION,
+	PAGE_DEFAULT,
 	FINALIZADO
 };
 
