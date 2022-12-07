@@ -347,7 +347,7 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 
 	//ejecutar
 	devuelve = ejecutar(pid);
-	log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
+	log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", pid, nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
 	//check interrupt
 	devuelve = check_interrupt(devuelve);
 
