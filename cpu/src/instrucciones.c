@@ -13,6 +13,8 @@ int interrumpido = 0;
 t_registros* registros;
 
 int tipo_operacion = -1;
+
+char* nombre_instruccion = NULL;
 char* operando_1_NOMBRE = NULL;
 char* operando_2_NOMBRE = NULL;
 int* operando_1_APUNTA = NULL;
@@ -142,7 +144,7 @@ int comparacion(char* valor1, char* valor2){
 
 void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
 	tipo_operacion = 0;
-	char* nombre_instruccion;
+
 	char* parametro_1;
 	char* parametro_2;
 
@@ -345,13 +347,14 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 
 	//ejecutar
 	devuelve = ejecutar(pid);
-
+	log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
 	//check interrupt
 	devuelve = check_interrupt(devuelve);
 
 	//actualizar ciclo
+	if (devuelve != PAGE_DEFAULT){
 	contexto->program_counter ++;
-	
+	}
 	return devuelve;
 
 
