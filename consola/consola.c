@@ -59,10 +59,59 @@ int main(int argc, char** argv){
 
     t_list* segmentos = config_consola->segmentos;
 
-    if(!send_instrucciones_y_segmentos(logger, fd, instrucciones, segmentos)) {
-        log_error(logger,"Hubo un error enviando la informacion al kernel");
+    if(!send_instrucciones(logger, fd, instrucciones)) {
+        log_error(logger,"Hubo un error enviando las instrucciones al kernel");
+        liberar_conexion(&fd);
+        terminar_programa();
+        return EXIT_SUCCESS;
     } else {
         log_info(logger,"La informacion fue enviada con exito al kernel");
+    }
+
+    if(!send_segmentos(logger, fd, segmentos)) {
+        log_error(logger,"Hubo un error enviando los segmentos al kernel");
+        liberar_conexion(&fd);
+        terminar_programa();
+        return EXIT_SUCCESS;
+    } else {
+        log_info(logger,"La informacion fue enviada con exito al kernel");
+    }
+
+    if(!send_op_code(logger, fd, CONSOLA_KERNEL_INIT_PCB)) {
+        log_error(logger,"Hubo un error enviando el op code: CONSOLA_KERNEL_INIT_PCB");
+        liberar_conexion(&fd);
+        terminar_programa();
+        return EXIT_SUCCESS;
+    } else {
+        log_info(logger,"La informacion fue enviada con exito al kernel");
+    }
+
+    op_code cod_op;
+    bool mantener_conexion = true;
+    uint32_t size = 0;
+
+    while(mantener_conexion) {
+
+        if(recv_op_code(logger, fd, &cod_op))
+			cod_op = -1;
+
+        switch(cod_op) {
+            case CONSOLA_PANTALLA:
+                break;
+            case CONSOLA_TECLADO:
+                break;
+            case CONSOLA_EXIT:
+                if(send_op_code(logger, fd, CONSOLA_EXIT)) {
+                    log_info(logger,"se envio el op code con exito");
+                } else {
+                    log_info(logger,"hubo un error al devolver el op code");
+                }
+                mantener_conexion = false;
+                break;
+            default:
+                break;
+
+        }
     }
 
     liberar_conexion(&fd);

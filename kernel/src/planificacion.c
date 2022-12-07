@@ -82,7 +82,18 @@ void hilo_planificador_largo_plazo_exit() {
 
 		char* rta = finalizar_proceso_memoria(fd_memoria, &sem_sincro_finalizar_pcb_en_memoria, logger, proceso->id_proceso);
 		sem_wait(&sem_sincro_finalizar_pcb_en_memoria);
-		// wait_consola_finalizar(proceso);
+		free(rta);
+
+		op_code cod_op;
+
+		if(send_op_code(logger, proceso->consola_fd, CONSOLA_EXIT)) {
+			log_info(logger,"Se envio op code con exito");
+		} else {
+			log_info(logger,"Fallo el envio de op code");
+		}
+
+		sem_wait(&sem_finalizar_proceso);
+
 		liberar_pcb(proceso);
 		sem_post(&sem_grado_multiprogramacion);
 	}
@@ -248,37 +259,41 @@ void devolver_proceso_a_ready(t_pcb* proceso) {
 }
 
 void hilo_planificador_corto_plazo_execute() {
+	
+	op_code cod_op;
+
 	while(1) {
 		sem_wait(&sem_corto_plazo_execute);
 
 		t_pcb* proceso = sacar_proceso_de_execute();
 		sem_wait(&sem_sacar_de_execute);
-		proceso->debe_ser_finalizado = true;
 
 		if(!send_pcb(logger, fd_cpu_dispatch, proceso)) {
 			log_error(logger,"Hubo un error enviando el proceso al cpu");
 		} else {
-			log_info(logger,"El proceso fue enviado a cpu para ejecutar");
+			log_info(logger,"El proceso fue enviado a cpu");
 		}
-		
+
 		if(proceso->puede_ser_interrumpido) {
 			sem_post(&sem_comienza_timer_quantum);
 		}
 		
 		t_pcb* proceso_recibido;
 
-		op_code cod_op;
 		recv(fd_cpu_dispatch, &cod_op, sizeof(op_code), MSG_WAITALL);
 
 		log_info(logger,"op_code %d", cod_op);
 
-		if(!recv_pcb(logger, fd_cpu_dispatch, &proceso_recibido)) {
-            log_error(logger,"Hubo un error al recibir el proceso de kernel");
-			char* rta = finalizar_proceso_memoria(fd_memoria, &sem_sincro_finalizar_pcb_en_memoria, logger, proceso->id_proceso);
-			sem_wait(&sem_sincro_finalizar_pcb_en_memoria);
+		if(!recv_pcb(logger, fd_cpu_dispatch, &proceso_recibido) || cod_op != PCB_KERNEL) {
+            log_error(logger,"Hubo un error al recibir el proceso de cpu, por lo que se procede a finalizar el mismo.");
+			meter_proceso_en_exit(proceso);
+			sem_post(&sem_cpu_libre);
 		} else {
-			log_info(logger,"El proceso volvio de cpu con exito");
-			log_info(logger,"PC actualizado: %d", proceso_recibido->program_counter);
+			//log_info(logger,"El proceso volvio de cpu con exito");
+			//log_info(logger,"PC actualizado: %d", proceso_recibido->program_counter);
+
+			log_info(logger,"PROCESO DESPUES DE VOLVER DE CPU");
+			log_pcb(logger, proceso_recibido);
 
 			liberar_pcb(proceso);
 
@@ -292,11 +307,6 @@ void hilo_planificador_corto_plazo_execute() {
 				devolver_proceso_a_ready(proceso_recibido);
 			}
 		}
-
-		// sem_post(&sem_comienza_timer_quantum);
-		// sem_wait(&sem_finaliza_timer_quantum);		// creo que el sem finaliza no es necesario, aca lo use para sincro no mas
-
-		
 	}
 }
 

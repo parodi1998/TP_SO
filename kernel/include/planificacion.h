@@ -51,6 +51,7 @@ extern sem_t sem_sincro_cargar_segmentos_en_memoria;
 extern sem_t sem_sincro_finalizar_pcb_en_memoria;
 
 extern sem_t sem_sacar_de_execute;
+extern sem_t sem_finalizar_proceso;
 
 // hilos
 extern pthread_t hilo_largo_plazo_new;

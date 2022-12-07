@@ -2,6 +2,10 @@
 #define PROTOCOLO_H_
 
 #include "shared_commons.h"
+#include "sockets.h"
+#include "client_memoria.h"
+#include "client_utils.h"
+#include "server_utils.h"
 
 typedef enum {
 	PCB_NEW,
@@ -43,12 +47,7 @@ typedef struct {
  * Funciones utiles
  * */
 void liberar_pcb(t_pcb* proceso);
-
-/**
- * Funciones para comunicacion entre consola y kernel
- * */
-bool send_instrucciones_y_segmentos(t_log* logger,int fd, t_list* instrucciones, t_list* segmentos);
-bool recv_instrucciones_y_segmentos(t_log* logger,int fd, t_list** instrucciones, t_list** segmentos);
+void log_pcb(t_log* logger, t_pcb* proceso);
 
 /**
  * Funciones para enviar y recibir un PCB
@@ -56,4 +55,14 @@ bool recv_instrucciones_y_segmentos(t_log* logger,int fd, t_list** instrucciones
 bool send_pcb(t_log* logger,int fd, t_pcb* pcb);
 bool recv_pcb(t_log* logger,int fd, t_pcb** pcb);
 
+char* finalizar_proceso_consola(int socket_cliente, t_log* logger);
+
+bool send_op_code(t_log* logger, uint32_t fd, op_code cod_op);
+bool recv_op_code(t_log* logger, uint32_t fd, op_code* cod_op);
+
+bool send_instrucciones(t_log*, int, t_list*);
+void recv_instrucciones(t_log*, int, t_list**);
+
+bool send_segmentos(t_log*, int, t_list*);
+void recv_segmentos(t_log*, int, t_list**);
 #endif

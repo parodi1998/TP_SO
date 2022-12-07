@@ -1,6 +1,6 @@
 #include "../include/client_utils.h"
 
-static void* serializar_paquete(t_paquete* paquete, int bytes)
+void* serializar_paquete(t_paquete* paquete, int bytes)
 {
 	void * magic = malloc(bytes);
 	int desplazamiento = 0;

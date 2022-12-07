@@ -99,13 +99,10 @@ t_contexto_ejecucion iniciar_proceso(t_pcb* pcb1){
 	contexto_ejecucion.reg_general.cx = pcb1->registro_CX;
 	contexto_ejecucion.reg_general.dx = pcb1->registro_DX;
 
-	log_info(get_log(),"ya cargue el contexto");
-
 	// 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
 	//	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso));
 	seguir_instrucciones(&contexto_ejecucion, pcb1->instrucciones, pcb1->id_proceso);
 
-	log_info(get_log(),"contexto_ejecucion.program_counter: %d", contexto_ejecucion.program_counter);
 	   // pthread_join( thread2, NULL);
 	interrumpir = 1;
 	  // pthread_join( thread1, NULL);
@@ -114,6 +111,10 @@ t_contexto_ejecucion iniciar_proceso(t_pcb* pcb1){
 
 static void actualizar_pcb(t_contexto_ejecucion contexto, t_pcb* proceso) {
 	proceso->program_counter = contexto.program_counter;
+	proceso->registro_AX = contexto.reg_general.ax;
+	proceso->registro_BX = contexto.reg_general.bx;
+	proceso->registro_CX = contexto.reg_general.cx;
+	proceso->registro_DX = contexto.reg_general.dx;
 	switch (contexto.estado) {
 			case BLOQUEO:
                 break;
@@ -147,10 +148,9 @@ void comunicacion_cpu_kernel_distpach() {
 				if(!recv_pcb(get_log(), fd_client_kernel_dispatch, &proceso)) {
                     log_error(get_log(),"Hubo un error al recibir el proceso de kernel");
                 } else {
+					log_info(get_log(),"Se recibio el proceso de kernel con exito");
 					contexto = iniciar_proceso(proceso);
-					// estaria bueno meter un wait
 					actualizar_pcb(contexto, proceso);
-					// estaria bueno meter un wait
 					if(!send_pcb(get_log(), fd_client_kernel_dispatch, proceso)) {
 						log_error(get_log(),"Hubo un error enviando el proceso al kernel");
 					} else {

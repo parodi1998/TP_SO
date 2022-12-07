@@ -28,48 +28,49 @@ static void procesar_conexion(void* void_args) {
 
     while (cliente_fd != -1) {
 
-        if (recv(cliente_fd, &codigo, sizeof(op_code), 0) != sizeof(op_code)) {
-            // Una vez que recibimos las instrucciones y los segmentos, creamos el PCB y lo ponemos en la cola de ready
-            generador_pcb_id++;
-            pcb_proceso = malloc(sizeof(t_pcb));
-            pcb_proceso->id_proceso = generador_pcb_id;
-            pcb_proceso->program_counter = 0;
-            carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
-            pcb_proceso->registro_AX = 0;
-            pcb_proceso->registro_BX = 0;
-            pcb_proceso->registro_CX = 0;
-            pcb_proceso->registro_DX = 0;
-            pcb_proceso->instrucciones = instrucciones;
-            pcb_proceso->estado_anterior = PCB_NEW;
-            pcb_proceso->estado_actual = PCB_NEW;
-            pcb_proceso->consola_fd = cliente_fd;
-            pcb_proceso->debe_ser_finalizado = false;
-            pcb_proceso->debe_ser_bloqueado = false;
-            pcb_proceso->puede_ser_interrumpido = false;
-            pcb_proceso->fue_interrumpido = false;
-            pcb_proceso->registro_para_bloqueo = 0;
-            pcb_proceso->unidades_de_trabajo = 0;
-            pcb_proceso->dispositivo_bloqueo = string_new();
-            pcb_proceso->page_fault_segmento = 0;
-            pcb_proceso->page_fault_pagina = 0;
-
-            meter_proceso_en_new(pcb_proceso);
-            break;
-        }
+        if (recv(cliente_fd, &codigo, sizeof(op_code), MSG_WAITALL) == -1) 
+            codigo = -1;
 
         switch (codigo) {
-            case INSTRUCCIONES_Y_SEGMENTOS:
-                if(!recv_instrucciones_y_segmentos(logger, cliente_fd, &instrucciones, &segmentos)) {
-                    log_error(logger,"Hubo un error al recuperar la lista de instrucciones y segmentos");
-                }
+            case CONSOLA_INSTRUCCIONES:
+                recv_instrucciones(logger, cliente_fd, &instrucciones);
                 break;
-            case -1:
-                log_error(logger, "el cliente se desconecto. Terminando servidor");
-                return;
+
+            case CONSOLA_SEGMENTOS:
+                recv_segmentos(logger, cliente_fd, &segmentos);
+                break;
+            case CONSOLA_KERNEL_INIT_PCB:
+                generador_pcb_id++;
+                    pcb_proceso = malloc(sizeof(t_pcb));
+                    pcb_proceso->id_proceso = generador_pcb_id;
+                    pcb_proceso->program_counter = 0;
+                    carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
+                    pcb_proceso->registro_AX = 0;
+                    pcb_proceso->registro_BX = 0;
+                    pcb_proceso->registro_CX = 0;
+                    pcb_proceso->registro_DX = 0;
+                    pcb_proceso->instrucciones = instrucciones;
+                    pcb_proceso->estado_anterior = PCB_NEW;
+                    pcb_proceso->estado_actual = PCB_NEW;
+                    pcb_proceso->consola_fd = cliente_fd;
+                    pcb_proceso->debe_ser_finalizado = false;
+                    pcb_proceso->debe_ser_bloqueado = false;
+                    pcb_proceso->puede_ser_interrumpido = false;
+                    pcb_proceso->fue_interrumpido = false;
+                    pcb_proceso->registro_para_bloqueo = 0;
+                    pcb_proceso->unidades_de_trabajo = 0;
+                    pcb_proceso->dispositivo_bloqueo = string_new();
+                    pcb_proceso->page_fault_segmento = 0;
+                    pcb_proceso->page_fault_pagina = 0;
+
+                    meter_proceso_en_new(pcb_proceso);
+                break;
+            case CONSOLA_EXIT:
+                sem_post(&sem_finalizar_proceso);
+                liberar_conexion(&cliente_fd);
+                break;
             default:
-                log_error(logger, "Algo anduvo mal en el server de %s", server_name);
-                log_info(logger, "Cop: %d", codigo);
-                return;
+                break;
         }
     }
 

@@ -36,6 +36,7 @@ sem_t sem_sincro_cargar_segmentos_en_memoria;
 sem_t sem_sincro_finalizar_pcb_en_memoria;
 
 sem_t sem_sacar_de_execute;
+sem_t sem_finalizar_proceso;
 
 pthread_t hilo_largo_plazo_new;
 pthread_t hilo_corto_plazo_ready;
@@ -97,6 +98,7 @@ void inicializar_semaforos() {
     sem_init(&sem_sincro_cargar_segmentos_en_memoria, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     sem_init(&sem_sincro_finalizar_pcb_en_memoria, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     sem_init(&sem_sacar_de_execute, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_finalizar_proceso, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
 
     // new
 	pthread_mutex_init(&mutex_new, NULL);
@@ -153,6 +155,7 @@ void destruir_semaforos() {
     sem_destroy(&sem_sincro_cargar_segmentos_en_memoria);
     sem_destroy(&sem_sincro_finalizar_pcb_en_memoria);
     sem_destroy(&sem_sacar_de_execute);
+    sem_destroy(&sem_finalizar_proceso);
     
 
     pthread_mutex_destroy(&mutex_new);

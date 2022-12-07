@@ -1,5 +1,35 @@
 #include "../include/protocolo.h"
 
+void log_pcb(t_log* logger, t_pcb* proceso) {
+	log_info(logger, "id_proceso: %d", proceso->id_proceso);
+	for(int index = 0; index < list_size(proceso->instrucciones); index++) {
+		char* instruccion = list_get(proceso->instrucciones, index);
+		log_info(logger, "instruccion nro %d: %s", index, instruccion);
+	}
+	log_info(logger, "program_counter: %d", proceso->program_counter);
+	log_info(logger, "registro_AX: %d", proceso->registro_AX);
+	log_info(logger, "registro_BX: %d", proceso->registro_BX);
+	log_info(logger, "registro_CX: %d", proceso->registro_CX);
+	log_info(logger, "registro_DX: %d", proceso->registro_DX);
+	for(int index = 0; index < list_size(proceso->tabla_segmentos); index++) {
+		t_pcb_segmentos* segmento = list_get(proceso->tabla_segmentos, index);
+		log_info(logger, "segmento nro %d tamanio: %d id_pagina: %d", index, segmento->tamanio_segmento, segmento->id_tabla_paginas);
+	}
+	log_info(logger, "estado_anterior: %d", proceso->estado_anterior);
+	log_info(logger, "estado_actual: %d", proceso->estado_actual);
+	log_info(logger, "consola_fd: %d", proceso->consola_fd);
+	log_info(logger, "debe_ser_finalizado: %d", proceso->debe_ser_finalizado);
+	log_info(logger, "debe_ser_bloqueado: %d", proceso->debe_ser_bloqueado);
+	log_info(logger, "puede_ser_interrumpido: %d", proceso->puede_ser_interrumpido);
+	log_info(logger, "fue_interrumpido: %d", proceso->fue_interrumpido);
+	log_info(logger, "dispositivo_bloqueo: %s", proceso->dispositivo_bloqueo);
+	log_info(logger, "registro_para_bloqueo: %d", proceso->registro_para_bloqueo);
+	log_info(logger, "unidades_de_trabajo: %d", proceso->unidades_de_trabajo);
+	log_info(logger, "page_fault_segmento: %d", proceso->page_fault_segmento);
+	log_info(logger, "page_fault_pagina: %d", proceso->page_fault_pagina);
+	
+}
+
 /**
  * Consola -> Kernel: Envio y recepcion de Instrucciones
  * */
@@ -16,134 +46,6 @@ static uint32_t calcular_tamanio_informacion_de_lista(t_log* logger, t_list* lis
 	return tamanio_informacion;
 }
 
-static void* serializar_instrucciones_y_segmentos(t_log* logger, uint32_t* size, t_list* instrucciones, t_list* segmentos) {
-    op_code cop = INSTRUCCIONES_Y_SEGMENTOS;
-	uint32_t cantidad_instrucciones = list_size(instrucciones);
-	uint32_t tamanio_instrucciones = calcular_tamanio_informacion_de_lista(logger, instrucciones, cantidad_instrucciones);
-    uint32_t cantidad_segmentos = list_size(segmentos);
-    uint32_t tamanio_segmentos = calcular_tamanio_informacion_de_lista(logger, segmentos, cantidad_segmentos);
-	uint32_t tamanio_informacion_total = 
-        sizeof(uint32_t) +            //cantidad instrucciones
-        tamanio_instrucciones +     //tamanio instrucciones
-        sizeof(uint32_t) +            //cantidad segmentos
-        tamanio_segmentos;          //tamanio segmentos
-	
-    *size = 
-		sizeof(op_code) + 		    // codigo de operacion
-		sizeof(uint32_t) +  		    // cantidad de informacion util
-		tamanio_informacion_total;	// informacion util
-
-    void* stream = malloc(*size);
-	void* p = stream;
-
-	memcpy(p, &cop, sizeof(op_code));
-	p += sizeof(op_code);
-
-    memcpy(p,&tamanio_informacion_total,sizeof(uint32_t)); 
-	p += sizeof(uint32_t);
-
-	memcpy(p,&cantidad_instrucciones,sizeof(uint32_t)); 
-	p += sizeof(uint32_t);
-
-	for(uint32_t i = 0; i<cantidad_instrucciones; i++) {
-        char* instruccion = list_get(instrucciones,i);
-		uint32_t tamanio_instruccion = string_length(instruccion)+1;
-		memcpy(p,&tamanio_instruccion,sizeof(uint32_t));
-		p += sizeof(uint32_t);
-		memcpy(p,instruccion,tamanio_instruccion);
-		p += tamanio_instruccion;
-    }
-
-    memcpy(p,&cantidad_segmentos,sizeof(uint32_t));
-	p += sizeof(uint32_t);
-
-	for(uint32_t i = 0; i<cantidad_segmentos; i++) {
-        char* segmento = list_get(segmentos,i);
-		uint32_t tamanio_segmento = string_length(segmento)+1;
-		memcpy(p,&tamanio_segmento,sizeof(uint32_t));
-		p += sizeof(uint32_t);
-		memcpy(p,segmento,tamanio_segmento);
-		p += tamanio_segmento;
-    }
-
-    return stream;
-}
-
-static void deserializar_instrucciones_y_segmentos(void* stream, t_list** instrucciones, t_list** segmentos) {
-	// se supone que si llegue aca, ya saque el codigo de operacion del paquete
-	uint32_t cantidad_instrucciones;
-	t_list* instrucciones_aux = list_create();
-    uint32_t cantidad_segmentos;
-	t_list* segmentos_aux = list_create();
-	
-    void* p = stream;
-	
-    memcpy(&cantidad_instrucciones, p, sizeof(uint32_t));	
-	p += sizeof(uint32_t);
-
-	for(uint32_t i = 0; i<cantidad_instrucciones; i++) {
-		uint32_t tamanio_instruccion;
-		memcpy(&tamanio_instruccion, p, sizeof(uint32_t));
-		p += sizeof(uint32_t);
-		char* instruccion = malloc(tamanio_instruccion);
-		memcpy(instruccion, p, tamanio_instruccion);
-		p += tamanio_instruccion;
-		list_add(instrucciones_aux, instruccion);
-    }
-
-    memcpy(&cantidad_segmentos, p, sizeof(uint32_t));	
-	p += sizeof(uint32_t);
-
-	for(uint32_t i = 0; i<cantidad_segmentos; i++) {
-		uint32_t tamanio_segmento;
-		memcpy(&tamanio_segmento, p, sizeof(uint32_t));
-		p += sizeof(uint32_t);
-		char* segmento = malloc(tamanio_segmento);
-		memcpy(segmento, p, tamanio_segmento);
-		p += tamanio_segmento;
-		list_add(segmentos_aux, segmento);
-    }
-
-	*instrucciones = instrucciones_aux;
-    *segmentos = segmentos_aux;
-}
-
-bool send_instrucciones_y_segmentos(t_log* logger, int fd, t_list* instrucciones, t_list* segmentos) {
-    uint32_t size = 0;
-    void* stream = serializar_instrucciones_y_segmentos(logger, &size, instrucciones, segmentos);
-    if (send(fd, stream, size, 0) != size) {
-        free(stream);
-        return false;
-    }
-    free(stream);
-    return true;
-}
-
-bool recv_instrucciones_y_segmentos(t_log* logger, int fd, t_list** instrucciones, t_list** segmentos) {
-    // tamanio total del stream    
-    uint32_t size;
-    if (recv(fd, &size, sizeof(uint32_t), 0) != sizeof(uint32_t)) {
-        return false;
-    }
-    // recibe TODO el stream
-    void* stream = malloc(size);
-    if (recv(fd, stream, size, 0) != size) {
-        free(stream);
-        return false;
-    }
-
-    t_list* instrucciones_aux; // el malloc lo realiza la funcion deserializar
-    t_list* segmentos_aux; // el malloc lo realiza la funcion deserializar
-	
-    deserializar_instrucciones_y_segmentos(stream, &instrucciones_aux, &segmentos_aux);
-
-    *instrucciones = instrucciones_aux;
-    *segmentos = segmentos_aux;
-
-    free(stream);
-    return true;
-}
-
 /**
  * PCB: envio y recepcion
  * */
@@ -156,7 +58,7 @@ static void* serializar_pcb(t_log* logger, uint32_t* size, t_pcb* pcb) {
     uint32_t cantidad_segmentos = list_size(pcb->tabla_segmentos);
 	uint32_t tamanio_segmentos = 2 * sizeof(uint32_t) * cantidad_segmentos;
 	uint32_t tamanio_dispositivo_bloqueo = string_length(pcb->dispositivo_bloqueo)+1;
-	uint32_t tamanio_pcb = 13 * sizeof(uint32_t) + 4 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
+	uint32_t tamanio_pcb = 14 * sizeof(uint32_t) + 4 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
 		sizeof(uint32_t) +  		    // tamanio total del pcb
@@ -255,9 +157,9 @@ static void* serializar_pcb(t_log* logger, uint32_t* size, t_pcb* pcb) {
 
     for(uint32_t i = 0; i<cantidad_segmentos; i++) {
         t_pcb_segmentos* segmento = list_get(pcb->tabla_segmentos,i);
-        memcpy(p,segmento,sizeof(uint32_t)); // guardo el tamanio_segmento
+        memcpy(p,&segmento->tamanio_segmento,sizeof(uint32_t)); // guardo el tamanio_segmento
 	    p += sizeof(uint32_t);
-        memcpy(p,segmento+sizeof(uint32_t),sizeof(uint32_t)); // guardo el id_tabla_paginas
+        memcpy(p,&segmento->id_tabla_paginas,sizeof(uint32_t)); // guardo el id_tabla_paginas
 	    p += sizeof(uint32_t);
     }
 
@@ -276,7 +178,7 @@ static void* serializar_pcb(t_log* logger, uint32_t* size, t_pcb* pcb) {
     return stream;
 }
 
-static void deserializar_pcb(void* stream, t_pcb** pcb) {
+static void deserializar_pcb(t_log* logger, void* stream, t_pcb** pcb) {
     // se supone que si llegue aca, ya saque el codigo de operacion del paquete
 	uint32_t cantidad_instrucciones;
     uint32_t cantidad_segmentos;
@@ -363,7 +265,7 @@ static void deserializar_pcb(void* stream, t_pcb** pcb) {
 
 	memcpy(&cantidad_instrucciones, p, sizeof(uint32_t));	
 	p += sizeof(uint32_t);
-
+	
 	for(uint32_t i = 0; i<cantidad_instrucciones; i++) {
 		uint32_t tamanio_instruccion;
 		memcpy(&tamanio_instruccion, p, sizeof(uint32_t));
@@ -404,7 +306,7 @@ bool recv_pcb(t_log* logger,int fd, t_pcb** pcb) {
 
     t_pcb* pcb_aux; // el malloc lo realiza la funcion deserializar
 	
-    deserializar_pcb(stream, &pcb_aux);
+    deserializar_pcb(logger, stream, &pcb_aux);
 
     *pcb = pcb_aux;
 
@@ -416,4 +318,134 @@ void liberar_pcb(t_pcb* proceso) {
     list_destroy_and_destroy_elements(proceso->instrucciones,free);
     list_destroy_and_destroy_elements(proceso->tabla_segmentos,free);
     free(proceso);
+}
+
+static void enviar_mensaje_consola(char* mensaje, int socket_cliente, op_code codigo_operacion)
+{
+	t_paquete* paquete = malloc(sizeof(t_paquete));
+
+		paquete->codigo_operacion = codigo_operacion;
+		paquete->buffer = malloc(sizeof(t_buffer));
+		paquete->buffer->size = strlen(mensaje) + 1;
+		paquete->buffer->stream = malloc(paquete->buffer->size);
+		memcpy(paquete->buffer->stream, mensaje, paquete->buffer->size);
+
+		int bytes = paquete->buffer->size + 2*sizeof(int);
+
+		void* a_enviar = serializar_paquete(paquete, bytes);
+
+		send(socket_cliente, a_enviar, bytes, 0);
+
+		free(a_enviar);
+
+}
+
+static char* recibir_mensaje_consola(int socket_cliente, t_log* logger)
+{
+	void * buffer;
+	int size;
+
+	recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
+
+	log_info(logger,"size recibir mensaje consola: %d", size);
+
+	buffer = malloc(size);
+	recv(socket_cliente, buffer,size, MSG_WAITALL);
+
+	return buffer;
+}
+
+char* finalizar_proceso_consola(int socket_cliente, t_log* logger){
+
+	log_info(logger,"REQUEST FINALIZAR_PROCESO en CONSOLA");
+	enviar_mensaje_consola("",socket_cliente,CONSOLA_EXIT);
+	char* rta = recibir_mensaje_consola(socket_cliente, logger);
+	log_info(logger,"RESPUESTA FINALIZAR_PROCESO en CONSOLA: %s" , rta );
+	return rta;
+}
+
+bool send_op_code(t_log* logger, uint32_t fd, op_code cod_op) {
+	return send(fd, &cod_op, sizeof(op_code), 0) != -1;
+}
+
+bool recv_op_code(t_log* logger, uint32_t fd, op_code* cod_op) {
+	return recv(fd, cod_op, sizeof(op_code), MSG_WAITALL) == -1;
+}
+
+static char* instrucciones_to_string(t_log* logger, t_list* instrucciones) {
+	char* respuesta = string_new();
+	for(int i = 0; i < list_size(instrucciones); i++) {
+		string_append(&respuesta, list_get(instrucciones, i));
+		if(i < list_size(instrucciones) - 1) {
+			string_append(&respuesta, "|");
+		}
+	} 
+	return respuesta;
+}
+
+static void instrucciones_from_string(t_log* logger, char* instrucciones_string, t_list** lista_destino) {
+	char** arr = string_split(instrucciones_string,"|");
+
+	t_list* list = list_create();
+    int index;
+    for(index = 0; arr[index] != NULL; index++) {
+        list_add(list, arr[index]);
+    }
+    
+	*lista_destino = list;
+}
+
+bool send_instrucciones(t_log* logger, int fd, t_list* instrucciones) {
+	char* mensaje = instrucciones_to_string(logger, instrucciones);
+	log_info(logger,"REQUEST CONSOLA_INSTRUCCIONES: %s" , mensaje );
+	bool respuesta = enviar_mensaje_bool(CONSOLA_INSTRUCCIONES, mensaje, fd);
+	log_info(logger,"RESPONSE CONSOLA_INSTRUCCIONES: %d" , respuesta );
+	free(mensaje);
+	return respuesta;
+}
+
+void recv_instrucciones(t_log* logger, int fd, t_list** instrucciones) {
+	uint32_t size;
+	char* response = recibir_buffer(&size, fd);
+	log_info(logger,"RECIBO CONSOLA_INSTRUCCIONES: %s" , response);
+	instrucciones_from_string(logger, response, instrucciones);
+}
+
+static char* segmentos_to_string(t_log* logger, t_list* segmentos) {
+	char* respuesta = string_new();
+	for(int i = 0; i < list_size(segmentos); i++) {
+		string_append(&respuesta, list_get(segmentos, i));
+		if(i < list_size(segmentos) - 1) {
+			string_append(&respuesta, "|");
+		}
+	} 
+	return respuesta;
+}
+
+static void segmentos_from_string(t_log* logger, char* segmentos_string, t_list** lista_destino) {
+	char** arr = string_split(segmentos_string,"|");
+
+	t_list* list = list_create();
+    int index;
+    for(index = 0; arr[index] != NULL; index++) {
+        list_add(list, arr[index]);
+    }
+    
+	*lista_destino = list;
+}
+
+bool send_segmentos(t_log* logger, int fd, t_list* segmentos) {
+	char* mensaje = instrucciones_to_string(logger, segmentos);
+	log_info(logger,"REQUEST CONSOLA_SEGMENTOS: %s" , mensaje );
+	bool respuesta = enviar_mensaje_bool(CONSOLA_SEGMENTOS, mensaje, fd);
+	log_info(logger,"RESPONSE CONSOLA_SEGMENTOS: %d" , respuesta );
+	free(mensaje);
+	return respuesta;
+}
+
+void recv_segmentos(t_log* logger, int fd, t_list** segmentos) {
+	uint32_t size;
+	char* response = recibir_buffer(&size, fd);
+	log_info(logger,"RECIBO CONSOLA_SEGMENTOS: %s" , response);
+	segmentos_from_string(logger, response, segmentos);
 }
