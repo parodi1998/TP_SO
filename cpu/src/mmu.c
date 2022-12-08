@@ -39,10 +39,10 @@ bool iniciar_mmu(){
 	free(parts);
 	free(config_string);
 	log_info(get_log(),"MMU INICIADA CORRECTAMENTE");
-	init_tlb(CONEXION_MEMORIA);
-
+	init_tlb();
 	return true;
 }
+
 
 int get_socket(){
 	return CONEXION_MEMORIA;
@@ -114,7 +114,7 @@ if (parts[0] == "1") {
 	pagina_page_fault = page;
 	return PAGE_FAULT;
 } else {
-	int32_t frame = atoi(parts[0]);
+	int32_t frame = atoi(parts[1]);
 	//actualizo tlb
 	update_tlb(pid,segment,page,frame);
 	return frame;
