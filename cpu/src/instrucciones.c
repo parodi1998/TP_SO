@@ -25,6 +25,7 @@ int direccion_fisica = 0;
 char* io = NULL;
 char* io_registro = NULL;
 int unidades = 0;
+t_translation_response_mmu*  traduccion_mmu = NULL;
 
 int continuar = 0;
 
@@ -121,19 +122,43 @@ void accederMemoria(int pid, t_list* tabla_segmentos){
 	switch(tipo_operacion){
 	case MOV_IN: 
 		sscanf(operando_2_NOMBRE, "%d", &direccion_logica);
-		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica, 0);
-		log_info(get_log(),"despues de traducir memoria en mov in direccion_fisica: %d", direccion_fisica);
+		traduccion_mmu = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica, 0);
+		validarTraduccionMemoria(traduccion_mmu,MOV_IN);
+		free(traduccion_mmu);
 		break;
 	case MOV_OUT: 
 		sscanf(operando_1_NOMBRE, "%d", &direccion_logica);
-		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica, 1);
-		log_info(get_log(),"despues de traducir memoria en mov out direccion_fisica: %d", direccion_fisica);
+		traduccion_mmu = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica, 1);
+		validarTraduccionMemoria(traduccion_mmu,MOV_OUT);
+		free(traduccion_mmu);
 		break;
 	default: 
 	//sleep((float)(get_retardo_instruccion()/1000));
 		break;
 
 	}
+}
+
+void validarTraduccionMemoria(t_translation_response_mmu* response,uint32_t operacion){
+	if(response->fue_page_fault){
+		log_info(get_log(),"PAGE FAULT - PID: %d - SEGMENTO: %d - PAGINA : %d",response->pid,response->segmento,response->pagina);
+	}
+	if(response->fue_segmentation_fault){
+		log_info(get_log(),"SEGMENTATION FAULT - PID: %d - SEGMENTO: %d - PAGINA : %d",response->pid,response->segmento,response->pagina);
+	}
+
+	if(!response->fue_segmentation_fault && !response->fue_page_fault){
+		direccion_fisica = response->direccion_fisica;
+		if(operacion == MOV_IN){
+			log_info(get_log(),"despues de traducir memoria MOV IN - direccion_fisica: %d", direccion_fisica);
+		}
+		if(operacion == MOV_OUT){
+			log_info(get_log(),"despues de traducir memoria MOV OUT - direccion_fisica: %d", direccion_fisica);
+		}
+	}
+
+
+
 }
 
 int comparacion(char* valor1, char* valor2){

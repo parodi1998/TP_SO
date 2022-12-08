@@ -112,5 +112,6 @@ void* inicializar(void);
 int unidades_en_registro(int*);
 void interrumpe(void);
 int* buscaOperando(char*);
+void validarTraduccionMemoria(t_translation_response_mmu* response,uint32_t operacion);
 
 #endif /* INSTRUCCIONES_H_ */

@@ -40,22 +40,67 @@ bool iniciar_mmu(){
 	free(config_string);
 	log_info(get_log(),"MMU INICIADA CORRECTAMENTE");
 	init_tlb();
+//	mockMMU();
 	return true;
 }
 
+void mockMMU(){
+	t_list* tabla_segmento = list_create();
+	t_segmento* segmento = NULL;
+	segmento = malloc(sizeof(t_segmento));
+	segmento->nro = 0;
+	segmento->nro_indice_tabla_paginas = 0;
+	segmento->tam = 64;
+
+	list_add(tabla_segmento,segmento );
+
+	segmento = malloc(sizeof(t_segmento));
+	segmento->nro = 1;
+	segmento->nro_indice_tabla_paginas = 1;
+	segmento->tam = 128;
+
+	list_add(tabla_segmento,segmento );
+
+	segmento = malloc(sizeof(t_segmento));
+	segmento->nro = 2;
+	segmento->nro_indice_tabla_paginas = 2;
+	segmento->tam = 256;
+
+	list_add(tabla_segmento,segmento );
+
+	uint32_t pid =0;
+	uint32_t rta;
+	t_translation_response_mmu* response = NULL;
+//	response = traducir_direccion_logica(0,tabla_segmento,45,1);
+//	log_info(get_log(),"RTA: %d",response->direccion_fisica);
+//	response = traducir_direccion_logica(0,tabla_segmento,257,1);
+//	log_info(get_log(),"RTA: %d",response->direccion_fisica);
+
+
+}
 
 int get_socket(){
 	return CONEXION_MEMORIA;
 }
 
 
-int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t dir_logica, int32_t es_escritura){
+t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t dir_logica, int32_t es_escritura){
+
+	t_translation_response_mmu* respuesta = malloc(sizeof(t_translation_response_mmu));
+
+	respuesta->fue_page_fault = false;
+	respuesta->fue_segmentation_fault = false;
+	respuesta->pid = pid;
+
 	//RETORNA LA DIR_FISICA
 	log_info(get_log(),"Entre a traducir_direccion_logica");
 	int32_t num_segmento = floor(dir_logica / TAM_MAX_SEGMENTO);
 	int32_t desplazamiento_segmento = dir_logica % TAM_MAX_SEGMENTO;
 	int32_t num_pagina = floor(desplazamiento_segmento  / TAMANIO_PAGINA);
 	int32_t desplazamiento_pagina = desplazamiento_segmento % TAMANIO_PAGINA;
+
+	respuesta->segmento = num_segmento;
+	respuesta->pagina = num_pagina;
 
 	bool tiene_num_segmento(t_segmento* aux){
 		return aux->nro == num_segmento;
@@ -64,12 +109,14 @@ int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t di
 	t_segmento* segmento = list_find(tabla_segmentos,(void*)tiene_num_segmento);
 	if(segmento == NULL){
 		log_info(get_log(),"segmento == NULL");
-		return SEGMENTATION_FAULT;
+		respuesta->fue_page_fault = true;
+		return respuesta;
 	}
 
 	if(desplazamiento_segmento > segmento->tam){
 		log_info(get_log(),"desplazamiento_segmento > segmento->tam");
-		return SEGMENTATION_FAULT;
+		respuesta->fue_page_fault = true;
+		return respuesta;;
 	}
 
 	log_info(get_log(),"num_segmento: %d", num_segmento);
@@ -83,9 +130,14 @@ int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t di
 	if(tlb_result == -1) {
 		log_info(get_log(),"Fue TLB_MISS");
 		direccion_fisica = find_frame_in_memory_module(pid, num_segmento, num_pagina, es_escritura);
-	} 
+		if(direccion_fisica == PAGE_FAULT){
+			respuesta->fue_page_fault = true;
+			return respuesta;
+		}
+	}
+	respuesta->direccion_fisica = (direccion_fisica * TAMANIO_PAGINA) + desplazamiento_pagina;
 
-	return direccion_fisica;
+	return respuesta;
 }
 
 // EN CASO DE OBTENER UN TLB MISS, LLAMAR A ESTA FUNCION PARA
@@ -99,7 +151,7 @@ int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t di
 	 *
 	 */
 
-int find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura) {
+int32_t find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura) {
 
 char* response_from_module = traducir_memoria(CONEXION_MEMORIA,get_log(),pid,segment,page,es_escritura);
 
