@@ -60,9 +60,4 @@ char* finalizar_proceso_consola(int socket_cliente, t_log* logger);
 bool send_op_code(t_log* logger, uint32_t fd, op_code cod_op);
 bool recv_op_code(t_log* logger, uint32_t fd, op_code* cod_op);
 
-bool send_instrucciones(t_log*, int, t_list*);
-void recv_instrucciones(t_log*, int, t_list**);
-
-bool send_segmentos(t_log*, int, t_list*);
-void recv_segmentos(t_log*, int, t_list**);
 #endif
