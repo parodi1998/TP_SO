@@ -3,6 +3,7 @@
 
 #include "commons.h"
 #include "kernel_logs.h"
+#include "conexion.h"
 
 #define SEM_NOT_SHARE_BETWEEN_PROCESS 0
 

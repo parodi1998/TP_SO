@@ -84,14 +84,18 @@ void hilo_planificador_largo_plazo_exit() {
 		sem_wait(&sem_sincro_finalizar_pcb_en_memoria);
 		free(rta);
 
-		op_code cod_op;
-
-		if(send_op_code(logger, proceso->consola_fd, CONSOLA_EXIT)) {
-			log_info(logger,"Se envio op code con exito");
+		if(proceso->finaliza_por_segmentation_fault) {
+			send_finalizar_consola_error_segmentation_fault_from_kernel(logger, proceso->consola_fd);
+		} else if(proceso->finaliza_por_error_instruccion) {
+			send_finalizar_consola_error_instruccion_from_kernel(logger, proceso->consola_fd);
+		} else if(proceso->finaliza_por_error_de_ejecucion) {
+			send_finalizar_consola_error_comunicacion_from_kernel(logger, proceso->consola_fd);
 		} else {
-			log_info(logger,"Fallo el envio de op code");
+			send_finalizar_consola_ok_from_kernel(logger, proceso->consola_fd);
 		}
 
+		recv_finalizar_consola_from_consola(logger, proceso->consola_fd);
+		
 		sem_wait(&sem_finalizar_proceso);
 
 		liberar_pcb(proceso);
@@ -286,6 +290,7 @@ void hilo_planificador_corto_plazo_execute() {
 
 		if(!recv_pcb(logger, fd_cpu_dispatch, &proceso_recibido) || cod_op != PCB_KERNEL) {
             log_error(logger,"Hubo un error al recibir el proceso de cpu, por lo que se procede a finalizar el mismo.");
+			proceso->finaliza_por_error_de_ejecucion = true;
 			meter_proceso_en_exit(proceso);
 			sem_post(&sem_cpu_libre);
 		} else {

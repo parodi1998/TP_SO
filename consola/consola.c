@@ -65,7 +65,7 @@ int main(int argc, char** argv){
         terminar_programa();
         return EXIT_SUCCESS;
     } else {
-        log_info(logger,"La informacion fue enviada con exito al kernel");
+        log_info(logger,"Las instrucciones fueron enviadas con exito al kernel");
     }
 
     if(!send_segmentos(logger, fd, segmentos)) {
@@ -74,7 +74,7 @@ int main(int argc, char** argv){
         terminar_programa();
         return EXIT_SUCCESS;
     } else {
-        log_info(logger,"La informacion fue enviada con exito al kernel");
+        log_info(logger,"Los segmentos fueron enviadas con exito al kernel");
     }
 
     if(!send_op_code(logger, fd, CONSOLA_KERNEL_INIT_PCB)) {
@@ -89,6 +89,7 @@ int main(int argc, char** argv){
     op_code cod_op;
     bool mantener_conexion = true;
     uint32_t size = 0;
+    char* mensaje_de_finalizacion;
 
     while(mantener_conexion) {
 
@@ -101,11 +102,10 @@ int main(int argc, char** argv){
             case CONSOLA_TECLADO:
                 break;
             case CONSOLA_EXIT:
-                if(send_op_code(logger, fd, CONSOLA_EXIT)) {
-                    log_info(logger,"se envio el op code con exito");
-                } else {
-                    log_info(logger,"hubo un error al devolver el op code");
-                }
+                recv_finalizar_consola_from_kernel(logger,fd, &mensaje_de_finalizacion);
+                send_finalizar_consola_from_consola(logger, fd);
+                log_info(logger,"Finaliza consola - Mensaje de finalizacion:");
+                log_info(logger,"%s", mensaje_de_finalizacion);
                 mantener_conexion = false;
                 break;
             default:

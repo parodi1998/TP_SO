@@ -31,6 +31,9 @@ typedef struct {
     bool debe_ser_bloqueado;
     bool puede_ser_interrumpido;
     bool fue_interrumpido;
+    bool finaliza_por_segmentation_fault;
+    bool finaliza_por_error_instruccion;
+    bool finaliza_por_error_de_ejecucion;
     char* dispositivo_bloqueo;
     uint32_t registro_para_bloqueo;
     uint32_t unidades_de_trabajo;

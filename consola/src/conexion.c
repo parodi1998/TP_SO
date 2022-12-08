@@ -18,18 +18,25 @@ static char* char_list_to_string(t_log* logger, t_list* instrucciones) {
 
 bool send_instrucciones(t_log* logger, int fd, t_list* instrucciones) {
 	char* mensaje = char_list_to_string(logger, instrucciones);
-	log_info(logger,"REQUEST CONSOLA_INSTRUCCIONES: %s" , mensaje );
 	bool respuesta = enviar_mensaje_bool(CONSOLA_INSTRUCCIONES, mensaje, fd);
-	log_info(logger,"RESPONSE CONSOLA_INSTRUCCIONES: %d" , respuesta );
 	free(mensaje);
 	return respuesta;
 }
 
 bool send_segmentos(t_log* logger, int fd, t_list* segmentos) {
 	char* mensaje = char_list_to_string(logger, segmentos);
-	log_info(logger,"REQUEST CONSOLA_SEGMENTOS: %s" , mensaje );
 	bool respuesta = enviar_mensaje_bool(CONSOLA_SEGMENTOS, mensaje, fd);
-	log_info(logger,"RESPONSE CONSOLA_SEGMENTOS: %d" , respuesta );
 	free(mensaje);
+	return respuesta;
+}
+
+void recv_finalizar_consola_from_kernel(t_log* logger, int fd, char** mensaje) {
+	uint32_t size;
+	char* response = recibir_buffer(&size, fd);
+	*mensaje = response;
+}
+
+bool send_finalizar_consola_from_consola(t_log* logger, int fd) {
+	bool respuesta = enviar_mensaje_bool(CONSOLA_EXIT, "", fd);
 	return respuesta;
 }

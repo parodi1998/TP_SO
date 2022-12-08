@@ -57,6 +57,9 @@ static void procesar_conexion(void* void_args) {
                     pcb_proceso->debe_ser_bloqueado = false;
                     pcb_proceso->puede_ser_interrumpido = false;
                     pcb_proceso->fue_interrumpido = false;
+                    pcb_proceso->finaliza_por_segmentation_fault = false;
+                    pcb_proceso->finaliza_por_error_instruccion = false;
+                    pcb_proceso->finaliza_por_error_de_ejecucion = false;
                     pcb_proceso->registro_para_bloqueo = 0;
                     pcb_proceso->unidades_de_trabajo = 0;
                     pcb_proceso->dispositivo_bloqueo = string_new();

@@ -58,7 +58,7 @@ static void* serializar_pcb(t_log* logger, uint32_t* size, t_pcb* pcb) {
     uint32_t cantidad_segmentos = list_size(pcb->tabla_segmentos);
 	uint32_t tamanio_segmentos = 2 * sizeof(uint32_t) * cantidad_segmentos;
 	uint32_t tamanio_dispositivo_bloqueo = string_length(pcb->dispositivo_bloqueo)+1;
-	uint32_t tamanio_pcb = 14 * sizeof(uint32_t) + 4 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
+	uint32_t tamanio_pcb = 14 * sizeof(uint32_t) + 7 * sizeof(bool) + 2 * sizeof(t_estado_pcb) + tamanio_dispositivo_bloqueo + tamanio_instrucciones + tamanio_segmentos;
 	*size = 
 		sizeof(op_code) + 		    // codigo de operacion
 		sizeof(uint32_t) +  		    // tamanio total del pcb
@@ -76,6 +76,9 @@ static void* serializar_pcb(t_log* logger, uint32_t* size, t_pcb* pcb) {
         sizeof(bool) +              // pcb.debe_ser_bloqueado
         sizeof(bool) +              // pcb.puede_ser_interrumpido
         sizeof(bool) +              // pcb.fue_interrumpido
+		sizeof(bool) +              // pcb.finaliza_por_segmentation_fault
+        sizeof(bool) +              // pcb.finaliza_por_error_instruccion
+        sizeof(bool) +              // pcb.finaliza_por_error_de_ejecucion
         sizeof(uint32_t) +            // pcb.registro_para_bloqueo
         sizeof(uint32_t) +            // pcb.unidades_de_trabajo
         sizeof(uint32_t) +            // tamanio_dispositivo_bloqueo
@@ -132,6 +135,15 @@ static void* serializar_pcb(t_log* logger, uint32_t* size, t_pcb* pcb) {
 	p += sizeof(bool);
 
     memcpy(p,&pcb->fue_interrumpido,sizeof(bool)); // guardo el estado fue_interrumpido del pcb
+	p += sizeof(bool);
+
+	memcpy(p,&pcb->finaliza_por_segmentation_fault,sizeof(bool)); // guardo el estado finaliza_por_segmentation_fault del pcb
+	p += sizeof(bool);
+
+	memcpy(p,&pcb->finaliza_por_error_instruccion,sizeof(bool)); // guardo el estado finaliza_por_error_instruccion del pcb
+	p += sizeof(bool);
+
+	memcpy(p,&pcb->finaliza_por_error_de_ejecucion,sizeof(bool)); // guardo el estado finaliza_por_error_de_ejecucion del pcb
 	p += sizeof(bool);
 
     memcpy(p,&pcb->registro_para_bloqueo,sizeof(uint32_t)); // guardo el index del registro_para_bloqueo del pcb
@@ -224,6 +236,15 @@ static void deserializar_pcb(t_log* logger, void* stream, t_pcb** pcb) {
 	p += sizeof(bool);
 
     memcpy(&pcb_aux->fue_interrumpido, p, sizeof(bool));	
+	p += sizeof(bool);
+
+	memcpy(&pcb_aux->finaliza_por_segmentation_fault, p, sizeof(bool));	
+	p += sizeof(bool);
+
+	memcpy(&pcb_aux->finaliza_por_error_instruccion, p, sizeof(bool));	
+	p += sizeof(bool);
+
+	memcpy(&pcb_aux->finaliza_por_error_de_ejecucion, p, sizeof(bool));	
 	p += sizeof(bool);
 
     memcpy(&pcb_aux->registro_para_bloqueo, p, sizeof(uint32_t));	

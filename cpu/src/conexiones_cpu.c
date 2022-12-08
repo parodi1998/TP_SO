@@ -160,11 +160,11 @@ static void actualizar_pcb(t_contexto_ejecucion contexto, t_pcb* proceso) {
                 break;
 			case ERROR_SEGMENTATION_FAULT:
 				proceso->debe_ser_finalizado = true;
-				// agregar algo para identificar segmentation fault
+				proceso->finaliza_por_segmentation_fault = true;
 				break;
 			case ERROR_INSTRUCCION:
 				proceso->debe_ser_finalizado = true;
-				// agregar algo para identificar error instruccion
+				proceso->finaliza_por_error_instruccion = true;
 				break;
 			default:
 				break; 
