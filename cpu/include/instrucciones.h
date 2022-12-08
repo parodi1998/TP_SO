@@ -94,7 +94,7 @@ void* funcion_hilo(void*);
 void* seguir_instrucciones(t_contexto_ejecucion*, t_list*,  int);
 void fetch(int, t_list*, char**);
 
-
+void limpiarParametros(void);
 int decodificaOperando(operando*);
 void accederMemoria(int, t_list*);
 int* operandoBusca(char*);

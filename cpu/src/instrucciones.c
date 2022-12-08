@@ -37,6 +37,15 @@ void* inicializar()
 	io_registro = NULL;
 	continuar = 0;
 }
+
+void limpiarParametros(void){
+	nombre_instruccion = NULL;
+	operando_1_NOMBRE = NULL;
+	operando_2_NOMBRE = NULL;
+	operando_1_APUNTA = NULL;
+	operando_2_APUNTA = NULL;
+}
+
 int sePuedeConvertirEnInt(char* palabra){
 
     	int valor;
@@ -143,6 +152,7 @@ int comparacion(char* valor1, char* valor2){
 }
 
 void decodificar (char* instruccion_en_bruto, t_list* tabla_segmentos, int pid){
+
 	tipo_operacion = 0;
 
 	char* parametro_1;
@@ -342,6 +352,8 @@ int check_interrupt(int devuelve){
 
 int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, int pid)
 {
+	//limpia parámetros
+	limpiarParametros();
 
 	int devuelve = OPTIMO;
 
