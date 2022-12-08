@@ -15,6 +15,9 @@ int CONEXION_MEMORIA;
 int SEGMENTATION_FAULT = -2;
 int PAGE_FAULT = -1;
 
+uint32_t segmento_page_fault = 0;
+uint32_t pagina_page_fault = 0;
+
 static bool conectar_cpu_a_memoria(int* fd) {
     *fd = crear_conexion(get_log(), "CPU_CLIENTE_MEMORIA", get_ip_memoria(),  get_puerto_memoria());
     return fd != 0;
@@ -46,8 +49,9 @@ int get_socket(){
 }
 
 
-int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t dir_logica){
+int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t dir_logica, int32_t es_escritura){
 	//RETORNA LA DIR_FISICA
+	log_info(get_log(),"Entre a traducir_direccion_logica");
 	int32_t num_segmento = floor(dir_logica / TAM_MAX_SEGMENTO);
 	int32_t desplazamiento_segmento = dir_logica % TAM_MAX_SEGMENTO;
 	int32_t num_pagina = floor(desplazamiento_segmento  / TAMANIO_PAGINA);
@@ -59,16 +63,29 @@ int32_t traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t di
 
 	t_segmento* segmento = list_find(tabla_segmentos,(void*)tiene_num_segmento);
 	if(segmento == NULL){
+		log_info(get_log(),"segmento == NULL");
 		return SEGMENTATION_FAULT;
 	}
 
 	if(desplazamiento_segmento > segmento->tam){
+		log_info(get_log(),"desplazamiento_segmento > segmento->tam");
 		return SEGMENTATION_FAULT;
 	}
 
-	return consult_tlb(pid,num_segmento, num_pagina);
+	log_info(get_log(),"num_segmento: %d", num_segmento);
+	log_info(get_log(),"desplazamiento_segmento: %d", desplazamiento_segmento);
+	log_info(get_log(),"num_pagina: %d", num_pagina);
+	log_info(get_log(),"desplazamiento_pagina: %d", desplazamiento_pagina);
 
+	uint32_t tlb_result = consult_tlb(pid,num_segmento, num_pagina); 
+	uint32_t direccion_fisica = tlb_result;
+	
+	if(tlb_result == -1) {
+		log_info(get_log(),"Fue TLB_MISS");
+		direccion_fisica = find_frame_in_memory_module(pid, num_segmento, num_pagina, es_escritura);
+	} 
 
+	return direccion_fisica;
 }
 
 // EN CASO DE OBTENER UN TLB MISS, LLAMAR A ESTA FUNCION PARA
@@ -92,7 +109,9 @@ char** parts = string_split(response_from_module, "|");
 //verifico si hubo page fault
 if (parts[0] == "1") {
 	//hubo pagefault
-
+	log_info(get_log(),"Fue PAGE_FAULT en pid: %d segmento: %d pagina: %d", pid, segment, page);
+	segmento_page_fault = segment;
+	pagina_page_fault = page;
 	return PAGE_FAULT;
 } else {
 	int32_t frame = atoi(parts[0]);

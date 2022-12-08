@@ -114,9 +114,21 @@ t_contexto_ejecucion iniciar_proceso(t_pcb* pcb1){
 	seguir_instrucciones(&contexto_ejecucion, pcb1->instrucciones, pcb1->id_proceso);
 
 	   // pthread_join( thread2, NULL);
-	interrumpir = 1;
+	//interrumpir = 1;
 	  // pthread_join( thread1, NULL);
 	return contexto_ejecucion;
+}
+
+static uint32_t registro_char_to_int(char* registro) {
+	if(string_equals_ignore_case(registro,"AX")) {
+		return 0;
+	} else if(string_equals_ignore_case(registro,"BX")) {
+		return 1;
+	} else if(string_equals_ignore_case(registro,"CX")) {
+		return 2;
+	} else {
+		return 3;
+	}
 }
 
 static void actualizar_pcb(t_contexto_ejecucion contexto, t_pcb* proceso) {
@@ -127,14 +139,33 @@ static void actualizar_pcb(t_contexto_ejecucion contexto, t_pcb* proceso) {
 	proceso->registro_DX = contexto.reg_general.dx;
 	switch (contexto.estado) {
 			case BLOQUEO:
+				proceso->debe_ser_bloqueado = true;
+				proceso->dispositivo_bloqueo = contexto.io_dispositivo;
+				proceso->unidades_de_trabajo = contexto.io_unidades;
+				if(contexto.io_registro != NULL) {
+					proceso->registro_para_bloqueo = registro_char_to_int(contexto.io_registro);
+				}
                 break;
 			case INTERRUPCION:
+				proceso->fue_interrumpido = true;
                 break;
 			case PAGE_DEFAULT:
+				proceso->debe_ser_bloqueado = true;
+				proceso->page_fault_segmento = segmento_page_fault;
+				proceso->page_fault_pagina = pagina_page_fault;
+				proceso->dispositivo_bloqueo = "PAGE_FAULT";
                 break;
 			case FINALIZADO:
 				proceso->debe_ser_finalizado = true;
                 break;
+			case ERROR_SEGMENTATION_FAULT:
+				proceso->debe_ser_finalizado = true;
+				// agregar algo para identificar segmentation fault
+				break;
+			case ERROR_INSTRUCCION:
+				proceso->debe_ser_finalizado = true;
+				// agregar algo para identificar error instruccion
+				break;
 			default:
 				break; 
 		}

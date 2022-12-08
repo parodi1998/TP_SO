@@ -112,12 +112,12 @@ void accederMemoria(int pid, t_list* tabla_segmentos){
 	switch(tipo_operacion){
 	case MOV_IN: 
 		sscanf(operando_2_NOMBRE, "%d", &direccion_logica);
-		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica);
+		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica, 0);
 		log_info(get_log(),"despues de traducir memoria en mov in direccion_fisica: %d", direccion_fisica);
 		break;
 	case MOV_OUT: 
 		sscanf(operando_1_NOMBRE, "%d", &direccion_logica);
-		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica);
+		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica, 1);
 		log_info(get_log(),"despues de traducir memoria en mov out direccion_fisica: %d", direccion_fisica);
 		break;
 	default: 
@@ -223,28 +223,39 @@ int ins_add(void){
 
 int ins_mov_in(int pid){
 	//registro en parametro 1 = lo que haya en la direccion fisica guardada en el parámetro 2
+	if(direccion_fisica == -1) { // PAGE_FAULT == -1
+		log_info(get_log(),"Ocurrio un page fault al hacer MOV_IN");
+		return PAGE_DEFAULT;
+	} 
+
+	if(direccion_fisica == -2) { // SEGMENTATION_FAULT == -2
+		log_info(get_log(),"Ocurrio un page fault al hacer MOV_IN");
+		return ERROR_SEGMENTATION_FAULT;
+	} 
 
 	char* valor_leido = leer_memoria(get_socket(),get_log(),pid, direccion_fisica,sizeof(int));
 	int valor_recibido = atoi(valor_leido);
-	//RECIBIR
-
-	log_info(get_log(),"TERMINÓ EL MOV IN, VALO RECIBIDO: %s", valor_leido);
-	if (valor_recibido > 0)
-	{
-		*operando_1_APUNTA = valor_recibido;
 	
-		return OPTIMO;
-	}
-	else
-	{
-		return PAGE_DEFAULT;
-	}
+	//RECIBIR
+	log_info(get_log(),"TERMINÓ EL MOV IN, VALO RECIBIDO: %s", valor_leido);
+	*operando_1_APUNTA = valor_recibido;
+	return OPTIMO;
 
 
 }
 
 int ins_mov_out(int pid){
 	//guarda en memoria en la dir fisica del parametro 1= lo que haya en el registro del parámetro 2
+	if(direccion_fisica == -1) { // PAGE_FAULT == -1
+		log_info(get_log(),"Ocurrio un page fault al hacer MOV_OUT");
+		return PAGE_DEFAULT;
+	} 
+
+	if(direccion_fisica == -2) { // SEGMENTATION_FAULT == -2
+		log_info(get_log(),"Ocurrio un page fault al hacer MOV_IN");
+		return ERROR_SEGMENTATION_FAULT;
+	} 
+
 	int valor_a_pasar = unidades_en_registro(operando_2_APUNTA);
 	char* valor_a_guardar = string_itoa(valor_a_pasar);
 
@@ -307,8 +318,7 @@ int ejecutar(int pid){
 		estado = ins_exit();
 		break;
 	default:
-		printf("Error");
-		estado = INTERRUPCION;
+		estado = ERROR_INSTRUCCION;
 	}
 	return estado;
 }
@@ -345,15 +355,20 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 	//ejecutar
 	devuelve = ejecutar(pid);
 	log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", pid, nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
-	//check interrupt
-	devuelve = check_interrupt(devuelve);
-
+	
 	//actualizar ciclo
 	if (devuelve != PAGE_DEFAULT){
-	contexto->program_counter ++;
+		contexto->program_counter ++;
 	}
+
+	//check interrupt
+
+	if (devuelve == OPTIMO){
+		devuelve = check_interrupt(devuelve);
+	}
+
+	//devuelve = check_interrupt(devuelve);
+
 	return devuelve;
-
-
 }
 

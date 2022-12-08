@@ -38,7 +38,9 @@ enum tipo_devolucion{
 	BLOQUEO,
 	INTERRUPCION,
 	PAGE_DEFAULT,
-	FINALIZADO
+	FINALIZADO,
+	ERROR_SEGMENTATION_FAULT,
+	ERROR_INSTRUCCION
 };
 
 typedef struct operando{
