@@ -98,6 +98,16 @@ t_contexto_ejecucion iniciar_proceso(t_pcb* pcb1){
 	contexto_ejecucion.reg_general.bx = pcb1->registro_BX;
 	contexto_ejecucion.reg_general.cx = pcb1->registro_CX;
 	contexto_ejecucion.reg_general.dx = pcb1->registro_DX;
+	contexto_ejecucion.tabla_segmentos = list_create();
+
+	for(int index = 0; index < list_size(pcb1->tabla_segmentos); index++) {
+		t_pcb_segmentos* segmento = list_get(pcb1->tabla_segmentos, index);
+		t_segmento* segmento_cpu = malloc(sizeof(t_segmento));
+		segmento_cpu->nro = index;
+		segmento_cpu->tam = segmento->tamanio_segmento;
+		segmento_cpu->nro_indice_tabla_paginas = segmento->id_tabla_paginas;
+		list_add(contexto_ejecucion.tabla_segmentos, segmento_cpu);
+	}
 
 	// 	iret1 = pthread_create( &thread1, NULL, esperarInterrupcion, NULL);
 	//	iret2 = pthread_create( &thread2, NULL, seguir_instrucciones, (&contexto_ejecucion, pcb1.tabla_segmentos, pcb1.id_proceso));

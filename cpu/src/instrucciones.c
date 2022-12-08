@@ -108,17 +108,17 @@ return numerico;
 }
 
 //void accederMemoria(operando* op){
-void accederMemoria(int pid, t_list* tlb){
+void accederMemoria(int pid, t_list* tabla_segmentos){
 	switch(tipo_operacion){
 	case MOV_IN: 
-		log_info(get_log(),"antes de traducir memoria en mov in");
 		sscanf(operando_2_NOMBRE, "%d", &direccion_logica);
-		direccion_fisica = traducir_direccion_logica(pid, tlb, direccion_logica);
-		log_info(get_log(),"despues de traducir memoria en mov in: %d", direccion_fisica);
+		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica);
+		log_info(get_log(),"despues de traducir memoria en mov in direccion_fisica: %d", direccion_fisica);
 		break;
 	case MOV_OUT: 
 		sscanf(operando_1_NOMBRE, "%d", &direccion_logica);
-		direccion_fisica = traducir_direccion_logica(pid, tlb, direccion_logica);
+		direccion_fisica = traducir_direccion_logica(pid, tabla_segmentos, direccion_logica);
+		log_info(get_log(),"despues de traducir memoria en mov out direccion_fisica: %d", direccion_fisica);
 		break;
 	default: 
 	//sleep((float)(get_retardo_instruccion()/1000));
@@ -142,7 +142,7 @@ int comparacion(char* valor1, char* valor2){
 
 }
 
-void decodificar (char* instruccion_en_bruto, t_list* la_tbl, int pid){
+void decodificar (char* instruccion_en_bruto, t_list* tabla_segmentos, int pid){
 	tipo_operacion = 0;
 
 	char* parametro_1;
@@ -193,7 +193,7 @@ if (tipo_operacion == 0){
 	}
 }
 
-	accederMemoria(pid, la_tbl);
+	accederMemoria(pid, tabla_segmentos);
 }
 
 //int ins_set(instruccion* instruct){
@@ -224,10 +224,8 @@ int ins_add(void){
 int ins_mov_in(int pid){
 	//registro en parametro 1 = lo que haya en la direccion fisica guardada en el parámetro 2
 
-	log_info(get_log(),"ESTÁ POR EMPEZAR EL MOV IN");
-
 	char* valor_leido = leer_memoria(get_socket(),get_log(),pid, direccion_fisica,sizeof(int));
-	int valor_recibido;// = atoi(valor_leido);
+	int valor_recibido = atoi(valor_leido);
 	//RECIBIR
 
 	log_info(get_log(),"TERMINÓ EL MOV IN, VALO RECIBIDO: %s", valor_leido);
@@ -246,7 +244,6 @@ int ins_mov_in(int pid){
 }
 
 int ins_mov_out(int pid){
-	log_info(get_log(),"ESTÁ POR EMPEZAR EL MOV OUT");
 	//guarda en memoria en la dir fisica del parametro 1= lo que haya en el registro del parámetro 2
 	int valor_a_pasar = unidades_en_registro(operando_2_APUNTA);
 	char* valor_a_guardar = string_itoa(valor_a_pasar);
