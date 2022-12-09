@@ -408,12 +408,9 @@ void hilo_planificador_block_pantalla() {
 				break;
 		}
 
-		log_info(logger, "valor_registro: %d", valor_registro);
-		log_info(logger, "valor_registro_string: %s",  string_itoa(valor_registro));
-
 		if(valor_registro != -1) {
 			send_mostrar_dato_en_pantalla_from_kernel(logger, proceso->consola_fd, string_itoa(valor_registro));
-			recv_fin_mostrar_dato_en_pantalla_from_consola(logger, proceso->consola_fd);
+			sem_wait(&sem_fin_io_pantalla);
 		} else {
 			log_error(logger, "Hubo un error al leer el registro para imprimir en pantalla");
 			log_error(logger, "registro_para_bloqueo: %d", proceso->registro_para_bloqueo);

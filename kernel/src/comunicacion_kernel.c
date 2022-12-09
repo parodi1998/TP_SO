@@ -72,6 +72,10 @@ static void procesar_conexion(void* void_args) {
                 sem_post(&sem_finalizar_proceso);
                 liberar_conexion(&cliente_fd);
                 break;
+            case CONSOLA_PANTALLA:
+                recv_fin_mostrar_dato_en_pantalla_from_consola(logger, cliente_fd);
+                sem_post(&sem_fin_io_pantalla);
+                break;
             default:
                 break;
         }

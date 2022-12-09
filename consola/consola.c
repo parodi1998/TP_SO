@@ -90,6 +90,7 @@ int main(int argc, char** argv){
     bool mantener_conexion = true;
     uint32_t size = 0;
     char* mensaje_de_finalizacion = string_new();
+    char* dato_a_escribir_por_teclado = string_new();
     char* dato_a_mostrar_en_pantalla = string_new();
     uint32_t tiempo_pantalla_wait_in_milis = atoi(config_consola->tiempo_pantalla);
     float tiempo_pantalla_wait_in_seconds = tiempo_pantalla_wait_in_milis / 1000;
@@ -102,11 +103,14 @@ int main(int argc, char** argv){
         switch(cod_op) {
             case CONSOLA_PANTALLA:
                 recv_mostrar_dato_en_pantalla_from_kernel(logger,fd, &dato_a_mostrar_en_pantalla);
-                printf("%s",dato_a_mostrar_en_pantalla);
+                printf("DATO RECIBIDO: %s\n",dato_a_mostrar_en_pantalla);
                 sleep(tiempo_pantalla_wait_in_seconds);
                 send_fin_mostrar_dato_en_pantalla_from_consola(logger, fd);
                 break;
             case CONSOLA_TECLADO:
+                // scanf("%d", dato_a_escribir_por_teclado); 
+                // getc();
+                // send_pedir_dato_en_teclado_from_consola(logger, fd, dato_a_escribir_por_teclado)
                 break;
             case CONSOLA_EXIT:
                 recv_finalizar_consola_from_kernel(logger,fd, &mensaje_de_finalizacion);
@@ -122,6 +126,7 @@ int main(int argc, char** argv){
     }
 
     free(mensaje_de_finalizacion);
+    free(dato_a_escribir_por_teclado);
     free(dato_a_mostrar_en_pantalla);
 
     liberar_conexion(&fd);

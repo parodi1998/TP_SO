@@ -43,7 +43,7 @@ void recv_mostrar_dato_en_pantalla_from_kernel(t_log* logger, int fd, char** men
 }
 
 bool send_fin_mostrar_dato_en_pantalla_from_consola(t_log* logger, int fd) {
-	bool respuesta = enviar_mensaje_bool(CONSOLA_PANTALLA, "", fd);
+	bool respuesta = enviar_mensaje_bool(CONSOLA_PANTALLA, "OK", fd);
 	return respuesta;
 }
 
