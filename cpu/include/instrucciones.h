@@ -94,7 +94,7 @@ void* funcion_hilo(void*);
 void* seguir_instrucciones(t_contexto_ejecucion*, t_list*,  int);
 void fetch(int, t_list*, char**);
 
-
+void limpiarParametros(void);
 int decodificaOperando(operando*);
 void accederMemoria(int, t_list*);
 int* operandoBusca(char*);
@@ -112,5 +112,6 @@ void* inicializar(void);
 int unidades_en_registro(int*);
 void interrumpe(void);
 int* buscaOperando(char*);
+void validarTraduccionMemoria(t_translation_response_mmu* response,uint32_t operacion);
 
 #endif /* INSTRUCCIONES_H_ */
