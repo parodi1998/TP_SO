@@ -36,6 +36,18 @@ void recv_finalizar_consola_from_kernel(t_log* logger, int fd, char** mensaje) {
 	*mensaje = response;
 }
 
+void recv_mostrar_dato_en_pantalla_from_kernel(t_log* logger, int fd, char** mensaje) {
+	uint32_t size;
+	char* response = recibir_buffer(&size, fd);
+	*mensaje = response;
+}
+
+bool send_fin_mostrar_dato_en_pantalla_from_consola(t_log* logger, int fd) {
+	bool respuesta = enviar_mensaje_bool(CONSOLA_PANTALLA, "", fd);
+	return respuesta;
+}
+
+
 bool send_finalizar_consola_from_consola(t_log* logger, int fd) {
 	bool respuesta = enviar_mensaje_bool(CONSOLA_EXIT, "", fd);
 	return respuesta;

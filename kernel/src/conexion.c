@@ -54,3 +54,14 @@ void recv_finalizar_consola_from_consola(t_log* logger, int fd) {
 	char* response = recibir_buffer(&size, fd);
 	free(response);
 }
+
+bool send_mostrar_dato_en_pantalla_from_kernel(t_log* logger, int fd, char* dato) {
+	bool respuesta = enviar_mensaje_bool(CONSOLA_PANTALLA, dato, fd);
+	return respuesta;
+}
+
+void recv_fin_mostrar_dato_en_pantalla_from_consola(t_log* logger, int fd) {
+	uint32_t size;
+	char* response = recibir_buffer(&size, fd);
+	free(response);
+}

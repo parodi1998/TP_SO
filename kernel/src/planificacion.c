@@ -391,22 +391,37 @@ void hilo_planificador_block_pantalla() {
 		sem_wait(sem_hilo_pointer);
 		
 		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
-		//proceso->debe_ser_bloqueado = false;
 
-		// enviar_mensaje_a_consola();
-		// esperar_respuesta_de_consola();
+		uint32_t valor_registro = -1; // Error
 
-		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
-		// pthread_mutex_lock(&mutex_analizando_interrupcion);
-		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
-		// meter_proceso_en_block(proceso, "BLOCK");
-		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
-        proceso->debe_ser_bloqueado = true;
-		proceso->dispositivo_bloqueo = "DISCO";
+		switch(proceso->registro_para_bloqueo) {
+			case 0:
+				valor_registro = proceso->registro_AX;
+				break;
+			case 1:
+				valor_registro = proceso->registro_BX;
+				break;
+			case 2:
+				valor_registro = proceso->registro_CX;
+				break;
+			case 3:
+				valor_registro = proceso->registro_DX;
+				break;
+		}
 
-		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		log_info(logger, "valor_registro: %d", valor_registro);
+		log_info(logger, "valor_registro_string: %s",  string_itoa(valor_registro));
+
+		if(valor_registro != -1) {
+			send_mostrar_dato_en_pantalla_from_kernel(logger, proceso->consola_fd, string_itoa(valor_registro));
+			recv_fin_mostrar_dato_en_pantalla_from_consola(logger, proceso->consola_fd);
+		} else {
+			log_error(logger, "Hubo un error al leer el registro para imprimir en pantalla");
+			log_error(logger, "registro_para_bloqueo: %d", proceso->registro_para_bloqueo);
+			// Deberiamos finalizar el proceso?
+		}
 		
-		sleep(quantum_in_seconds);
+		proceso->debe_ser_bloqueado = false;
 
 		meter_proceso_en_ready(proceso);
 	}

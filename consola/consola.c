@@ -90,7 +90,10 @@ int main(int argc, char** argv){
     bool mantener_conexion = true;
     uint32_t size = 0;
     char* mensaje_de_finalizacion;
-
+    char* dato_a_mostrar_en_pantalla;
+    uint32_t tiempo_pantalla_wait_in_milis = atoi(config_consola->tiempo_pantalla);
+    float tiempo_pantalla_wait_in_seconds = tiempo_pantalla_wait_in_milis / 1000;
+	
     while(mantener_conexion) {
 
         if(recv_op_code(logger, fd, &cod_op))
@@ -98,6 +101,10 @@ int main(int argc, char** argv){
 
         switch(cod_op) {
             case CONSOLA_PANTALLA:
+                recv_mostrar_dato_en_pantalla_from_kernel(logger,fd, &dato_a_mostrar_en_pantalla);
+                printf("%s",dato_a_mostrar_en_pantalla);
+                sleep(tiempo_pantalla_wait_in_seconds);
+                send_fin_mostrar_dato_en_pantalla_from_consola(logger, fd);
                 break;
             case CONSOLA_TECLADO:
                 break;
@@ -113,6 +120,9 @@ int main(int argc, char** argv){
 
         }
     }
+
+    free(mensaje_de_finalizacion);
+    free(dato_a_mostrar_en_pantalla);
 
     liberar_conexion(&fd);
     terminar_programa();

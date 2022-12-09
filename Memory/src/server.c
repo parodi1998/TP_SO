@@ -8,6 +8,14 @@
 #include "../include/memory_file_management.h"
 #include "../include/server.h"
 
+int fd_client_kernel;
+int fd_client_cpu;
+
+pthread_t hilo_memoria_cpu;
+pthread_t hilo_memoria_kernel;
+
+sem_t sem_memoria_finalizar;
+
 int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto) {
     int socket_servidor;
     struct addrinfo hints, *servinfo;
@@ -59,6 +67,17 @@ bool iniciar_server_memoria(int* fd) {
     return fd != 0;
 }
 
+static int esperar_cliente_memoria(t_log* logger, const char* name, int socket_servidor) {
+    struct sockaddr_in dir_cliente;
+    socklen_t tam_direccion = sizeof(struct sockaddr_in);
+
+    int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
+
+    log_info(logger, "Cliente conectado (a %s)\n", name);
+
+    return socket_cliente;
+}
+
 void iniciar_servidor_memory(void)
 {
 	int socket_servidor = 0;
@@ -68,25 +87,28 @@ void iniciar_servidor_memory(void)
         // terminar_programa(); deberia llamarse a una funcion que libere toda la memoria de loggers, configs, listas, giladas
         return;
     } else {
-		while(1)
-    		esperar_cliente_memory(socket_servidor);
+		sem_init(&sem_memoria_finalizar, 0, 0);
+		
+		fd_client_cpu = esperar_cliente_memoria(get_logger(), "CPU", socket_servidor);
+		if (fd_client_cpu != -1) {
+			pthread_create(&hilo_memoria_cpu, NULL, (void*) serve_client_memory, &fd_client_cpu);
+    		pthread_detach(hilo_memoria_cpu);
+		} else {
+			return;
+		}
+
+		fd_client_kernel = esperar_cliente_memoria(get_logger(), "KERNEL", socket_servidor);
+		if (fd_client_kernel != -1) {
+			pthread_create(&hilo_memoria_kernel, NULL, (void*) serve_client_memory, &fd_client_kernel);
+    		pthread_detach(hilo_memoria_kernel);
+		} else {
+			return;
+		}	
+
+		sem_wait(&sem_memoria_finalizar);
+		sem_destroy(&sem_memoria_finalizar);
+		return;
 	}
-  
-}
-
-void esperar_cliente_memory(int socket_servidor)
-{
-	struct sockaddr_in dir_cliente;
-
-	int tam_direccion = sizeof(struct sockaddr_in);
-
-	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
-
-	pthread_t thread;
-
-	pthread_create(&thread,NULL,(void*)serve_client_memory,&socket_cliente);
-	pthread_detach(thread);
-
 }
 
 void serve_client_memory(int* socket)
@@ -97,7 +119,7 @@ void serve_client_memory(int* socket)
 			cod_op = -1;
 		process_request_memory(cod_op, *socket);
 	}
-	
+	sem_post(&sem_memoria_finalizar);
 }
 
 void process_request_memory(int cod_op, int cliente_fd) {
