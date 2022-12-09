@@ -150,6 +150,7 @@ static void actualizar_pcb(t_contexto_ejecucion contexto, t_pcb* proceso) {
 				proceso->fue_interrumpido = true;
                 break;
 			case PAGE_DEFAULT:
+				log_info(get_log(),"Antes de devolver pcb por page fault - SEGMENTO: %d - PAGINA : %d",segmento_page_fault,pagina_page_fault);
 				proceso->debe_ser_bloqueado = true;
 				proceso->page_fault_segmento = segmento_page_fault;
 				proceso->page_fault_pagina = pagina_page_fault;

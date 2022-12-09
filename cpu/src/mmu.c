@@ -162,8 +162,6 @@ char** parts = string_split(response_from_module, "|");
 if (parts[0] == "1") {
 	//hubo pagefault
 	log_info(get_log(),"Fue PAGE_FAULT en pid: %d segmento: %d pagina: %d", pid, segment, page);
-	segmento_page_fault = segment;
-	pagina_page_fault = page;
 	return PAGE_FAULT;
 } else {
 	int32_t frame = atoi(parts[1]);

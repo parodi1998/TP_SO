@@ -462,23 +462,10 @@ void hilo_planificador_block_page_fault(void* args) {
 		sem_wait(sem_hilo_pointer);
 		
 		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
+
+		page_fault_memoria(fd_memoria, logger, proceso->id_proceso, proceso->page_fault_segmento, proceso->page_fault_pagina);
+
 		proceso->debe_ser_bloqueado = false;
-
-		// enviar_mensaje_a_consola();
-		// esperar_respuesta_de_consola();
-
-		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
-		// pthread_mutex_lock(&mutex_analizando_interrupcion);
-		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
-		// meter_proceso_en_block(proceso, "BLOCK");
-		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
-		proceso->debe_ser_bloqueado = true;
-		proceso->dispositivo_bloqueo = "IMPRESORA";
-
-		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
-		
-		sleep(quantum_in_seconds);
-
 		meter_proceso_en_ready(proceso);
 	}
 }
