@@ -72,7 +72,7 @@ char* page_fault_memoria(int socket_cliente,t_log* logger,uint32_t pid,uint32_t 
 	char* mensaje = string_from_format("%d|%d|%d",pid,segment,page);
 
 	log_info(logger,"REQUEST PAGE_FAULT: %s" , mensaje );
-	enviar_mensaje_memoria(mensaje,socket_cliente,PAGE_FAULT_MEMORIA);
+	enviar_mensaje_memoria(mensaje,socket_cliente,SWAP_PAGE_MEMORIA);
 	char* rta = recibir_mensaje_memoria(socket_cliente);
 	log_info(logger,"RESPUESTA PAGE_FAULT: %s" , rta );
 	free(mensaje);
