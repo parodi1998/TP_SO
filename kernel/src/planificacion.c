@@ -326,10 +326,9 @@ void hilo_timer_contador_quantum() {
 		
 		sleep(quantum_in_seconds);
 
-		// enviar_interrupcion_a_cpu();
-
-		//imagino que esto podria estar en un hilo que se encargue solo de enviar la señal interrupt a cpu
-		sem_post(&sem_finaliza_timer_quantum);
+		if(!send_interrumpir_cpu_from_kernel(logger, fd_cpu_interrupt)) {
+			log_error(logger,"No se envio la interrupcion a cpu correctamente");
+		}
 	}
 }
 

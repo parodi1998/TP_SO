@@ -133,7 +133,7 @@ void accederMemoria(int pid, t_list* tabla_segmentos){
 		free(traduccion_mmu);
 		break;
 	default: 
-	//sleep((float)(get_retardo_instruccion()/1000));
+		sleep((float)(get_retardo_instruccion()/1000));
 		break;
 
 	}

@@ -65,3 +65,8 @@ void recv_fin_mostrar_dato_en_pantalla_from_consola(t_log* logger, int fd) {
 	char* response = recibir_buffer(&size, fd);
 	free(response);
 }
+
+bool send_interrumpir_cpu_from_kernel(t_log* logger, int fd) {
+	bool respuesta = send_op_code(logger, fd, PCB_INTERRUPT);
+	return respuesta;
+}
