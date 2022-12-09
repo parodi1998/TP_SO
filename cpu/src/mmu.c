@@ -115,7 +115,7 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 
 	if(desplazamiento_segmento > segmento->tam){
 		log_info(get_log(),"desplazamiento_segmento > segmento->tam");
-		respuesta->fue_page_fault = true;
+		respuesta->fue_segmentation_fault = true;
 		return respuesta;;
 	}
 

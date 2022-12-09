@@ -140,10 +140,13 @@ void accederMemoria(int pid, t_list* tabla_segmentos){
 }
 
 void validarTraduccionMemoria(t_translation_response_mmu* response,uint32_t operacion){
+	
 	if(response->fue_page_fault){
+		direccion_fisica = -1;
 		log_info(get_log(),"PAGE FAULT - PID: %d - SEGMENTO: %d - PAGINA : %d",response->pid,response->segmento,response->pagina);
 	}
 	if(response->fue_segmentation_fault){
+		direccion_fisica = -2;
 		log_info(get_log(),"SEGMENTATION FAULT - PID: %d - SEGMENTO: %d - PAGINA : %d",response->pid,response->segmento,response->pagina);
 	}
 
@@ -264,7 +267,7 @@ int ins_mov_in(int pid){
 	} 
 
 	if(direccion_fisica == -2) { // SEGMENTATION_FAULT == -2
-		log_info(get_log(),"Ocurrio un page fault al hacer MOV_IN");
+		log_info(get_log(),"Ocurrio un segmentation fault al hacer MOV_IN");
 		return ERROR_SEGMENTATION_FAULT;
 	} 
 
@@ -287,7 +290,7 @@ int ins_mov_out(int pid){
 	} 
 
 	if(direccion_fisica == -2) { // SEGMENTATION_FAULT == -2
-		log_info(get_log(),"Ocurrio un page fault al hacer MOV_IN");
+		log_info(get_log(),"Ocurrio un segmentation fault al hacer MOV_IN");
 		return ERROR_SEGMENTATION_FAULT;
 	} 
 
