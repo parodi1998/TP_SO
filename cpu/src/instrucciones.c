@@ -264,12 +264,10 @@ int ins_add(void){
 int ins_mov_in(int pid){
 	//registro en parametro 1 = lo que haya en la direccion fisica guardada en el parámetro 2
 	if(direccion_fisica == -1) { // PAGE_FAULT == -1
-		log_info(get_log(),"Ocurrio un page fault al hacer MOV_IN");
 		return PAGE_DEFAULT;
 	} 
 
 	if(direccion_fisica == -2) { // SEGMENTATION_FAULT == -2
-		log_info(get_log(),"Ocurrio un segmentation fault al hacer MOV_IN");
 		return ERROR_SEGMENTATION_FAULT;
 	} 
 
@@ -287,12 +285,10 @@ int ins_mov_in(int pid){
 int ins_mov_out(int pid){
 	//guarda en memoria en la dir fisica del parametro 1= lo que haya en el registro del parámetro 2
 	if(direccion_fisica == -1) { // PAGE_FAULT == -1
-		log_info(get_log(),"Ocurrio un page fault al hacer MOV_OUT");
 		return PAGE_DEFAULT;
 	} 
 
 	if(direccion_fisica == -2) { // SEGMENTATION_FAULT == -2
-		log_info(get_log(),"Ocurrio un segmentation fault al hacer MOV_IN");
 		return ERROR_SEGMENTATION_FAULT;
 	} 
 
@@ -395,8 +391,8 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 	decodificar(instruccion_en_bruto, contexto->tabla_segmentos, pid);
 
 	//ejecutar
-	devuelve = ejecutar(pid);
 	log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", pid, nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
+	devuelve = ejecutar(pid);
 	
 	//actualizar ciclo
 	if (devuelve != PAGE_DEFAULT){

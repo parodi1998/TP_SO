@@ -119,11 +119,6 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 		return respuesta;;
 	}
 
-	log_info(get_log(),"num_segmento: %d", num_segmento);
-	log_info(get_log(),"desplazamiento_segmento: %d", desplazamiento_segmento);
-	log_info(get_log(),"num_pagina: %d", num_pagina);
-	log_info(get_log(),"desplazamiento_pagina: %d", desplazamiento_pagina);
-
 	uint32_t tlb_result = consult_tlb(pid,num_segmento, num_pagina); 
 	uint32_t direccion_fisica = tlb_result;
 	
