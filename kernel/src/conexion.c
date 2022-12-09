@@ -70,3 +70,14 @@ bool send_interrumpir_cpu_from_kernel(t_log* logger, int fd) {
 	bool respuesta = send_op_code(logger, fd, PCB_INTERRUPT);
 	return respuesta;
 }
+
+bool send_ingresar_dato_por_teclado_from_kernel(t_log* logger, int fd) {
+	bool respuesta = send_op_code(logger, fd, CONSOLA_TECLADO);
+	return respuesta;
+}
+
+void recv_dato_ingresado_por_teclado_from_consola(t_log* logger, int fd, char** mensaje) {
+	uint32_t size;
+	char* response = recibir_buffer(&size, fd);
+	*mensaje = response;
+}

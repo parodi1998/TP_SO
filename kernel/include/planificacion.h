@@ -24,6 +24,8 @@ extern t_dictionary* sem_hilos_block;
 extern t_dictionary* mutex_colas_block;
 extern t_dictionary* tiempos_io;
 
+extern t_dictionary* dato_ingreso_por_teclado;
+
 // mutex
 extern pthread_mutex_t mutex_new;
 extern pthread_mutex_t mutex_ready;
@@ -54,6 +56,7 @@ extern sem_t sem_sincro_finalizar_pcb_en_memoria;
 extern sem_t sem_sacar_de_execute;
 extern sem_t sem_finalizar_proceso;
 extern sem_t sem_fin_io_pantalla;
+extern sem_t sem_dato_por_teclado_ingresado;
 
 // hilos
 extern pthread_t hilo_largo_plazo_new;

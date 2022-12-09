@@ -25,6 +25,8 @@ static void procesar_conexion(void* void_args) {
     t_list* instrucciones;
     t_list* segmentos;
     t_pcb* pcb_proceso;
+    char* dato_recibido = string_new();
+    char* id_proceso = string_new();
 
     while (cliente_fd != -1) {
 
@@ -41,32 +43,38 @@ static void procesar_conexion(void* void_args) {
                 break;
             case CONSOLA_KERNEL_INIT_PCB:
                 generador_pcb_id++;
-                    pcb_proceso = malloc(sizeof(t_pcb));
-                    pcb_proceso->id_proceso = generador_pcb_id;
-                    pcb_proceso->program_counter = 0;
-                    carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
-                    pcb_proceso->registro_AX = 0;
-                    pcb_proceso->registro_BX = 0;
-                    pcb_proceso->registro_CX = 0;
-                    pcb_proceso->registro_DX = 0;
-                    pcb_proceso->instrucciones = instrucciones;
-                    pcb_proceso->estado_anterior = PCB_NEW;
-                    pcb_proceso->estado_actual = PCB_NEW;
-                    pcb_proceso->consola_fd = cliente_fd;
-                    pcb_proceso->debe_ser_finalizado = false;
-                    pcb_proceso->debe_ser_bloqueado = false;
-                    pcb_proceso->puede_ser_interrumpido = false;
-                    pcb_proceso->fue_interrumpido = false;
-                    pcb_proceso->finaliza_por_segmentation_fault = false;
-                    pcb_proceso->finaliza_por_error_instruccion = false;
-                    pcb_proceso->finaliza_por_error_de_ejecucion = false;
-                    pcb_proceso->registro_para_bloqueo = 0;
-                    pcb_proceso->unidades_de_trabajo = 0;
-                    pcb_proceso->dispositivo_bloqueo = string_new();
-                    pcb_proceso->page_fault_segmento = 0;
-                    pcb_proceso->page_fault_pagina = 0;
+                pcb_proceso = malloc(sizeof(t_pcb));
+                pcb_proceso->id_proceso = generador_pcb_id;
+                pcb_proceso->program_counter = 0;
+                carga_tabla_segmentos_pcb(&pcb_proceso->tabla_segmentos, segmentos);
+                pcb_proceso->registro_AX = 0;
+                pcb_proceso->registro_BX = 0;
+                pcb_proceso->registro_CX = 0;
+                pcb_proceso->registro_DX = 0;
+                pcb_proceso->instrucciones = instrucciones;
+                pcb_proceso->estado_anterior = PCB_NEW;
+                pcb_proceso->estado_actual = PCB_NEW;
+                pcb_proceso->consola_fd = cliente_fd;
+                pcb_proceso->debe_ser_finalizado = false;
+                pcb_proceso->debe_ser_bloqueado = false;
+                pcb_proceso->puede_ser_interrumpido = false;
+                pcb_proceso->fue_interrumpido = false;
+                pcb_proceso->finaliza_por_segmentation_fault = false;
+                pcb_proceso->finaliza_por_error_instruccion = false;
+                pcb_proceso->finaliza_por_error_de_ejecucion = false;
+                pcb_proceso->registro_para_bloqueo = 0;
+                pcb_proceso->unidades_de_trabajo = 0;
+                pcb_proceso->dispositivo_bloqueo = string_new();
+                pcb_proceso->page_fault_segmento = 0;
+                pcb_proceso->page_fault_pagina = 0;
 
-                    meter_proceso_en_new(pcb_proceso);
+                meter_proceso_en_new(pcb_proceso);
+
+                id_proceso = string_itoa(pcb_proceso->id_proceso);
+
+                dictionary_put(dato_ingreso_por_teclado, id_proceso, string_new());
+
+
                 break;
             case CONSOLA_EXIT:
                 sem_post(&sem_finalizar_proceso);
@@ -75,6 +83,12 @@ static void procesar_conexion(void* void_args) {
             case CONSOLA_PANTALLA:
                 recv_fin_mostrar_dato_en_pantalla_from_consola(logger, cliente_fd);
                 sem_post(&sem_fin_io_pantalla);
+                break;
+            case CONSOLA_TECLADO:
+                recv_dato_ingresado_por_teclado_from_consola(logger, cliente_fd, &dato_recibido);
+                log_info(logger,"Dato ingresado por teclado: %s", dato_recibido);
+                dictionary_put(dato_ingreso_por_teclado, id_proceso, dato_recibido);
+                sem_post(&sem_dato_por_teclado_ingresado);
                 break;
             default:
                 break;

@@ -52,3 +52,8 @@ bool send_finalizar_consola_from_consola(t_log* logger, int fd) {
 	bool respuesta = enviar_mensaje_bool(CONSOLA_EXIT, "", fd);
 	return respuesta;
 }
+
+bool send_dato_ingresado_por_teclado_from_consola(t_log* logger, int fd, char* dato) {
+	bool respuesta = enviar_mensaje_bool(CONSOLA_TECLADO, dato, fd);
+	return respuesta;
+}

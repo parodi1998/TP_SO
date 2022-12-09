@@ -10,6 +10,8 @@ t_dictionary* sem_hilos_block;
 t_dictionary* mutex_colas_block;
 t_dictionary* tiempos_io;
 
+t_dictionary* dato_ingreso_por_teclado;
+
 pthread_mutex_t mutex_new;
 pthread_mutex_t mutex_ready;
 pthread_mutex_t mutex_ready_fifo;
@@ -39,6 +41,8 @@ sem_t sem_sacar_de_execute;
 sem_t sem_finalizar_proceso;
 
 sem_t sem_fin_io_pantalla;
+sem_t sem_dato_por_teclado_ingresado;
+
 
 pthread_t hilo_largo_plazo_new;
 pthread_t hilo_corto_plazo_ready;
@@ -59,6 +63,7 @@ void inicializar_diccionario() {
     generador_pcb_id = 0;
     colas = dictionary_create();
     tiempos_io = dictionary_create();
+    dato_ingreso_por_teclado = dictionary_create();
     dictionary_put(colas,"NEW",queue_create());
     dictionary_put(colas,"READY_FIFO",queue_create());
     dictionary_put(colas,"READY_RR",queue_create());
@@ -80,6 +85,7 @@ void destruir_diccionario() {
     queue_destroy_and_destroy_elements((t_queue*)dictionary_get(colas,"PAGE_FAULT"),free);
     dictionary_destroy(colas);
     dictionary_destroy(tiempos_io);
+    dictionary_destroy(dato_ingreso_por_teclado);
 }
 
 void crear_semaforos_y_mutex_de_cola_block_dinamica(char* key) {
@@ -102,6 +108,7 @@ void inicializar_semaforos() {
     sem_init(&sem_sacar_de_execute, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     sem_init(&sem_finalizar_proceso, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     sem_init(&sem_fin_io_pantalla, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+    sem_init(&sem_dato_por_teclado_ingresado, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
 
     // new
 	pthread_mutex_init(&mutex_new, NULL);
@@ -160,6 +167,7 @@ void destruir_semaforos() {
     sem_destroy(&sem_sacar_de_execute);
     sem_destroy(&sem_finalizar_proceso);
     sem_destroy(&sem_fin_io_pantalla);
+    sem_destroy(&sem_dato_por_teclado_ingresado);
     
     pthread_mutex_destroy(&mutex_new);
     sem_destroy(&contador_new);

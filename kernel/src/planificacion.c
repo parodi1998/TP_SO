@@ -430,22 +430,33 @@ void hilo_planificador_block_teclado(void* args) {
 		sem_wait(sem_hilo_pointer);
 		
 		t_pcb* proceso = sacar_proceso_de_block(key_cola_de_bloqueo);
-		proceso->debe_ser_bloqueado = false;
 
-		// enviar_mensaje_a_consola();
-		// esperar_respuesta_de_consola();
+		if(!send_ingresar_dato_por_teclado_from_kernel(logger, proceso->consola_fd)) {
+			log_error(logger, "Hubo un error al pedir que se ingrese un dato por teclado a consola: %d",proceso->consola_fd);
+			// Deberiamos finalizar el proceso?
+		}
 
-		// pthread_mutex_lock(&mutex_analizando_fin_de_bloqueo);
-		// pthread_mutex_lock(&mutex_analizando_interrupcion);
-		// pthread_mutex_unlock(&mutex_analizando_interrupcion);
-		// meter_proceso_en_block(proceso, "BLOCK");
-		// pthread_mutex_unlock(&mutex_analizando_fin_de_bloqueo);
-		proceso->debe_ser_bloqueado = true;
-		proceso->dispositivo_bloqueo = "PAGE_FAULT";
-
-		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		sem_wait(&sem_dato_por_teclado_ingresado);
 		
-		sleep(quantum_in_seconds);
+		char* dato = dictionary_get(dato_ingreso_por_teclado, string_itoa(proceso->id_proceso));
+		uint32_t dato_a_guardar = atoi(dato);
+
+		switch(proceso->registro_para_bloqueo) {
+			case 0:
+				proceso->registro_AX = dato_a_guardar;
+				break;
+			case 1:
+				proceso->registro_BX = dato_a_guardar;
+				break;
+			case 2:
+				proceso->registro_CX = dato_a_guardar;
+				break;
+			case 3:
+				proceso->registro_DX = dato_a_guardar;
+				break;
+		}
+		
+		proceso->debe_ser_bloqueado = false;
 
 		meter_proceso_en_ready(proceso);
 	}
