@@ -10,7 +10,7 @@ int main(int argc, char** argv){
     if(argc < 3) {
         log_error(logger,"La cantidad de argumentos ingresados es incorrecta");
         log_warning(logger,"Ejemplo de inicializacion: ./consola.out consola.config pseudo_codigo_1.txt");
-        terminar_programa();
+        log_destroy(logger);
         return EXIT_FAILURE;
     }
 
@@ -89,8 +89,8 @@ int main(int argc, char** argv){
     op_code cod_op;
     bool mantener_conexion = true;
     uint32_t size = 0;
-    char* mensaje_de_finalizacion;
-    char* dato_a_mostrar_en_pantalla;
+    char* mensaje_de_finalizacion = string_new();
+    char* dato_a_mostrar_en_pantalla = string_new();
     uint32_t tiempo_pantalla_wait_in_milis = atoi(config_consola->tiempo_pantalla);
     float tiempo_pantalla_wait_in_seconds = tiempo_pantalla_wait_in_milis / 1000;
 	
