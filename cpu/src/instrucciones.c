@@ -391,7 +391,13 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 	decodificar(instruccion_en_bruto, contexto->tabla_segmentos, pid);
 
 	//ejecutar
-	log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", pid, nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
+	if (operando_1_NOMBRE != NULL || operando_2_NOMBRE != NULL) {
+		log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", pid, nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
+	}
+	else {
+		log_info(get_log(),"PID: %d - Ejecutando: %s", pid, nombre_instruccion);
+	}
+	
 	devuelve = ejecutar(pid);
 	
 	//actualizar ciclo
