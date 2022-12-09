@@ -1,0 +1,387 @@
+[INFO] 19:25:02:088 Memory/(30760:30760): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:25:02:090 Memory/(30760:30760): Estructuras administrativas inicializadas
+[INFO] 19:25:02:090 Memory/(30760:30760): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:25:02:092 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:092 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:092 Memory/(30760:30760): Se reserva el frame 0 para el PID 1
+[INFO] 19:25:02:092 Memory/(30760:30760): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:25:02:093 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:093 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:093 Memory/(30760:30760): Se reserva el frame 1 para el PID 1
+[INFO] 19:25:02:093 Memory/(30760:30760): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:25:02:093 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:093 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:093 Memory/(30760:30760): Se reserva el frame 2 para el PID 1
+[INFO] 19:25:02:093 Memory/(30760:30760): Se creo la pagina 2 con frame 2 para el PID 1
+[INFO] 19:25:02:093 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:093 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:094 Memory/(30760:30760): Se reserva el frame 3 para el PID 1
+[INFO] 19:25:02:094 Memory/(30760:30760): Se creo la pagina 3 con frame 3 para el PID 1
+[INFO] 19:25:02:095 Memory/(30760:30760): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:25:02:095 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:095 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:096 Memory/(30760:30760): start_page 0
+[INFO] 19:25:02:096 Memory/(30760:30760): end_page 1
+[INFO] 19:25:02:096 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:096 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:096 Memory/(30760:30760): Se guardo en la direccion 61 para el PID 1, tamanio 3
+[INFO] 19:25:02:096 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:096 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:096 Memory/(30760:30760): Se guardo en la direccion 64 para el PID 1, tamanio 12
+[INFO] 19:25:02:096 Memory/(30760:30760): Escritura exitosa del valor 134525684 para el PID 1
+[INFO] 19:25:02:097 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:097 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:098 Memory/(30760:30760): start_page 0
+[INFO] 19:25:02:098 Memory/(30760:30760): end_page 1
+[INFO] 19:25:02:098 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:099 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:099 Memory/(30760:30760): Se obtuvo el valor en la direccion 61 para el PID 1
+[INFO] 19:25:02:099 Memory/(30760:30760): Buscamos la tabla del PID 1 ...
+[INFO] 19:25:02:099 Memory/(30760:30760): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:25:02:099 Memory/(30760:30760): Se obtuvo el valor en la direccion 64 para el PID 1
+[INFO] 19:25:02:099 Memory/(30760:30760): Lectura exitosa para el PID 1
+[INFO] 19:25:02:099 Memory/(30760:30760): Result: jojitosasdasdas
+[INFO] 20:45:45:113 Memory/(6058:6058): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 20:45:45:122 Memory/(6058:6058): Estructuras administrativas inicializadas
+[INFO] 20:45:45:124 Memory/(6058:6058): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:124 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:124 Memory/(6058:6058): Se reserva el frame 0 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:124 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:124 Memory/(6058:6058): Se reserva el frame 1 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:124 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:124 Memory/(6058:6058): Se reserva el frame 2 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Se creo la pagina 2 con frame 2 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:124 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:124 Memory/(6058:6058): Se reserva el frame 3 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Se creo la pagina 3 con frame 3 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:124 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:124 Memory/(6058:6058): start_page 0
+[INFO] 20:45:45:124 Memory/(6058:6058): end_page 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:124 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:124 Memory/(6058:6058): Se guardo en la direccion 61 para el PID 1, tamanio 3
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:124 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:124 Memory/(6058:6058): Se guardo en la direccion 64 para el PID 1, tamanio 12
+[INFO] 20:45:45:124 Memory/(6058:6058): Escritura exitosa del valor 134528276 para el PID 1
+[INFO] 20:45:45:124 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:125 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:125 Memory/(6058:6058): start_page 0
+[INFO] 20:45:45:125 Memory/(6058:6058): end_page 1
+[INFO] 20:45:45:125 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:125 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:125 Memory/(6058:6058): Se obtuvo el valor en la direccion 61 para el PID 1
+[INFO] 20:45:45:125 Memory/(6058:6058): Buscamos la tabla del PID 1 ...
+[INFO] 20:45:45:125 Memory/(6058:6058): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 20:45:45:125 Memory/(6058:6058): Se obtuvo el valor en la direccion 64 para el PID 1
+[INFO] 20:45:45:125 Memory/(6058:6058): Lectura exitosa para el PID 1
+[INFO] 20:45:45:125 Memory/(6058:6058): Result: jojitosasdasdastabla del PIDQ
+[INFO] 20:47:57:917 Memory/(6146:6146): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 20:47:57:924 Memory/(6146:6146): Estructuras administrativas inicializadas
+[INFO] 16:50:31:569 Memory/(4881:4881): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 16:50:31:578 Memory/(4881:4881): Estructuras administrativas inicializadas
+[INFO] 16:57:26:499 Memory/(4993:4993): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 16:57:26:499 Memory/(4993:4993): Estructuras administrativas inicializadas
+[INFO] 16:59:15:105 Memory/(5064:5064): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 16:59:15:106 Memory/(5064:5064): Estructuras administrativas inicializadas
+[INFO] 17:02:45:698 Memory/(5191:5191): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 17:02:45:698 Memory/(5191:5191): Estructuras administrativas inicializadas
+[INFO] 18:01:46:917 Memory/(6987:6987): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:01:46:918 Memory/(6987:6987): Estructuras administrativas inicializadas
+[INFO] 18:03:56:380 Memory/(7158:7158): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:03:56:383 Memory/(7158:7158): Estructuras administrativas inicializadas
+[INFO] 18:05:28:032 Memory/(7221:7221): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:05:28:032 Memory/(7221:7221): Estructuras administrativas inicializadas
+[INFO] 18:07:59:689 Memory/(7355:7355): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:07:59:690 Memory/(7355:7355): Estructuras administrativas inicializadas
+[INFO] 18:08:06:933 Memory/(7355:7379): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 18:08:06:934 Memory/(7355:7379): Buscamos la tabla del PID 1 ...
+[INFO] 18:08:06:934 Memory/(7355:7379): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 18:08:06:934 Memory/(7355:7379): Se reserva el frame 0 para el PID 1
+[INFO] 18:08:06:934 Memory/(7355:7379): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 18:08:06:934 Memory/(7355:7379): Buscamos la tabla del PID 1 ...
+[INFO] 18:08:06:934 Memory/(7355:7379): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 18:08:06:935 Memory/(7355:7379): Se reserva el frame 1 para el PID 1
+[INFO] 18:08:06:939 Memory/(7355:7379): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 18:08:06:939 Memory/(7355:7379): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 18:09:28:841 Memory/(7427:7427): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:09:28:843 Memory/(7427:7427): Estructuras administrativas inicializadas
+[INFO] 18:09:33:980 Memory/(7427:7444): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 18:09:33:980 Memory/(7427:7444): Buscamos la tabla del PID 1 ...
+[INFO] 18:09:33:980 Memory/(7427:7444): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 18:09:33:980 Memory/(7427:7444): Se reserva el frame 0 para el PID 1
+[INFO] 18:09:33:981 Memory/(7427:7444): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 18:09:33:981 Memory/(7427:7444): Buscamos la tabla del PID 1 ...
+[INFO] 18:09:33:981 Memory/(7427:7444): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 18:09:33:981 Memory/(7427:7444): Se reserva el frame 1 para el PID 1
+[INFO] 18:09:33:981 Memory/(7427:7444): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 18:09:33:981 Memory/(7427:7444): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 18:10:42:226 Memory/(7472:7472): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:10:42:227 Memory/(7472:7472): Estructuras administrativas inicializadas
+[INFO] 18:16:05:385 Memory/(7472:7868): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 18:16:05:395 Memory/(7472:7868): Buscamos la tabla del PID 1 ...
+[INFO] 18:16:05:395 Memory/(7472:7868): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 18:16:05:395 Memory/(7472:7868): Se reserva el frame 0 para el PID 1
+[INFO] 18:16:05:395 Memory/(7472:7868): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 18:16:05:395 Memory/(7472:7868): Buscamos la tabla del PID 1 ...
+[INFO] 18:16:05:395 Memory/(7472:7868): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 18:16:05:395 Memory/(7472:7868): Se reserva el frame 1 para el PID 1
+[INFO] 18:16:05:395 Memory/(7472:7868): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 18:16:05:395 Memory/(7472:7868): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:17:04:682 Memory/(9062:9062): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:17:04:683 Memory/(9062:9062): Estructuras administrativas inicializadas
+[INFO] 19:17:11:273 Memory/(9062:9080): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:17:11:275 Memory/(9062:9080): Buscamos la tabla del PID 1 ...
+[INFO] 19:17:11:275 Memory/(9062:9080): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:17:11:275 Memory/(9062:9080): Se reserva el frame 0 para el PID 1
+[INFO] 19:17:11:275 Memory/(9062:9080): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:17:11:275 Memory/(9062:9080): Buscamos la tabla del PID 1 ...
+[INFO] 19:17:11:275 Memory/(9062:9080): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:17:11:275 Memory/(9062:9080): Se reserva el frame 1 para el PID 1
+[INFO] 19:17:11:275 Memory/(9062:9080): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:17:11:275 Memory/(9062:9080): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:18:46:311 Memory/(9120:9120): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:18:46:312 Memory/(9120:9120): Estructuras administrativas inicializadas
+[INFO] 19:18:53:610 Memory/(9120:9151): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:18:53:610 Memory/(9120:9151): Buscamos la tabla del PID 1 ...
+[INFO] 19:18:53:610 Memory/(9120:9151): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:18:53:610 Memory/(9120:9151): Se reserva el frame 0 para el PID 1
+[INFO] 19:18:53:610 Memory/(9120:9151): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:18:53:610 Memory/(9120:9151): Buscamos la tabla del PID 1 ...
+[INFO] 19:18:53:610 Memory/(9120:9151): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:18:53:610 Memory/(9120:9151): Se reserva el frame 1 para el PID 1
+[INFO] 19:18:53:610 Memory/(9120:9151): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:18:53:610 Memory/(9120:9151): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:21:41:786 Memory/(9254:9254): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:21:41:787 Memory/(9254:9254): Estructuras administrativas inicializadas
+[INFO] 19:22:02:090 Memory/(9254:9300): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:22:02:090 Memory/(9254:9300): Buscamos la tabla del PID 1 ...
+[INFO] 19:22:02:095 Memory/(9254:9300): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:22:02:095 Memory/(9254:9300): Se reserva el frame 0 para el PID 1
+[INFO] 19:22:02:095 Memory/(9254:9300): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:22:02:095 Memory/(9254:9300): Buscamos la tabla del PID 1 ...
+[INFO] 19:22:02:095 Memory/(9254:9300): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:22:02:096 Memory/(9254:9300): Se reserva el frame 1 para el PID 1
+[INFO] 19:22:02:096 Memory/(9254:9300): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:22:02:096 Memory/(9254:9300): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:26:03:713 Memory/(9415:9415): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:26:03:713 Memory/(9415:9415): Estructuras administrativas inicializadas
+[INFO] 19:26:14:073 Memory/(9415:9453): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:26:14:073 Memory/(9415:9453): Buscamos la tabla del PID 1 ...
+[INFO] 19:26:14:073 Memory/(9415:9453): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:26:14:073 Memory/(9415:9453): Se reserva el frame 0 para el PID 1
+[INFO] 19:26:14:073 Memory/(9415:9453): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:26:14:073 Memory/(9415:9453): Buscamos la tabla del PID 1 ...
+[INFO] 19:26:14:073 Memory/(9415:9453): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:26:14:073 Memory/(9415:9453): Se reserva el frame 1 para el PID 1
+[INFO] 19:26:14:073 Memory/(9415:9453): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:26:14:073 Memory/(9415:9453): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:28:14:721 Memory/(9515:9515): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:28:14:753 Memory/(9515:9515): Estructuras administrativas inicializadas
+[INFO] 19:28:40:443 Memory/(9515:9574): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:28:40:443 Memory/(9515:9574): Buscamos la tabla del PID 1 ...
+[INFO] 19:28:40:443 Memory/(9515:9574): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:28:40:444 Memory/(9515:9574): Se reserva el frame 0 para el PID 1
+[INFO] 19:28:40:444 Memory/(9515:9574): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:28:40:444 Memory/(9515:9574): Buscamos la tabla del PID 1 ...
+[INFO] 19:28:40:444 Memory/(9515:9574): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:28:40:444 Memory/(9515:9574): Se reserva el frame 1 para el PID 1
+[INFO] 19:28:40:444 Memory/(9515:9574): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:28:40:444 Memory/(9515:9574): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:33:07:146 Memory/(9515:9727): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:33:07:146 Memory/(9515:9727): Buscamos la tabla del PID 1 ...
+[INFO] 19:33:07:147 Memory/(9515:9727): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:33:07:147 Memory/(9515:9727): Se reserva el frame 2 para el PID 1
+[INFO] 19:33:07:147 Memory/(9515:9727): Se creo la pagina 0 con frame 2 para el PID 1
+[INFO] 19:33:07:147 Memory/(9515:9727): Buscamos la tabla del PID 1 ...
+[INFO] 19:33:07:147 Memory/(9515:9727): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:33:07:147 Memory/(9515:9727): Se reserva el frame 3 para el PID 1
+[INFO] 19:33:07:147 Memory/(9515:9727): Se creo la pagina 1 con frame 3 para el PID 1
+[INFO] 19:33:07:147 Memory/(9515:9727): Se asigna la pagina de primer nivel con ID 1 al PID 1
+[INFO] 19:33:38:543 Memory/(9758:9758): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:33:38:543 Memory/(9758:9758): Estructuras administrativas inicializadas
+[INFO] 19:40:10:894 Memory/(10423:10423): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:40:10:894 Memory/(10423:10423): Estructuras administrativas inicializadas
+[INFO] 19:40:24:432 Memory/(10423:10462): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:40:24:434 Memory/(10423:10462): Buscamos la tabla del PID 1 ...
+[INFO] 19:40:24:442 Memory/(10423:10462): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:40:24:443 Memory/(10423:10462): Se reserva el frame 0 para el PID 1
+[INFO] 19:40:24:443 Memory/(10423:10462): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:40:24:444 Memory/(10423:10462): Buscamos la tabla del PID 1 ...
+[INFO] 19:40:24:444 Memory/(10423:10462): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:40:24:444 Memory/(10423:10462): Se reserva el frame 1 para el PID 1
+[INFO] 19:40:24:446 Memory/(10423:10462): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:40:24:447 Memory/(10423:10462): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:42:01:456 Memory/(10509:10509): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:42:01:456 Memory/(10509:10509): Estructuras administrativas inicializadas
+[INFO] 19:47:58:721 Memory/(11018:11018): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:47:58:722 Memory/(11018:11018): Estructuras administrativas inicializadas
+[INFO] 19:48:21:749 Memory/(11018:11056): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:48:21:758 Memory/(11018:11056): Buscamos la tabla del PID 1 ...
+[INFO] 19:48:21:758 Memory/(11018:11056): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:48:21:759 Memory/(11018:11056): Se reserva el frame 0 para el PID 1
+[INFO] 19:48:21:759 Memory/(11018:11056): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:48:21:759 Memory/(11018:11056): Buscamos la tabla del PID 1 ...
+[INFO] 19:48:21:759 Memory/(11018:11056): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:48:21:759 Memory/(11018:11056): Se reserva el frame 1 para el PID 1
+[INFO] 19:48:21:793 Memory/(11018:11056): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:48:21:793 Memory/(11018:11056): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:50:21:875 Memory/(11114:11114): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:50:21:878 Memory/(11114:11114): Estructuras administrativas inicializadas
+[INFO] 19:51:01:418 Memory/(11305:11305): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:51:01:419 Memory/(11305:11305): Estructuras administrativas inicializadas
+[INFO] 19:51:16:322 Memory/(11305:11340): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:51:16:323 Memory/(11305:11340): Buscamos la tabla del PID 1 ...
+[INFO] 19:51:16:323 Memory/(11305:11340): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:51:16:323 Memory/(11305:11340): Se reserva el frame 0 para el PID 1
+[INFO] 19:51:16:323 Memory/(11305:11340): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:51:16:323 Memory/(11305:11340): Buscamos la tabla del PID 1 ...
+[INFO] 19:51:16:323 Memory/(11305:11340): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:51:16:323 Memory/(11305:11340): Se reserva el frame 1 para el PID 1
+[INFO] 19:51:16:323 Memory/(11305:11340): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:51:16:323 Memory/(11305:11340): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:53:15:422 Memory/(11409:11409): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:53:15:438 Memory/(11409:11409): Estructuras administrativas inicializadas
+[INFO] 19:53:27:707 Memory/(11811:11811): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:53:27:708 Memory/(11811:11811): Estructuras administrativas inicializadas
+[INFO] 19:53:43:390 Memory/(11811:11848): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:53:43:395 Memory/(11811:11848): Buscamos la tabla del PID 1 ...
+[INFO] 19:53:43:397 Memory/(11811:11848): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:53:43:397 Memory/(11811:11848): Se reserva el frame 0 para el PID 1
+[INFO] 19:53:43:397 Memory/(11811:11848): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:53:43:397 Memory/(11811:11848): Buscamos la tabla del PID 1 ...
+[INFO] 19:53:43:397 Memory/(11811:11848): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:53:43:397 Memory/(11811:11848): Se reserva el frame 1 para el PID 1
+[INFO] 19:53:43:397 Memory/(11811:11848): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:53:43:398 Memory/(11811:11848): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:54:21:640 Memory/(11899:11899): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:54:21:644 Memory/(11899:11899): Estructuras administrativas inicializadas
+[INFO] 19:54:32:650 Memory/(11899:11947): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:54:32:655 Memory/(11899:11947): Buscamos la tabla del PID 1 ...
+[INFO] 19:54:32:655 Memory/(11899:11947): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:54:32:655 Memory/(11899:11947): Se reserva el frame 0 para el PID 1
+[INFO] 19:54:32:656 Memory/(11899:11947): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:54:32:656 Memory/(11899:11947): Buscamos la tabla del PID 1 ...
+[INFO] 19:54:32:656 Memory/(11899:11947): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:54:32:657 Memory/(11899:11947): Se reserva el frame 1 para el PID 1
+[INFO] 19:54:32:657 Memory/(11899:11947): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:54:32:657 Memory/(11899:11947): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 19:58:02:778 Memory/(12023:12023): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:58:02:842 Memory/(12023:12023): Estructuras administrativas inicializadas
+[INFO] 19:58:16:359 Memory/(12023:12076): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:58:16:359 Memory/(12023:12076): Buscamos la tabla del PID 1 ...
+[INFO] 19:58:16:359 Memory/(12023:12076): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:58:16:359 Memory/(12023:12076): Se reserva el frame 0 para el PID 1
+[INFO] 19:58:16:359 Memory/(12023:12076): Se creo la pagina 0 con frame 0 para el PID 1
+[INFO] 19:58:16:360 Memory/(12023:12076): Buscamos la tabla del PID 1 ...
+[INFO] 19:58:16:360 Memory/(12023:12076): Encontramos la tabla del PID 1 en tabla de paginas de primer nivel nro 0
+[INFO] 19:58:16:360 Memory/(12023:12076): Se reserva el frame 1 para el PID 1
+[INFO] 19:58:16:360 Memory/(12023:12076): Se creo la pagina 1 con frame 1 para el PID 1
+[INFO] 19:58:16:360 Memory/(12023:12076): Se asigna la pagina de primer nivel con ID 0 al PID 1
+[INFO] 17:12:53:270 Memory/(7196:7196): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 17:12:53:338 Memory/(7196:7196): Estructuras administrativas inicializadas
+[INFO] 17:12:54:193 Memory/(7196:7196): SWAP FILE CREATED
+[INFO] 18:51:51:074 Memory/(4997:4997): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:52:21:798 Memory/(5015:5015): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:54:57:321 Memory/(5117:5117): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:55:49:846 Memory/(5194:5194): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 18:55:49:848 Memory/(5194:5194): Estructuras administrativas inicializadas
+[INFO] 18:55:49:864 Memory/(5194:5194): SWAP FILE CREATED
+[INFO] 18:55:49:864 Memory/(5194:5194): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 18:55:49:864 Memory/(5194:5194): Se reservaron frames para el PID 1
+[INFO] 18:55:49:864 Memory/(5194:5194): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 18:55:49:864 Memory/(5194:5194): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 18:55:49:865 Memory/(5194:5194): Se creo la pagina 2 con frame -1 para el PID 1
+[INFO] 18:55:49:865 Memory/(5194:5194): Se creo la pagina 3 con frame -1 para el PID 1
+[INFO] 18:55:49:865 Memory/(5194:5194): Se crea la tabla de paginas ID: 0  al PID: 1
+[INFO] 19:18:56:999 Memory/(5439:5439): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:18:56:999 Memory/(5439:5439): Estructuras administrativas inicializadas
+[INFO] 19:18:57:016 Memory/(5439:5439): SWAP FILE CREATED
+[INFO] 19:18:57:016 Memory/(5439:5439): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:18:57:016 Memory/(5439:5439): Se reservaron frames para el PID 1
+[INFO] 19:18:57:016 Memory/(5439:5439): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 19:18:57:016 Memory/(5439:5439): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 19:18:57:016 Memory/(5439:5439): Se creo la pagina 2 con frame -1 para el PID 1
+[INFO] 19:18:57:016 Memory/(5439:5439): Se creo la pagina 3 con frame -1 para el PID 1
+[INFO] 19:18:57:017 Memory/(5439:5439): Se crea la tabla de paginas ID: 0  al PID: 1
+[INFO] 19:18:57:017 Memory/(5439:5439): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 19:18:57:017 Memory/(5439:5439): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 19:19:36:627 Memory/(5497:5497): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:19:36:628 Memory/(5497:5497): Estructuras administrativas inicializadas
+[INFO] 19:19:36:642 Memory/(5497:5497): SWAP FILE CREATED
+[INFO] 19:19:36:643 Memory/(5497:5497): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:19:36:643 Memory/(5497:5497): Se reservaron frames para el PID 1
+[INFO] 19:19:36:643 Memory/(5497:5497): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 19:19:36:643 Memory/(5497:5497): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 19:19:36:643 Memory/(5497:5497): Se creo la pagina 2 con frame -1 para el PID 1
+[INFO] 19:19:36:643 Memory/(5497:5497): Se creo la pagina 3 con frame -1 para el PID 1
+[INFO] 19:19:36:643 Memory/(5497:5497): Se crea la tabla de paginas ID: 0  al PID: 1
+[INFO] 19:19:36:643 Memory/(5497:5497): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 19:19:36:643 Memory/(5497:5497): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 19:19:36:644 Memory/(5497:5497): Result: -1
+[INFO] 19:21:13:758 Memory/(5559:5559): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:21:13:759 Memory/(5559:5559): Estructuras administrativas inicializadas
+[INFO] 19:21:13:812 Memory/(5559:5559): SWAP FILE CREATED
+[INFO] 19:21:13:813 Memory/(5559:5559): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:21:13:817 Memory/(5559:5559): Se reservaron frames para el PID 1
+[INFO] 19:21:13:817 Memory/(5559:5559): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 19:21:13:817 Memory/(5559:5559): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 19:21:13:817 Memory/(5559:5559): Se creo la pagina 2 con frame -1 para el PID 1
+[INFO] 19:21:13:818 Memory/(5559:5559): Se creo la pagina 3 con frame -1 para el PID 1
+[INFO] 19:21:13:818 Memory/(5559:5559): Se crea la tabla de paginas ID: 0  al PID: 1
+[INFO] 19:21:13:818 Memory/(5559:5559): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 19:21:13:819 Memory/(5559:5559): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 19:21:13:819 Memory/(5559:5559): PAGE FAULT! La pag 0 del proceso 1, segmento 1 no se encuentra en memoria
+[INFO] 19:21:13:819 Memory/(5559:5559): Cargando la pagina 0 de swap a memoria, PID 1
+[INFO] 19:23:00:216 Memory/(5625:5625): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:23:01:784 Memory/(5625:5625): Estructuras administrativas inicializadas
+[INFO] 19:23:03:649 Memory/(5625:5625): SWAP FILE CREATED
+[INFO] 19:23:05:079 Memory/(5625:5625): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:23:05:079 Memory/(5625:5625): Se reservaron frames para el PID 1
+[INFO] 19:23:05:080 Memory/(5625:5625): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 19:23:05:080 Memory/(5625:5625): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 19:23:05:080 Memory/(5625:5625): Se creo la pagina 2 con frame -1 para el PID 1
+[INFO] 19:23:05:080 Memory/(5625:5625): Se creo la pagina 3 con frame -1 para el PID 1
+[INFO] 19:23:05:080 Memory/(5625:5625): Se crea la tabla de paginas ID: 0  al PID: 1
+[INFO] 19:23:05:080 Memory/(5625:5625): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 19:23:05:080 Memory/(5625:5625): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 19:23:05:080 Memory/(5625:5625): PAGE FAULT! La pag 0 del proceso 1, segmento 1 no se encuentra en memoria
+[INFO] 19:23:39:528 Memory/(5625:5625): Cargando la pagina 0 de swap a memoria, PID 1
+[INFO] 19:26:18:739 Memory/(5756:5756): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:26:18:743 Memory/(5756:5756): Estructuras administrativas inicializadas
+[INFO] 19:26:18:788 Memory/(5756:5756): SWAP FILE CREATED
+[INFO] 19:26:18:788 Memory/(5756:5756): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:26:18:788 Memory/(5756:5756): Se reservaron frames para el PID 1
+[INFO] 19:26:18:788 Memory/(5756:5756): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 19:26:18:788 Memory/(5756:5756): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 19:26:18:789 Memory/(5756:5756): Se creo la pagina 2 con frame -1 para el PID 1
+[INFO] 19:26:18:789 Memory/(5756:5756): Se creo la pagina 3 con frame -1 para el PID 1
+[INFO] 19:26:18:789 Memory/(5756:5756): Se crea la tabla de paginas ID: 0  al PID: 1
+[INFO] 19:26:18:789 Memory/(5756:5756): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 19:26:18:789 Memory/(5756:5756): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 19:26:18:789 Memory/(5756:5756): PAGE FAULT! La pag 0 del proceso 1, segmento 1 no se encuentra en memoria
+[INFO] 19:26:18:789 Memory/(5756:5756): Se encontro frame libre para la pagina 0 -- PID 1 -- FRAME: 0
+[INFO] 19:26:18:790 Memory/(5756:5756): Result: 0
+[INFO] 19:26:25:198 Memory/(5770:5770): Hay 64 frames de 64 bytes en memoria principal
+[INFO] 19:26:25:208 Memory/(5770:5770): Estructuras administrativas inicializadas
+[INFO] 19:26:25:247 Memory/(5770:5770): SWAP FILE CREATED
+[INFO] 19:26:25:247 Memory/(5770:5770): Se encontro espacio libre en la tabla de 1er nivel para el PID 1
+[INFO] 19:26:25:247 Memory/(5770:5770): Se reservaron frames para el PID 1
+[INFO] 19:26:25:247 Memory/(5770:5770): Se creo la pagina 0 con frame -1 para el PID 1
+[INFO] 19:26:25:248 Memory/(5770:5770): Se creo la pagina 1 con frame -1 para el PID 1
+[INFO] 19:26:25:248 Memory/(5770:5770): Se creo la pagina 2 con frame -1 para el PID 1
+[INFO] 19:26:25:248 Memory/(5770:5770): Se creo la pagina 3 con frame -1 para el PID 1
+[INFO] 19:26:25:248 Memory/(5770:5770): Se crea la tabla de paginas ID: 0  al PID: 1
+[INFO] 19:26:25:248 Memory/(5770:5770): Buscamos la tabla del PID 1 y segmento 1 ...
+[INFO] 19:26:25:248 Memory/(5770:5770): Encontramos la tabla del PID 1, segmento: 1
+[INFO] 19:26:25:248 Memory/(5770:5770): PAGE FAULT! La pag 0 del proceso 1, segmento 1 no se encuentra en memoria
+[INFO] 19:26:25:248 Memory/(5770:5770): Se encontro frame libre para la pagina 0 -- PID 1 -- FRAME: 0
+[INFO] 19:26:25:248 Memory/(5770:5770): Result: 0

@@ -1,0 +1,149 @@
+/*
+ * tlb.c
+ *
+ *  Created on: 4 oct. 2022
+ *      Author: utnso
+ */
+#include "../include/tlb.h"
+#include "../include/config_cpu.h"
+#include "../../shared/include/client_memoria.h"
+
+t_list* SEGMENT_TABLE;
+
+t_list* TLB;
+
+pthread_mutex_t mutexTiempoTLB;
+pthread_mutex_t mutexTLB;
+
+int32_t TIEMPO_TLB;
+int32_t PUNTERO_FIFO;
+int32_t PUNTERO_LRU;
+
+int32_t ENTRADAS_TLB;
+char* REEMPLAZO_TLB;
+
+int TLB_MISS =-1;
+
+void init_tlb() {
+	SEGMENT_TABLE = list_create();
+	TLB = list_create();
+	TIEMPO_TLB = 0;
+	PUNTERO_FIFO = 0;
+	PUNTERO_LRU = 0;
+	ENTRADAS_TLB = get_entradas_tlb();
+	REEMPLAZO_TLB = get_reemplazo_tlb();
+	log_info(get_log(), "TLB inicializada correctamente");
+
+}
+
+int32_t consult_tlb(int32_t pid, int32_t segment, int32_t page){
+	//busco si existe la entrada
+
+	bool is_the_entry(t_tlb_entry* entry_aux) {
+			return entry_aux->pid == pid && entry_aux->segment == segment
+					&& entry_aux->page == page;
+		}
+
+
+		t_tlb_entry* record = list_find(TLB,(void*)is_the_entry);
+
+		//actualizo el tiempo de consulta y retorno frame
+		if(record != NULL){
+			record->last_use = PUNTERO_LRU++;
+
+			return record->frame;
+
+		}
+		//no encontré,
+		return TLB_MISS;
+
+}
+
+
+void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
+
+	bool is_the_entry(t_tlb_entry* entry_aux) {
+		return entry_aux->pid == pid && entry_aux->segment == segment
+				&& entry_aux->page == page;
+	}
+
+	//busco si existe la entrada
+	t_tlb_entry* record = list_find(TLB,(void*)is_the_entry );
+	if(record == NULL){
+
+		if(TLB->elements_count < ENTRADAS_TLB){
+			record =  malloc(sizeof(t_tlb_entry));
+			record->pid = pid;
+			record->segment = segment;
+			record->page = page;
+			record->frame = frame;
+			record->last_use = PUNTERO_LRU++;
+
+			list_add(TLB,(void*) record);
+			return;
+		}
+
+		t_tlb_entry* victim;
+
+		if(REEMPLAZO_TLB == "LRU"){
+
+			bool sort_by_lru(t_tlb_entry* record_aux1,t_tlb_entry* record_aux2 ){
+						return record_aux1->last_use < record_aux2->last_use;
+			}
+			t_list* list_sorted_by_time = list_sorted(TLB,(void*) sort_by_lru);
+			victim = list_get(list_sorted_by_time,0);
+
+			victim->pid = pid;
+			victim->segment = segment;
+			victim->page = page;
+			victim->frame = frame;
+			victim->last_use =PUNTERO_LRU++;
+
+			list_destroy(list_sorted_by_time);
+		}else{
+			victim = list_get(TLB,PUNTERO_FIFO);
+			victim->pid = pid;
+			victim->segment = segment;
+			victim->page = page;
+			victim->frame = frame;
+			victim->last_use =PUNTERO_LRU++;
+
+			update_fifo_pointer();
+
+		}
+
+
+	}else{
+		record->frame = frame;
+		record->last_use = PUNTERO_LRU++;
+	}
+
+
+}
+
+void update_fifo_pointer(){
+
+	if(PUNTERO_FIFO < (ENTRADAS_TLB -1)){
+			PUNTERO_FIFO++;
+	}
+
+	if(PUNTERO_FIFO == (ENTRADAS_TLB -1) ){
+		PUNTERO_FIFO =0;
+	}
+}
+
+void finalize_process_tlb(int32_t pid){
+	//eliminar todos los registros pertenecientes a la tlb
+	bool has_pid(t_tlb_entry* aux){
+		return aux->pid == pid;
+	}
+
+	void destroy_tlb_entry(t_tlb_entry* aux){
+		free(aux);
+	}
+
+	list_remove_and_destroy_all_by_condition(TLB,(void*)has_pid,(void*)destroy_tlb_entry);
+}
+
+
+
