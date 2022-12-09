@@ -69,8 +69,6 @@ void inicializar_diccionario() {
     dictionary_put(colas,"READY_RR",queue_create());
     dictionary_put(colas,"EXECUTE",queue_create());
     dictionary_put(colas,"EXIT",queue_create());
-    dictionary_put(colas,"PANTALLA",queue_create());
-    dictionary_put(colas,"TECLADO",queue_create());
     dictionary_put(colas,"PAGE_FAULT",queue_create());
 }
 
@@ -143,8 +141,6 @@ void inicializar_semaforos() {
     contador_colas_block = dictionary_create();
     sem_hilos_block = dictionary_create();
     mutex_colas_block = dictionary_create();
-    crear_semaforos_y_mutex_de_cola_block_dinamica("PANTALLA");
-    crear_semaforos_y_mutex_de_cola_block_dinamica("TECLADO");
     crear_semaforos_y_mutex_de_cola_block_dinamica("PAGE_FAULT");
 }
 
@@ -195,8 +191,6 @@ void destruir_semaforos() {
     sem_destroy(&sem_finaliza_timer_quantum);
 
     // BLOCK
-    destruir_semaforos_y_mutex_de_cola_block_dinamica("PANTALLA");
-    destruir_semaforos_y_mutex_de_cola_block_dinamica("TECLADO");
     destruir_semaforos_y_mutex_de_cola_block_dinamica("PAGE_FAULT");
     dictionary_destroy(contador_colas_block);
     dictionary_destroy(sem_hilos_block);
@@ -218,12 +212,6 @@ void inicializar_planificadores() {
 
     pthread_create(&hilo_cuenta_quantum, NULL, (void*)hilo_timer_contador_quantum, NULL);
 	pthread_detach(hilo_cuenta_quantum);
-
-    pthread_create(&hilo_block_pantalla, NULL, (void*)hilo_planificador_block_pantalla, NULL);
-	pthread_detach(hilo_block_pantalla);
-
-    pthread_create(&hilo_block_teclado, NULL, (void*)hilo_planificador_block_teclado, NULL);
-	pthread_detach(hilo_block_teclado);
 
     pthread_create(&hilo_block_page_fault, NULL, (void*)hilo_planificador_block_page_fault, NULL);
 	pthread_detach(hilo_block_page_fault);

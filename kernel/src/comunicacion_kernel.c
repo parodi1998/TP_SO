@@ -14,6 +14,22 @@ static void carga_tabla_segmentos_pcb( t_list** lista_a_cargar, t_list* segmento
     *lista_a_cargar = tabla_segmentos;
 }
 
+static void crear_colas_de_block_teclado_y_pantalla_por_proceso(char* key) {
+
+    sem_t* mutex = malloc(sizeof(sem_t));
+    sem_t* contador = malloc(sizeof(sem_t));
+    sem_t* sem_hilo = malloc(sizeof(sem_t));
+
+    sem_init(mutex, SEM_NOT_SHARE_BETWEEN_PROCESS, 1); 
+	sem_init(contador, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
+	sem_init(sem_hilo, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
+
+    dictionary_put(colas, key, queue_create());
+    dictionary_put(mutex_colas_block ,key, mutex);
+    dictionary_put(contador_colas_block, key, contador);
+    dictionary_put(sem_hilos_block, key, sem_hilo);
+}
+
 static void procesar_conexion(void* void_args) {
     t_procesar_conexion_args* args = (t_procesar_conexion_args*) void_args;
     t_log* logger = args->log;
@@ -71,9 +87,18 @@ static void procesar_conexion(void* void_args) {
                 meter_proceso_en_new(pcb_proceso);
 
                 id_proceso = string_itoa(pcb_proceso->id_proceso);
-
                 dictionary_put(dato_ingreso_por_teclado, id_proceso, string_new());
 
+                crear_colas_de_block_teclado_y_pantalla_por_proceso(string_from_format("%d-PANTALLA",pcb_proceso->id_proceso));
+                crear_colas_de_block_teclado_y_pantalla_por_proceso(string_from_format("%d-TECLADO",pcb_proceso->id_proceso));
+
+                pthread_t* hilo_block_io_teclado = malloc(sizeof(pthread_t));
+                pthread_create(hilo_block_io_teclado, NULL, (void*)hilo_planificador_block_teclado, (void*) string_from_format("%d-TECLADO",pcb_proceso->id_proceso));
+	            pthread_detach(*hilo_block_io_teclado);
+
+                pthread_t* hilo_block_io_pantalla = malloc(sizeof(pthread_t));
+                pthread_create(hilo_block_io_pantalla, NULL, (void*)hilo_planificador_block_pantalla, (void*) string_from_format("%d-PANTALLA",pcb_proceso->id_proceso));
+                pthread_detach(*hilo_block_io_pantalla);
 
                 break;
             case CONSOLA_EXIT:

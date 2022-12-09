@@ -294,8 +294,6 @@ void hilo_planificador_corto_plazo_execute() {
 			meter_proceso_en_exit(proceso);
 			sem_post(&sem_cpu_libre);
 		} else {
-			//log_info(logger,"El proceso volvio de cpu con exito");
-			//log_info(logger,"PC actualizado: %d", proceso_recibido->program_counter);
 
 			log_info(logger,"PROCESO DESPUES DE VOLVER DE CPU");
 			log_pcb(logger, proceso_recibido);
@@ -306,7 +304,11 @@ void hilo_planificador_corto_plazo_execute() {
 				meter_proceso_en_exit(proceso_recibido);
 				sem_post(&sem_cpu_libre);
 			} else if(proceso_recibido->debe_ser_bloqueado) {
-				meter_proceso_en_block(proceso_recibido, proceso_recibido->dispositivo_bloqueo);
+				if(string_equals_ignore_case(proceso_recibido->dispositivo_bloqueo,"PANTALLA") || string_equals_ignore_case(proceso_recibido->dispositivo_bloqueo,"TECLADO")) {
+					meter_proceso_en_block(proceso_recibido, string_from_format("%d-%s",proceso_recibido->id_proceso, proceso_recibido->dispositivo_bloqueo));
+				} else {
+					meter_proceso_en_block(proceso_recibido, proceso_recibido->dispositivo_bloqueo);
+				}
 				sem_post(&sem_cpu_libre);
 			} else {
 				devolver_proceso_a_ready(proceso_recibido);
@@ -338,12 +340,13 @@ void hilo_timer_contador_quantum() {
 void meter_proceso_en_block(t_pcb* proceso, char* key_cola_de_bloqueo) {
 	sem_t* mutex_pointer = dictionary_get(mutex_colas_block ,key_cola_de_bloqueo);
 	sem_t* contador_pointer = dictionary_get(contador_colas_block, key_cola_de_bloqueo);
-	sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
+	sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);	
 	sem_wait(mutex_pointer);
 	actualizar_estado_proceso(logger_kernel_obligatorio, proceso, PCB_BLOCK);
 	t_queue* cola_block_dinamica = dictionary_get(colas,key_cola_de_bloqueo);
 	queue_push(cola_block_dinamica, proceso);
-	log_motivo_de_bloqueo(logger_kernel_obligatorio, proceso, key_cola_de_bloqueo);
+	//log_motivo_de_bloqueo(logger_kernel_obligatorio, proceso, key_cola_de_bloqueo);
+	log_motivo_de_bloqueo(logger_kernel_obligatorio, proceso, proceso->dispositivo_bloqueo);
 	sem_post(mutex_pointer);
 
 	sem_post(contador_pointer);
@@ -383,8 +386,8 @@ void hilo_planificador_block_io(void* args) {
 	}
 }
 
-void hilo_planificador_block_pantalla() {
-	char* key_cola_de_bloqueo = "PANTALLA";
+void hilo_planificador_block_pantalla(void* args) {
+	char* key_cola_de_bloqueo = args;
 	while(1) {
 		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
 		sem_wait(sem_hilo_pointer);
@@ -424,7 +427,7 @@ void hilo_planificador_block_pantalla() {
 }
 
 void hilo_planificador_block_teclado(void* args) {
-	char* key_cola_de_bloqueo = "TECLADO";
+	char* key_cola_de_bloqueo = args;
 	while(1) {
 		sem_t* sem_hilo_pointer = dictionary_get(sem_hilos_block, key_cola_de_bloqueo);
 		sem_wait(sem_hilo_pointer);
