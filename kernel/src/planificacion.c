@@ -252,7 +252,7 @@ void devolver_proceso_a_ready(t_pcb* proceso) {
 
 	t_queue* cola_ready_fifo = dictionary_get(colas,"READY_FIFO");
 	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
-
+	log_proceso_desalojado_por_quantum(logger, proceso);
 	if(queue_is_empty(cola_ready_fifo) && queue_is_empty(cola_ready_rr)) {
 		meter_proceso_en_execute(proceso);
 	} else {
@@ -286,7 +286,7 @@ void hilo_planificador_corto_plazo_execute() {
 
 		recv(fd_cpu_dispatch, &cod_op, sizeof(op_code), MSG_WAITALL);
 
-		log_info(logger,"op_code %d", cod_op);
+		//log_info(logger,"op_code %d", cod_op);
 
 		if(!recv_pcb(logger, fd_cpu_dispatch, &proceso_recibido) || cod_op != PCB_KERNEL) {
             log_error(logger,"Hubo un error al recibir el proceso de cpu, por lo que se procede a finalizar el mismo.");
@@ -324,9 +324,9 @@ void hilo_timer_contador_quantum() {
 	while(1) {
 		sem_wait(&sem_comienza_timer_quantum);
 
-		float quantum_in_seconds = atoi(config_kernel->quantum_RR) / 1000;
+		uint32_t quantum_in_seconds = atoi(config_kernel->quantum_RR);
 		
-		sleep(quantum_in_seconds);
+		usleep(quantum_in_seconds*1000);
 
 		if(!send_interrumpir_cpu_from_kernel(logger, fd_cpu_interrupt)) {
 			log_error(logger,"No se envio la interrupcion a cpu correctamente");
@@ -376,9 +376,9 @@ void hilo_planificador_block_io(void* args) {
 		char* tiempo_io_string = dictionary_get(tiempos_io, key_cola_de_bloqueo);
 		uint32_t tiempo_io_en_milis = atoi(tiempo_io_string) * proceso->unidades_de_trabajo;
 
-		float io_block_in_seconds = tiempo_io_en_milis / 1000;
+		//float io_block_in_seconds = tiempo_io_en_milis / 1000;
 		
-		sleep(io_block_in_seconds);
+		usleep(tiempo_io_en_milis*1000);
 
 		proceso->debe_ser_bloqueado = false;
 

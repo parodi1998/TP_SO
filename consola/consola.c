@@ -93,7 +93,6 @@ int main(int argc, char** argv){
     uint32_t dato_a_escribir_por_teclado = 0;
     char* dato_a_mostrar_en_pantalla = string_new();
     uint32_t tiempo_pantalla_wait_in_milis = atoi(config_consola->tiempo_pantalla);
-    float tiempo_pantalla_wait_in_seconds = tiempo_pantalla_wait_in_milis / 1000;
 	
     while(mantener_conexion) {
 
@@ -104,7 +103,7 @@ int main(int argc, char** argv){
             case CONSOLA_PANTALLA:
                 recv_mostrar_dato_en_pantalla_from_kernel(logger,fd, &dato_a_mostrar_en_pantalla);
                 printf("\nDATO RECIBIDO: %s\n",dato_a_mostrar_en_pantalla);
-                sleep(tiempo_pantalla_wait_in_seconds);
+                usleep(tiempo_pantalla_wait_in_milis*1000);
                 send_fin_mostrar_dato_en_pantalla_from_consola(logger, fd);
                 break;
             case CONSOLA_TECLADO:

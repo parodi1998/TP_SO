@@ -133,7 +133,7 @@ void accederMemoria(int pid, t_list* tabla_segmentos){
 		free(traduccion_mmu);
 		break;
 	default: 
-		sleep((float)(get_retardo_instruccion()/1000));
+		usleep(get_retardo_instruccion()*1000);
 		break;
 
 	}
@@ -377,6 +377,33 @@ int check_interrupt(int devuelve){
 	return devuelve;
 }
 
+static char* tipo_devolucion_string(int codigo) {
+	char* respuesta = string_new();
+	switch(codigo) {
+		case OPTIMO:
+			respuesta = "OPTIMO";
+			break;
+		case BLOQUEO:
+			respuesta = "BLOQUEO";
+			break;
+		case INTERRUPCION:
+			respuesta = "INTERRUPCION";
+			break;
+		case PAGE_DEFAULT:
+			respuesta = "PAGE_DEFAULT";
+			break;
+		case FINALIZADO:
+			respuesta = "FINALIZADO";
+			break;
+		case ERROR_SEGMENTATION_FAULT:
+			respuesta = "ERROR_SEGMENTATION_FAULT";
+			break;
+		case ERROR_INSTRUCCION:
+			respuesta = "ERROR_INSTRUCCION";
+			break;
+	}
+	return respuesta;
+}
 
 int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, int pid)
 {
@@ -414,6 +441,7 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 	}
 
 	//devuelve = check_interrupt(devuelve);
+	//log_info(get_log(),"DEVUELVE: %s", tipo_devolucion_string(devuelve));
 
 	return devuelve;
 }

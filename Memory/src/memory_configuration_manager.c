@@ -52,7 +52,7 @@ char* algorithm(){
     return replacement_algorithm;
 }
 uint32_t swap_time(){
-    return swap_delay_time;
+    return swap_delay_time * 1000;
 }
 uint32_t frames_per_table_getter(){
     return frames_per_process;
