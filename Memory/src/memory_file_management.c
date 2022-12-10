@@ -681,13 +681,15 @@ t_list* get_free_frames() {
 	return list_filter(FRAMES, (void*) is_free);
 }
 
-void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
+char* swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 	table_page* table = find_table_with_pid(pid,segment);
 	t_page* page = list_get(table->pages,page_number);
 
 
 
 	t_page* page_victim = execute_swapping(pid);
+	char* response = string_from_format("%d|%d",page_victim->segment,page_victim->id);
+
 	int32_t frame = page_victim->frame;
 
 	if(page->pos_swap != -1){
@@ -702,6 +704,7 @@ void swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 	page->present = true;
 	page->frame = frame;
 	page->modified = false;
+	return response;
 }
 
 char* config_cpu(){

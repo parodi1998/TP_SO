@@ -308,14 +308,14 @@ void* procesar_traducir_direccion(char* string,int* size, int* op_code){
 
 void* procesar_swapping(char* string, int* size,int* op_code){
 	//ENTRADA: <PID>|<SEGMENTO>|<PAGINA>
-	//SALIDA: OK
+	//SALIDA: <SEGMENTO>|<PAGINA> de la victima
 	char** array = string_split(string,"|");
-		uint32_t pid = (volatile uint32_t) atoi( array[0]);
-		uint32_t segment = (volatile uint32_t) atoi( array[1]);
-		uint32_t page_number = (volatile uint32_t) atoi( array[2]);
-		swap_page(pid, segment,page_number);
-		*size = string_length("OK")+1;
-		*op_code = OK;
-		return (void*)"OK";
+	uint32_t pid = (volatile uint32_t) atoi( array[0]);
+	uint32_t segment = (volatile uint32_t) atoi( array[1]);
+	uint32_t page_number = (volatile uint32_t) atoi( array[2]);
+	char* response =swap_page(pid, segment,page_number);
+	*size = string_length(response);
+	*op_code = OK;
+	return (void*)response;
 
 }

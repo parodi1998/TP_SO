@@ -116,7 +116,7 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 	if(desplazamiento_segmento > segmento->tam){
 		log_info(get_log(),"desplazamiento_segmento > segmento->tam");
 		respuesta->fue_segmentation_fault = true;
-		return respuesta;;
+		return respuesta;
 	}
 
 	uint32_t tlb_result = consult_tlb(pid,num_segmento, num_pagina); 
@@ -136,16 +136,6 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 	return respuesta;
 }
 
-// EN CASO DE OBTENER UN TLB MISS, LLAMAR A ESTA FUNCION PARA
-// OBTENER EL FRAME DEL MODULO DE MEMORIA O UN PAGE FAULT EN SU DEFECTO
-
-//SI SE OBTIENE UN PF, Se deberá realizar lo siguiente
-/*
-	 * devolver el contexto de ejecución al Kernel sin actualizar el valor del program counter.
-	 * Deberemos indicarle al Kernel qué segmento y número de página
-	 * fueron los que generaron el page fault para que éste resuelva el mismo.
-	 *
-	 */
 
 int32_t find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura) {
 
