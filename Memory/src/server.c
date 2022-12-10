@@ -158,6 +158,7 @@ void process_request_memory(int cod_op, int cliente_fd) {
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_swapping(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			devolver_mensaje_memory(response,size, fd_client_cpu,ACTUALIZAR_TLB);
 			break;
 		case SUSPENDER_PROCESO:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
@@ -313,7 +314,7 @@ void* procesar_swapping(char* string, int* size,int* op_code){
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
 	uint32_t page_number = (volatile uint32_t) atoi( array[2]);
-	char* response =swap_page(pid, segment,page_number);
+	char* response = swap_page(pid, segment,page_number);
 	*size = string_length(response);
 	*op_code = OK;
 	return (void*)response;

@@ -18,6 +18,11 @@ int PAGE_FAULT = -1;
 uint32_t segmento_page_fault = 0;
 uint32_t pagina_page_fault = 0;
 
+pthread_t hilo_tlb;
+pthread_mutex_t mutex_tlb;
+
+
+
 static bool conectar_cpu_a_memoria(int* fd) {
     *fd = crear_conexion(get_log(), "CPU_CLIENTE_MEMORIA", get_ip_memoria(),  get_puerto_memoria());
     return fd != 0;
@@ -40,44 +45,9 @@ bool iniciar_mmu(){
 	free(config_string);
 	log_info(get_log(),"MMU INICIADA CORRECTAMENTE");
 	init_tlb();
-//	mockMMU();
 	return true;
 }
 
-void mockMMU(){
-	t_list* tabla_segmento = list_create();
-	t_segmento* segmento = NULL;
-	segmento = malloc(sizeof(t_segmento));
-	segmento->nro = 0;
-	segmento->nro_indice_tabla_paginas = 0;
-	segmento->tam = 64;
-
-	list_add(tabla_segmento,segmento );
-
-	segmento = malloc(sizeof(t_segmento));
-	segmento->nro = 1;
-	segmento->nro_indice_tabla_paginas = 1;
-	segmento->tam = 128;
-
-	list_add(tabla_segmento,segmento );
-
-	segmento = malloc(sizeof(t_segmento));
-	segmento->nro = 2;
-	segmento->nro_indice_tabla_paginas = 2;
-	segmento->tam = 256;
-
-	list_add(tabla_segmento,segmento );
-
-	uint32_t pid =0;
-	uint32_t rta;
-	t_translation_response_mmu* response = NULL;
-//	response = traducir_direccion_logica(0,tabla_segmento,45,1);
-//	log_info(get_log(),"RTA: %d",response->direccion_fisica);
-//	response = traducir_direccion_logica(0,tabla_segmento,257,1);
-//	log_info(get_log(),"RTA: %d",response->direccion_fisica);
-
-
-}
 
 int get_socket(){
 	return CONEXION_MEMORIA;
@@ -85,7 +55,7 @@ int get_socket(){
 
 
 t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_segmentos,int32_t dir_logica, int32_t es_escritura){
-
+	pthread_mutex_lock(&mutex_tlb);
 	t_translation_response_mmu* respuesta = malloc(sizeof(t_translation_response_mmu));
 
 	respuesta->fue_page_fault = false;
@@ -110,12 +80,14 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 	if(segmento == NULL){
 		log_info(get_log(),"segmento == NULL");
 		respuesta->fue_page_fault = true;
+		pthread_mutex_unlock(&mutex_tlb);
 		return respuesta;
 	}
 
 	if(desplazamiento_segmento > segmento->tam){
 		log_info(get_log(),"desplazamiento_segmento > segmento->tam");
 		respuesta->fue_segmentation_fault = true;
+		pthread_mutex_unlock(&mutex_tlb);
 		return respuesta;
 	}
 
@@ -127,12 +99,13 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 		direccion_fisica = find_frame_in_memory_module(pid, num_segmento, num_pagina, es_escritura);
 		if(direccion_fisica == PAGE_FAULT){
 			respuesta->fue_page_fault = true;
+			pthread_mutex_unlock(&mutex_tlb);
 			return respuesta;
 		}
 	}
 	log_info(get_log(),"PID: %d - TLB HIT - Segmento: <%d> - Pagina: %d",pid,num_segmento,num_pagina);
 	respuesta->direccion_fisica = (direccion_fisica * TAMANIO_PAGINA) + desplazamiento_pagina;
-
+	pthread_mutex_unlock(&mutex_tlb);
 	return respuesta;
 }
 
@@ -145,7 +118,7 @@ char* response_from_module = traducir_memoria(CONEXION_MEMORIA,get_log(),pid,seg
 char** parts = string_split(response_from_module, "|");
 
 //verifico si hubo page fault
-if (parts[0] == "1") {
+if (strcmp(parts[0],"1") == 0) {
 	//hubo pagefault
 	log_info(get_log(),"Fue PAGE_FAULT en pid: %d segmento: %d pagina: %d", pid, segment, page);
 	return PAGE_FAULT;
@@ -158,8 +131,34 @@ if (parts[0] == "1") {
 
 }
 
+void verificar_pedidos_tlb(){
+	//funcion asincronica que actualiza la tlb quitando la entrada victima
+	pthread_create(&hilo_tlb, NULL, (void*) recibir_actualizacion_tlb, NULL);
+	pthread_detach(hilo_tlb);
+}
 
-
+void recibir_actualizacion_tlb(){
+	pthread_mutex_lock(&mutex_tlb);
+	bool active = true;
+	int size;
+	void* buffer;
+	void* rta;
+	while(active){
+		if(recv(CONEXION_MEMORIA, &size, sizeof(int), MSG_WAITALL) != -1){
+			log_info(get_log(),"recibiendo info de memoria");
+			buffer = malloc(size);
+			recv(CONEXION_MEMORIA, buffer,size, MSG_WAITALL);
+			log_info(get_log(),"RESPUESTA ACTUALIZAR TLB %s",(char*)buffer);
+			char** array = string_split((char*)buffer,"|");
+			uint32_t pid = (volatile uint32_t) atoi( array[0]);
+			uint32_t segmento = (volatile uint32_t) atoi( array[1]);
+			uint32_t pagina = (volatile uint32_t) atoi( array[2]);
+			delete_entry_tlb(pid, segmento, pagina);
+			active = false;
+		}
+	}
+	pthread_mutex_unlock(&mutex_tlb);
+}
 
 
 

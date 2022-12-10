@@ -688,7 +688,7 @@ char* swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 
 
 	t_page* page_victim = execute_swapping(pid);
-	char* response = string_from_format("%d|%d",page_victim->segment,page_victim->id);
+	char* response = string_from_format("%d|%d|%d",page_victim->pid,page_victim->segment,page_victim->id);
 
 	int32_t frame = page_victim->frame;
 
@@ -704,6 +704,7 @@ char* swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 	page->present = true;
 	page->frame = frame;
 	page->modified = false;
+
 	return response;
 }
 

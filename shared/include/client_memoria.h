@@ -33,7 +33,8 @@ typedef enum
 		PAGE_FAULT_MEMORIA = 8,
 		SWAP_PAGE_MEMORIA = 9,
 		OK = 10,
-		ERROR = 11
+		ERROR = 11,
+		ACTUALIZAR_TLB = 12
 } op_code_memoria;
 
 

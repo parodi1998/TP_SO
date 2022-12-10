@@ -33,7 +33,8 @@ typedef enum
 	PAGE_FAULT = 8,
 	SWAP_PAGE = 9,
 	OK = 10,
-	ERROR = 11
+	ERROR = 11,
+	ACTUALIZAR_TLB = 12
 }op_code;
 
 typedef struct
@@ -70,5 +71,4 @@ void* procesar_mensaje_escribir(char* string,int* size, int* op_code);
 void* procesar_mensaje_leer(char* string,int* size, int* op_code);
 void* procesar_traducir_direccion(char* string,int* size, int* op_code);
 void* procesar_swapping(char* string, int* size,int* op_code);
-
 #endif /* SERVER_H_ */

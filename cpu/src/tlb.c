@@ -147,7 +147,7 @@ void finalize_process_tlb(int32_t pid){
 	imprimir_tlb();
 }
 
-void delete_entry_tlb(uint32_t pid, uint32_t page, uint32_t segment){
+void delete_entry_tlb(uint32_t pid, uint32_t segment, uint32_t page){
 
 	log_info(get_log(),"TLB- DELETE ENTRY - PID: %d - SEGMENTO: %d - PAGINA: %d",pid,segment,page);
 

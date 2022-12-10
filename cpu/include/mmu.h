@@ -26,5 +26,6 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 bool iniciar_mmu();
 int32_t find_frame_in_memory_module(int32_t pid, int32_t segment,int32_t page, int32_t es_escritura);
 int get_socket();
-
+void recibir_actualizacion_tlb();
+void verificar_pedidos_tlb();
 #endif /* MMU_H_ */
