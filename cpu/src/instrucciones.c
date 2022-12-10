@@ -352,6 +352,7 @@ int ejecutar(int pid){
 		break;
 	case EXIT:
 		estado = ins_exit();
+		finalize_process_tlb(pid); // PIDO QUE LIMPIE LOS REGISTROS DEL PID EN LA TLB
 		break;
 	default:
 		estado = ERROR_INSTRUCCION;

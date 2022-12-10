@@ -5,8 +5,6 @@
  *      Author: utnso
  */
 #include "../include/tlb.h"
-#include "../include/config_cpu.h"
-#include "../../shared/include/client_memoria.h"
 
 t_list* SEGMENT_TABLE;
 
@@ -80,6 +78,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 			record->last_use = PUNTERO_LRU++;
 
 			list_add(TLB,(void*) record);
+			imprimir_tlb();
 			return;
 		}
 
@@ -117,6 +116,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 		record->frame = frame;
 		record->last_use = PUNTERO_LRU++;
 	}
+	imprimir_tlb();
 
 
 }
@@ -134,6 +134,7 @@ void update_fifo_pointer(){
 
 void finalize_process_tlb(int32_t pid){
 	//eliminar todos los registros pertenecientes a la tlb
+	log_info(get_log(),"TLB - DELETE ALL - PID: %d",pid);
 	bool has_pid(t_tlb_entry* aux){
 		return aux->pid == pid;
 	}
@@ -143,7 +144,62 @@ void finalize_process_tlb(int32_t pid){
 	}
 
 	list_remove_and_destroy_all_by_condition(TLB,(void*)has_pid,(void*)destroy_tlb_entry);
+	imprimir_tlb();
 }
 
+void delete_entry_tlb(uint32_t pid, uint32_t page, uint32_t segment){
+
+	log_info(get_log(),"TLB- DELETE ENTRY - PID: %d - SEGMENTO: %d - PAGINA: %d",pid,segment,page);
+
+	bool deleted_success = false;
+
+	void destroy_tlb_entry(t_tlb_entry* aux){
+			free(aux);
+		}
+
+	t_tlb_entry* record =  NULL;
+
+
+	for(int i=0;i<TLB->elements_count;i++){
+		record = list_get(TLB,i);
+		if(record->pid == pid && record->segment == segment && record->page == page){
+
+			list_remove_and_destroy_element(TLB, i, (void*) destroy_tlb_entry);
+			deleted_success = true;
+
+			//verifico si el indice de FIFO apunta aca
+			if(PUNTERO_FIFO == i){
+
+				if(PUNTERO_FIFO == 0){
+					PUNTERO_FIFO = TLB->elements_count -1;
+				}else{
+					PUNTERO_FIFO--;
+				}
+			}
+
+
+		}
+	}
+
+	if(!deleted_success){
+		log_info(get_log(),"No existe entrada TLB para eliminar");
+	}
+	log_info(get_log(),"Se elimino la entrada TLB");
+	imprimir_tlb();
+
+}
+
+
+void imprimir_tlb(){
+	t_tlb_entry* entry = NULL;
+
+	log_info(get_log(),"ESTADO TLB");
+	log_info(get_log(),"///////////////////////////////");
+	for(int i=0;i<TLB->elements_count;i++){
+		entry = list_get(TLB,i);
+		log_info(get_log(),"%d|PID:%d|SEGMENTO:%d|PAGINA:%d|MARCO:%d",i,entry->pid,entry->segment,entry->page,entry->frame);
+	}
+	log_info(get_log(),"///////////////////////////////");
+}
 
 

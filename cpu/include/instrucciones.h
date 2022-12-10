@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "mmu.h"
 #include "config_cpu.h"
+#include "tlb.h"
 
 enum tipo_instruccion{
 	SET,

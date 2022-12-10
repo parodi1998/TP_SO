@@ -123,13 +123,14 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 	uint32_t direccion_fisica = tlb_result;
 	
 	if(tlb_result == -1) {
-		log_info(get_log(),"Fue TLB_MISS");
+		log_info(get_log(),"PID: %d - TLB MISS - Segmento: %d - Pagina: %d",pid,num_segmento,num_pagina);
 		direccion_fisica = find_frame_in_memory_module(pid, num_segmento, num_pagina, es_escritura);
 		if(direccion_fisica == PAGE_FAULT){
 			respuesta->fue_page_fault = true;
 			return respuesta;
 		}
 	}
+	log_info(get_log(),"PID: %d - TLB HIT - Segmento: <%d> - Pagina: %d",pid,num_segmento,num_pagina);
 	respuesta->direccion_fisica = (direccion_fisica * TAMANIO_PAGINA) + desplazamiento_pagina;
 
 	return respuesta;
