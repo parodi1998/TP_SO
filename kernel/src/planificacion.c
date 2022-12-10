@@ -295,8 +295,8 @@ void hilo_planificador_corto_plazo_execute() {
 			sem_post(&sem_cpu_libre);
 		} else {
 
-			log_info(logger,"PROCESO DESPUES DE VOLVER DE CPU");
-			log_pcb(logger, proceso_recibido);
+			//log_info(logger,"PROCESO DESPUES DE VOLVER DE CPU");
+			//log_pcb(logger, proceso_recibido);
 
 			liberar_pcb(proceso);
 
