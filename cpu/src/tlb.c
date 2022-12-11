@@ -64,6 +64,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 		return entry_aux->pid == pid && entry_aux->segment == segment
 				&& entry_aux->page == page;
 	}
+	if(ENTRADAS_TLB != 0){
 
 	//busco si existe la entrada
 	t_tlb_entry* record = list_find(TLB,(void*)is_the_entry );
@@ -117,6 +118,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 		record->last_use = PUNTERO_LRU++;
 	}
 	imprimir_tlb();
+	}
 
 
 }
@@ -183,8 +185,9 @@ void delete_entry_tlb(uint32_t pid, uint32_t segment, uint32_t page){
 
 	if(!deleted_success){
 		log_info(get_log(),"No existe entrada TLB para eliminar");
+	}else{
+		log_info(get_log(),"Se elimino la entrada TLB");
 	}
-	log_info(get_log(),"Se elimino la entrada TLB");
 	imprimir_tlb();
 
 }
