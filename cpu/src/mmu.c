@@ -84,8 +84,8 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 		return respuesta;
 	}
 
-	if(desplazamiento_segmento > segmento->tam){
-		log_info(get_log(),"desplazamiento_segmento > segmento->tam");
+	if(desplazamiento_segmento >= segmento->tam){
+		log_info(get_log(),"desplazamiento_segmento >= segmento->tam");
 		respuesta->fue_segmentation_fault = true;
 		pthread_mutex_unlock(&mutex_tlb);
 		return respuesta;
@@ -100,6 +100,7 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 		if(direccion_fisica == PAGE_FAULT){
 			respuesta->fue_page_fault = true;
 			pthread_mutex_unlock(&mutex_tlb);
+			verificar_pedidos_tlb();
 			return respuesta;
 		}
 		respuesta->direccion_fisica = (direccion_fisica * TAMANIO_PAGINA) + desplazamiento_pagina;
@@ -146,7 +147,6 @@ void recibir_actualizacion_tlb(){
 	bool active = true;
 	int size;
 	void* buffer;
-	void* rta;
 	while(active){
 		if(recv(CONEXION_MEMORIA, &size, sizeof(int), MSG_WAITALL) != -1){
 			log_info(get_log(),"recibiendo info de memoria");
@@ -155,6 +155,9 @@ void recibir_actualizacion_tlb(){
 			log_info(get_log(),"RESPUESTA ACTUALIZAR TLB %s",(char*)buffer);
 			if(strcmp((char*)buffer,"OK") == 0){
 				active = false;
+				free(buffer);
+				pthread_mutex_unlock(&mutex_tlb);
+				break;
 			}else{
 				char** array = string_split((char*)buffer,"|");
 				uint32_t pid = (volatile uint32_t) atoi( array[0]);
@@ -162,10 +165,12 @@ void recibir_actualizacion_tlb(){
 				uint32_t pagina = (volatile uint32_t) atoi( array[2]);
 				delete_entry_tlb(pid, segmento, pagina);
 				active = false;
+				free(buffer);
+				pthread_mutex_unlock(&mutex_tlb);
+				break;
 			}
 		}
 	}
-	pthread_mutex_unlock(&mutex_tlb);
 }
 
 
