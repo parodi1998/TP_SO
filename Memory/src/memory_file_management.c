@@ -675,7 +675,7 @@ void book_frames(uint32_t pid) {
 
 t_list* get_free_frames() {
 	bool is_free(t_frame* frame) {
-		return frame->is_free;
+		return frame->is_free && frame->pid == -1;
 	}
 
 	return list_filter(FRAMES, (void*) is_free);
