@@ -37,6 +37,9 @@ void save_value_in_memory(uint32_t pid ,uint32_t address, void* value, uint32_t 
 	pthread_mutex_lock(&mutex_memory_block);
 	memcpy(MEMORY_BLOCK + address, value, size);
 	pthread_mutex_unlock(&mutex_memory_block);
+	log_info(get_logger(),"RETARDO MEMORIA START");
+	usleep(memory_time());
+	log_info(get_logger(),"RETARDO MEMORIA END");
 	log_info(get_logger(),"PID: %d - Acción: ESCRIBIR - Dirección física: %d",pid,address);
 }
 
@@ -45,6 +48,9 @@ void* read_value_in_memory(uint32_t pid ,uint32_t address, uint32_t size) {
 	pthread_mutex_lock(&mutex_memory_block);
 	memcpy(value, MEMORY_BLOCK + address, size);
 	pthread_mutex_unlock(&mutex_memory_block);
+	log_info(get_logger(),"RETARDO MEMORIA START");
+	usleep(memory_time());
+	log_info(get_logger(),"RETARDO MEMORIA END");
 	log_info(get_logger(), "PID: %d - Acción: LEER - Dirección física: %d",pid, address);
 	return value;
 }
@@ -608,6 +614,9 @@ t_translation_response* translate_logical_address(uint32_t pid, uint32_t segment
 
 		return response;
 	}
+	log_info(get_logger(),"RETARDO MEMORIA START");
+	usleep(memory_time());
+	log_info(get_logger(),"RETARDO MEMORIA END");
 	t_page* page = list_get(table->pages, index_page);
 	page->used = true;
 	//NO esta en memoria
