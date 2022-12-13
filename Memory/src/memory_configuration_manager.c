@@ -46,7 +46,7 @@ uint32_t entries_per_table_getter(){
     return entries_per_table;
 }
 uint32_t memory_time(){
-    return memory_delay_time;
+    return memory_delay_time * 1000;
 }
 char* algorithm(){
     return replacement_algorithm;
