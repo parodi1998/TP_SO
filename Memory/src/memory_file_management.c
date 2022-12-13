@@ -37,6 +37,9 @@ void save_value_in_memory(uint32_t pid ,uint32_t address, void* value, uint32_t 
 	pthread_mutex_lock(&mutex_memory_block);
 	memcpy(MEMORY_BLOCK + address, value, size);
 	pthread_mutex_unlock(&mutex_memory_block);
+	log_info(get_logger(),"RETARDO MEMORIA START");
+	usleep(memory_time());
+	log_info(get_logger(),"RETARDO MEMORIA END");
 	log_info(get_logger(),"PID: %d - Acción: ESCRIBIR - Dirección física: %d",pid,address);
 }
 
@@ -45,6 +48,9 @@ void* read_value_in_memory(uint32_t pid ,uint32_t address, uint32_t size) {
 	pthread_mutex_lock(&mutex_memory_block);
 	memcpy(value, MEMORY_BLOCK + address, size);
 	pthread_mutex_unlock(&mutex_memory_block);
+	log_info(get_logger(),"RETARDO MEMORIA START");
+	usleep(memory_time());
+	log_info(get_logger(),"RETARDO MEMORIA END");
 	log_info(get_logger(), "PID: %d - Acción: LEER - Dirección física: %d",pid, address);
 	return value;
 }
@@ -56,8 +62,9 @@ void save_content_in_swap_file(uint32_t address, uint32_t size,uint32_t logical_
 	memcpy(MEMORY_BLOCK_SECONDARY + logical_address, MEMORY_BLOCK + address,size);
 	msync(MEMORY_BLOCK_SECONDARY, size, MS_SYNC);
 	pthread_mutex_unlock(&mutex_swap);
-	log_info(get_logger(),"Se carga la pagina de memoria desde el puntero %d hasta %d a swap desde el puntero %d hasta %d",address, (address + size), logical_address,(logical_address + size));
+	log_info(get_logger(),"RETARDO SWAP START");
 	usleep(swap_time());
+	log_info(get_logger(),"RETARDO SWAP END");
 }
 
 void create_swap_file() {
@@ -408,9 +415,6 @@ t_page* execute_swapping(uint32_t pid) {
 
 	victim->locked = true;
 
-	log_info(get_logger(), "[REEMPLAZO] Saco NRO_PAG <%d> del PID <%d> en FRAME <%d>",
-			victim->id, victim->pid, victim->frame);
-
 
 	//SI EL BIT DE MODIFICADO ES 1, LA GUARDO EM MV -> PORQUE TIENE CONTENIDO DIFERENTE A LO QUE ESTA EN MV
 	if (victim->modified) {
@@ -540,11 +544,10 @@ bool load_page_to_memory(t_page* page) {//RETORNA TRUE SI HUBO PAGE_FAULT, FALSE
 		page->present = true;
 	} else {
 		pagefault = true;
-		log_info(get_logger(),"PAGE FAULT! La pag %d del proceso %d, segmento %d no se encuentra en memoria",page->id, page->pid, page->segment);
+		log_info(get_logger(),"No se encontro frame libre para %d del proceso %d, segmento %d no se encuentra en memoria",page->id, page->pid, page->segment);
 		page->present = false;
 	}
 	list_destroy(process_free_frames);
-	page->modified = false;
 
 
 	return pagefault;
@@ -611,11 +614,14 @@ t_translation_response* translate_logical_address(uint32_t pid, uint32_t segment
 
 		return response;
 	}
+	log_info(get_logger(),"RETARDO MEMORIA START");
+	usleep(memory_time());
+	log_info(get_logger(),"RETARDO MEMORIA END");
 	t_page* page = list_get(table->pages, index_page);
 	page->used = true;
 	//NO esta en memoria
 	if (!page->present) {
-		response->page_fault = load_page_to_memory(page);
+		response->page_fault = true;
 	}
 
 	response->result= SUCCESS;
@@ -686,24 +692,29 @@ char* swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 	t_page* page = list_get(table->pages,page_number);
 
 
+	bool was_page_fault_finding_free_frame =  load_page_to_memory(page);
+	char* response = NULL;
+	if(was_page_fault_finding_free_frame){
+		t_page* page_victim = execute_swapping(pid);
+		response = string_from_format("%d|%d|%d",page_victim->pid,page_victim->segment,page_victim->id);
 
-	t_page* page_victim = execute_swapping(pid);
-	char* response = string_from_format("%d|%d|%d",page_victim->pid,page_victim->segment,page_victim->id);
+		int32_t frame = page_victim->frame;
 
-	int32_t frame = page_victim->frame;
+		if(page->pos_swap != -1){
+			load_file_into_memory(page->frame * page_size_getter(),page_size_getter(), page->pos_swap * page_size_getter());
+			log_info(get_logger(),"SWAP IN -  PID: <%d> - Marco: <%d> - Page In: <%d>|<%d>",pid,page->pos_swap,page->segment,page->id);
+		}
 
-	if(page->pos_swap != -1){
-		load_file_into_memory(page->frame * page_size_getter(),page_size_getter(), page->pos_swap * page_size_getter());
-		log_info(get_logger(),"SWAP IN -  PID: <%d> - Marco: <%d> - Page In: <%d>|<%d>",pid,page->pos_swap,page->segment,page->id);
+
+
+		log_info(get_logger(),"REEMPLAZO - PID: <%d> - Marco: <%d> - Page Out: <%d>|<%d> - Page In: %d|%d",pid,frame,page_victim->segment,page_victim->id,segment,page_number);
+
+		page->present = true;
+		page->frame = frame;
+		page->modified = false;
+	}else{
+		response = "OK";
 	}
-
-
-
-	log_info(get_logger(),"REEMPLAZO - PID: <%d> - Marco: <%d> - Page Out: <%d>|<%d> - Page In: %d|%d",pid,frame,page_victim->segment,page_victim->id,segment,page_number);
-
-	page->present = true;
-	page->frame = frame;
-	page->modified = false;
 
 	return response;
 }
