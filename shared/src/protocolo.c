@@ -336,6 +336,9 @@ bool recv_pcb(t_log* logger,int fd, t_pcb** pcb) {
 }
 
 void liberar_pcb(t_pcb* proceso) {
+
+	free(proceso->dispositivo_bloqueo);
+
     list_destroy_and_destroy_elements(proceso->instrucciones,free);
     list_destroy_and_destroy_elements(proceso->tabla_segmentos,free);
     free(proceso);

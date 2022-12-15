@@ -79,7 +79,7 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 	t_segmento* segmento = list_find(tabla_segmentos,(void*)tiene_num_segmento);
 	if(segmento == NULL){
 		log_info(get_log(),"segmento == NULL");
-		respuesta->fue_page_fault = true;
+		respuesta->fue_segmentation_fault = true;
 		pthread_mutex_unlock(&mutex_tlb);
 		return respuesta;
 	}
@@ -90,6 +90,21 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 		pthread_mutex_unlock(&mutex_tlb);
 		return respuesta;
 	}
+
+
+
+	int32_t limite_paginas_segmento = ceil(segmento->tam/TAMANIO_PAGINA) -1;
+	log_info(get_log(),"limite_paginas_segmento : %d",limite_paginas_segmento);
+	if(num_pagina > limite_paginas_segmento){
+		log_info(get_log(),"num_pagina > paginas_del_segmento");
+		respuesta->fue_segmentation_fault = true;
+		pthread_mutex_unlock(&mutex_tlb);
+		return respuesta;
+	}
+
+
+
+
 
 	uint32_t tlb_result = consult_tlb(pid,num_segmento, num_pagina); 
 	uint32_t direccion_fisica = tlb_result;

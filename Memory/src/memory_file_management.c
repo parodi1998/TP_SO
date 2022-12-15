@@ -722,19 +722,3 @@ char* swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 char* config_cpu(){
 	return string_from_format("%d|%d",entries_per_table_getter(),page_size_getter());
 }
-
-/*
- * CODIGO DE PRUEBA CON ASIGNACION DE 1 FRAME POR PID
- * 	initialize_process(0,0,128);
-	translate_logical_address(0,0,0,1);
-	save_value_in_memory(0,0,"jojito",string_length("jojito")+1);
-	log_info(get_logger(),read_value_in_memory(0,0,string_length("jojito")+1));
-	translate_logical_address(0,0,1,1);
-	swap_page(0,0,1);
-	translate_logical_address(0,0,1,1);
-	save_value_in_memory(0,0,"baba",string_length("baba")+1);
-	log_info(get_logger(),read_value_in_memory(0,0,string_length("baba")+1));
-	swap_page(0,0,0);
-	log_info(get_logger(),read_value_in_memory(0,0,string_length("jojito")+1));
- */
-
