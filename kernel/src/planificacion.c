@@ -274,7 +274,7 @@ void devolver_proceso_a_ready(t_pcb* proceso) {
 	pthread_mutex_lock(&mutex_dictionary_colas);
 	t_queue* cola_ready_rr = dictionary_get(colas,"READY_RR");
 	pthread_mutex_unlock(&mutex_dictionary_colas);
-	log_proceso_desalojado_por_quantum(logger, proceso);
+	log_proceso_desalojado_por_quantum(logger_kernel_obligatorio, proceso);
 	if(queue_is_empty(cola_ready_fifo) && queue_is_empty(cola_ready_rr)) {
 		meter_proceso_en_execute(proceso);
 	} else {
@@ -295,8 +295,7 @@ void hilo_planificador_corto_plazo_execute() {
 
 		if(!send_pcb(logger, fd_cpu_dispatch, proceso)) {
 			log_error(logger,"Hubo un error enviando el proceso al cpu");
-		} else {
-			log_info(logger,"El proceso fue enviado a cpu");
+			// deberia finalizar?
 		}
 
 		if(proceso->puede_ser_interrumpido) {
