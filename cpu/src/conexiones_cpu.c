@@ -122,6 +122,7 @@ void comunicacion_cpu_kernel_distpach() {
 					} else {
 						log_info(get_log(),"El proceso fue enviado a kernel");
 					}
+					liberar_pcb(proceso);
 				}
                 break;
 			default:

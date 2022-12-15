@@ -146,20 +146,20 @@ void validarTraduccionMemoria(t_translation_response_mmu* response,uint32_t oper
 		segmento_page_fault = response->segmento;
 		pagina_page_fault = response->pagina;
 		log_info(get_log(),"PAGE FAULT - PID: %d - SEGMENTO: %d - PAGINA : %d",response->pid,response->segmento,response->pagina);
-		verificar_pedidos_tlb();
 	}
 	if(response->fue_segmentation_fault){
 		direccion_fisica = -2;
 		log_info(get_log(),"SEGMENTATION FAULT - PID: %d - SEGMENTO: %d - PAGINA : %d",response->pid,response->segmento,response->pagina);
+		finalize_process_tlb(response->pid);
 	}
 
 	if(!response->fue_segmentation_fault && !response->fue_page_fault){
 		direccion_fisica = response->direccion_fisica;
 		if(operacion == MOV_IN){
-			log_info(get_log(),"despues de traducir memoria MOV IN - direccion_fisica: %d", direccion_fisica);
+			log_info(get_log(), "PID: %d - Acción: LEER - Segmento: %d - Pagina: %d - Dirección Fisica: %d", response->pid, respuesta->segmento, respuesta->pagina, direccion_fisica);
 		}
 		if(operacion == MOV_OUT){
-			log_info(get_log(),"despues de traducir memoria MOV OUT - direccion_fisica: %d", direccion_fisica);
+			log_info(get_log(),"PID: %d - Acción: ESCRIBIR - Segmento: %d - Pagina: %d - Dirección Fisica: %d", response->pid, respuesta->segmento, respuesta->pagina, direccion_fisica);
 		}
 	}
 

@@ -79,17 +79,32 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 	t_segmento* segmento = list_find(tabla_segmentos,(void*)tiene_num_segmento);
 	if(segmento == NULL){
 		log_info(get_log(),"segmento == NULL");
-		respuesta->fue_page_fault = true;
-		pthread_mutex_unlock(&mutex_tlb);
-		return respuesta;
-	}
-
-	if(desplazamiento_segmento > segmento->tam){
-		log_info(get_log(),"desplazamiento_segmento > segmento->tam");
 		respuesta->fue_segmentation_fault = true;
 		pthread_mutex_unlock(&mutex_tlb);
 		return respuesta;
 	}
+
+	if(desplazamiento_segmento >= segmento->tam){
+		log_info(get_log(),"desplazamiento_segmento >= segmento->tam");
+		respuesta->fue_segmentation_fault = true;
+		pthread_mutex_unlock(&mutex_tlb);
+		return respuesta;
+	}
+
+
+
+	int32_t limite_paginas_segmento = ceil((double) segmento->tam/ (double) TAMANIO_PAGINA);
+	log_info(get_log(),"limite_paginas_segmento : %d",limite_paginas_segmento);
+	if(num_pagina >= limite_paginas_segmento){
+		log_info(get_log(),"num_pagina > paginas_del_segmento");
+		respuesta->fue_segmentation_fault = true;
+		pthread_mutex_unlock(&mutex_tlb);
+		return respuesta;
+	}
+
+
+
+
 
 	uint32_t tlb_result = consult_tlb(pid,num_segmento, num_pagina); 
 	uint32_t direccion_fisica = tlb_result;
@@ -100,13 +115,18 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 		if(direccion_fisica == PAGE_FAULT){
 			respuesta->fue_page_fault = true;
 			pthread_mutex_unlock(&mutex_tlb);
+			verificar_pedidos_tlb();
 			return respuesta;
 		}
+		respuesta->direccion_fisica = (direccion_fisica * TAMANIO_PAGINA) + desplazamiento_pagina;
+		pthread_mutex_unlock(&mutex_tlb);
+		return respuesta;
+	}else{
+		log_info(get_log(),"PID: %d - TLB HIT - Segmento: <%d> - Pagina: %d",pid,num_segmento,num_pagina);
+		respuesta->direccion_fisica = (direccion_fisica * TAMANIO_PAGINA) + desplazamiento_pagina;
+		pthread_mutex_unlock(&mutex_tlb);
+		return respuesta;
 	}
-	log_info(get_log(),"PID: %d - TLB HIT - Segmento: <%d> - Pagina: %d",pid,num_segmento,num_pagina);
-	respuesta->direccion_fisica = (direccion_fisica * TAMANIO_PAGINA) + desplazamiento_pagina;
-	pthread_mutex_unlock(&mutex_tlb);
-	return respuesta;
 }
 
 
@@ -142,22 +162,30 @@ void recibir_actualizacion_tlb(){
 	bool active = true;
 	int size;
 	void* buffer;
-	void* rta;
 	while(active){
 		if(recv(CONEXION_MEMORIA, &size, sizeof(int), MSG_WAITALL) != -1){
 			log_info(get_log(),"recibiendo info de memoria");
 			buffer = malloc(size);
 			recv(CONEXION_MEMORIA, buffer,size, MSG_WAITALL);
 			log_info(get_log(),"RESPUESTA ACTUALIZAR TLB %s",(char*)buffer);
-			char** array = string_split((char*)buffer,"|");
-			uint32_t pid = (volatile uint32_t) atoi( array[0]);
-			uint32_t segmento = (volatile uint32_t) atoi( array[1]);
-			uint32_t pagina = (volatile uint32_t) atoi( array[2]);
-			delete_entry_tlb(pid, segmento, pagina);
-			active = false;
+			if(strcmp((char*)buffer,"OK") == 0){
+				active = false;
+				free(buffer);
+				pthread_mutex_unlock(&mutex_tlb);
+				break;
+			}else{
+				char** array = string_split((char*)buffer,"|");
+				uint32_t pid = (volatile uint32_t) atoi( array[0]);
+				uint32_t segmento = (volatile uint32_t) atoi( array[1]);
+				uint32_t pagina = (volatile uint32_t) atoi( array[2]);
+				delete_entry_tlb(pid, segmento, pagina);
+				active = false;
+				free(buffer);
+				pthread_mutex_unlock(&mutex_tlb);
+				break;
+			}
 		}
 	}
-	pthread_mutex_unlock(&mutex_tlb);
 }
 
 

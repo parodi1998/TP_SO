@@ -64,6 +64,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 		return entry_aux->pid == pid && entry_aux->segment == segment
 				&& entry_aux->page == page;
 	}
+	if(ENTRADAS_TLB != 0){
 
 	//busco si existe la entrada
 	t_tlb_entry* record = list_find(TLB,(void*)is_the_entry );
@@ -84,7 +85,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 
 		t_tlb_entry* victim;
 
-		if(REEMPLAZO_TLB == "LRU"){
+		if(string_equals_ignore_case(REEMPLAZO_TLB,"LRU")){
 
 			bool sort_by_lru(t_tlb_entry* record_aux1,t_tlb_entry* record_aux2 ){
 						return record_aux1->last_use < record_aux2->last_use;
@@ -117,6 +118,7 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 		record->last_use = PUNTERO_LRU++;
 	}
 	imprimir_tlb();
+	}
 
 
 }
@@ -124,11 +126,13 @@ void update_tlb(int32_t pid, int32_t segment, int32_t page, int32_t frame) {
 void update_fifo_pointer(){
 
 	if(PUNTERO_FIFO < (ENTRADAS_TLB -1)){
-			PUNTERO_FIFO++;
+		PUNTERO_FIFO++;
+		return;
 	}
 
 	if(PUNTERO_FIFO == (ENTRADAS_TLB -1) ){
 		PUNTERO_FIFO =0;
+		return;
 	}
 }
 
@@ -183,8 +187,9 @@ void delete_entry_tlb(uint32_t pid, uint32_t segment, uint32_t page){
 
 	if(!deleted_success){
 		log_info(get_log(),"No existe entrada TLB para eliminar");
+	}else{
+		log_info(get_log(),"Se elimino la entrada TLB");
 	}
-	log_info(get_log(),"Se elimino la entrada TLB");
 	imprimir_tlb();
 
 }
