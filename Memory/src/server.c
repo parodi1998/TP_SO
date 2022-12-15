@@ -131,44 +131,60 @@ void process_request_memory(int cod_op, int cliente_fd) {
 		case CONFIG_CPU:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = config_cpu();
-			size = sizeof(response);
+			size =  string_length((char*)response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			free(msg);
+			free(response);
 			break;
 		case INICIAR_PROCESO:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_mensaje_iniciar_proceso(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			free(msg);
+			free(response);
 			break;
 		case TRADUCIR:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_traducir_direccion(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			free(msg);
+			free(response);
 			break;
 		case ESCRIBIR:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_mensaje_escribir(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			free(msg);
+			free(response);
 			break;
 		case LEER:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_mensaje_leer(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			free(msg);
+			free(response);
 			break;
 		case SWAP_PAGE:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_swapping(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			devolver_mensaje_memory(response,size, fd_client_cpu,ACTUALIZAR_TLB);
+			free(msg);
+			free(response);
 			break;
 		case SUSPENDER_PROCESO:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_suspender_proceso(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			free(msg);
+			free(response);
 			break;
 		case FINALIZAR_PROCESO:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_finalizar_proceso(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
+			free(msg);
+			free(response);
 			break;
 		}
 }
@@ -232,6 +248,11 @@ void* procesar_mensaje_iniciar_proceso(char* string,int* size_response,int* op_c
 	*size_response = sizeof(response);
 	*op_code = INICIAR_PROCESO;
 
+	free(array[0]);
+	free(array[1]);
+	free(array[2]);
+	free(array);
+
 	return (void*)message;
 }
 
@@ -244,7 +265,14 @@ void* procesar_mensaje_leer(char* string,int* size_response,int* op_code){
 	uint32_t size = (volatile uint32_t) atoi( array[2]);
 	*size_response = size;
 	*op_code = LEER;
-	return read_value_in_memory(pid,address,size);
+	void* response = read_value_in_memory(pid,address,size);
+
+	free(array[0]);
+	free(array[1]);
+	free(array[2]);
+	free(array);
+
+	return response;
 }
 
 void* procesar_mensaje_escribir(char* string,int* size_response,int* op_code){
@@ -258,6 +286,13 @@ void* procesar_mensaje_escribir(char* string,int* size_response,int* op_code){
 	save_value_in_memory(pid,address,(void*) array[3],size);
 	*op_code = OK;
 	*size_response = string_length("OK")+1;
+
+	free(array[0]);
+	free(array[1]);
+	free(array[2]);
+	free(array[3]);
+	free(array);
+
 	return (void*)"OK";
 
 }
@@ -269,6 +304,11 @@ void* procesar_suspender_proceso(char* string,int* size,int* op_code){
 	uint32_t pid = (volatile uint32_t) atoi( array[0]);
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
 	suspend_process(pid,segment);
+
+	free(array[0]);
+	free(array[1]);
+	free(array);
+
 
 	*size = string_length("OK")+1;
 	*op_code = OK;
@@ -304,6 +344,12 @@ void* procesar_traducir_direccion(char* string,int* size, int* op_code){
 	free(response);
 	*size = sizeof(response_string);
 
+	free(array[0]);
+	free(array[1]);
+	free(array[2]);
+	free(array[3]);
+	free(array);
+
 	return response_string;
 }
 
@@ -317,6 +363,11 @@ void* procesar_swapping(char* string, int* size,int* op_code){
 	char* response = swap_page(pid, segment,page_number);
 	*size = string_length(response);
 	*op_code = OK;
+
+	free(array[0]);
+	free(array[1]);
+	free(array[2]);
+	free(array);
 	return (void*)response;
 
 }
