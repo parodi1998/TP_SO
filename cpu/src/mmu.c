@@ -93,9 +93,9 @@ t_translation_response_mmu* traducir_direccion_logica(int32_t pid,t_list* tabla_
 
 
 
-	int32_t limite_paginas_segmento = ceil(segmento->tam/TAMANIO_PAGINA) -1;
+	int32_t limite_paginas_segmento = ceil((double) segmento->tam/ (double) TAMANIO_PAGINA);
 	log_info(get_log(),"limite_paginas_segmento : %d",limite_paginas_segmento);
-	if(num_pagina > limite_paginas_segmento){
+	if(num_pagina >= limite_paginas_segmento){
 		log_info(get_log(),"num_pagina > paginas_del_segmento");
 		respuesta->fue_segmentation_fault = true;
 		pthread_mutex_unlock(&mutex_tlb);
