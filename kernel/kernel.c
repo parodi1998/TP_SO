@@ -12,6 +12,13 @@ t_dictionary* tiempos_io;
 
 t_dictionary* dato_ingreso_por_teclado;
 
+pthread_mutex_t mutex_dictionary_colas;
+pthread_mutex_t mutex_dictionary_contador_colas_block;
+pthread_mutex_t mutex_dictionary_sem_hilos_block;
+pthread_mutex_t mutex_dictionary_mutex_colas_block;
+pthread_mutex_t mutex_dictionary_tiempos_io;
+pthread_mutex_t mutex_dictionary_dato_ingreso_por_teclado;
+
 pthread_mutex_t mutex_new;
 pthread_mutex_t mutex_ready;
 pthread_mutex_t mutex_ready_fifo;
@@ -109,7 +116,14 @@ void inicializar_semaforos() {
     sem_init(&sem_dato_por_teclado_ingresado, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
 
     // new
-	pthread_mutex_init(&mutex_new, NULL);
+	pthread_mutex_init(&mutex_dictionary_colas, NULL);
+	pthread_mutex_init(&mutex_dictionary_contador_colas_block, NULL);
+	pthread_mutex_init(&mutex_dictionary_sem_hilos_block, NULL);
+	pthread_mutex_init(&mutex_dictionary_mutex_colas_block, NULL);
+	pthread_mutex_init(&mutex_dictionary_tiempos_io, NULL);
+	pthread_mutex_init(&mutex_dictionary_dato_ingreso_por_teclado, NULL);
+	
+    pthread_mutex_init(&mutex_new, NULL);
 	sem_init(&contador_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
 	sem_init(&sem_largo_plazo_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
     // ready
@@ -165,6 +179,13 @@ void destruir_semaforos() {
     sem_destroy(&sem_fin_io_pantalla);
     sem_destroy(&sem_dato_por_teclado_ingresado);
     
+    pthread_mutex_destroy(&mutex_dictionary_colas);
+    pthread_mutex_destroy(&mutex_dictionary_contador_colas_block);
+    pthread_mutex_destroy(&mutex_dictionary_sem_hilos_block);
+    pthread_mutex_destroy(&mutex_dictionary_mutex_colas_block);
+    pthread_mutex_destroy(&mutex_dictionary_tiempos_io);
+    pthread_mutex_destroy(&mutex_dictionary_dato_ingreso_por_teclado);
+
     pthread_mutex_destroy(&mutex_new);
     sem_destroy(&contador_new);
     sem_destroy(&sem_largo_plazo_new);

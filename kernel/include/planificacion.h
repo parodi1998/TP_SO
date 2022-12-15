@@ -27,6 +27,13 @@ extern t_dictionary* tiempos_io;
 extern t_dictionary* dato_ingreso_por_teclado;
 
 // mutex
+extern pthread_mutex_t mutex_dictionary_colas;
+extern pthread_mutex_t mutex_dictionary_contador_colas_block;
+extern pthread_mutex_t mutex_dictionary_sem_hilos_block;
+extern pthread_mutex_t mutex_dictionary_mutex_colas_block;
+extern pthread_mutex_t mutex_dictionary_tiempos_io;
+extern pthread_mutex_t mutex_dictionary_dato_ingreso_por_teclado;
+
 extern pthread_mutex_t mutex_new;
 extern pthread_mutex_t mutex_ready;
 extern pthread_mutex_t mutex_ready_fifo;
