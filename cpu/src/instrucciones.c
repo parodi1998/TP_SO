@@ -156,10 +156,10 @@ void validarTraduccionMemoria(t_translation_response_mmu* response,uint32_t oper
 	if(!response->fue_segmentation_fault && !response->fue_page_fault){
 		direccion_fisica = response->direccion_fisica;
 		if(operacion == MOV_IN){
-			log_info(get_log(), "PID: %d - Acción: LEER - Segmento: %d - Pagina: %d - Dirección Fisica: %d", response->pid, respuesta->segmento, respuesta->pagina, direccion_fisica);
+			log_info(get_log(), "PID: %d - Acción: LEER - Segmento: %d - Pagina: %d - Dirección Fisica: %d", response->pid, response->segmento, response->pagina, direccion_fisica);
 		}
 		if(operacion == MOV_OUT){
-			log_info(get_log(),"PID: %d - Acción: ESCRIBIR - Segmento: %d - Pagina: %d - Dirección Fisica: %d", response->pid, respuesta->segmento, respuesta->pagina, direccion_fisica);
+			log_info(get_log(),"PID: %d - Acción: ESCRIBIR - Segmento: %d - Pagina: %d - Dirección Fisica: %d", response->pid, response->segmento, response->pagina, direccion_fisica);
 		}
 	}
 
@@ -182,7 +182,7 @@ int comparacion(char* valor1, char* valor2){
 
 }
 
-void decodificar (char* instruccion_en_bruto, t_list* tabla_segmentos, int pid){
+void decodificar (char* instruccion_en_bruto){
 
 	tipo_operacion = 0;
 
@@ -214,27 +214,25 @@ void decodificar (char* instruccion_en_bruto, t_list* tabla_segmentos, int pid){
 	}
 
 
-if (tipo_operacion == 0){
+	if (tipo_operacion == 0){
 
 
-	if(string_equals_ignore_case(nombre_instruccion,"SET")) {
-		tipo_operacion = SET;
-	} else if(string_equals_ignore_case(nombre_instruccion,"ADD")) {
-		tipo_operacion = ADD;
-	} else if(string_equals_ignore_case(nombre_instruccion,"MOV_IN")) {
-		tipo_operacion = MOV_IN;
-	} else if(string_equals_ignore_case(nombre_instruccion,"MOV_OUT")) {
-		tipo_operacion = MOV_OUT;
-	} else if(string_equals_ignore_case(nombre_instruccion,"I/O")) {
-		tipo_operacion = IO;
-	} else if(string_equals_ignore_case(nombre_instruccion,"EXIT")) {
-		tipo_operacion = EXIT;
-	} else {
-		tipo_operacion = -1;
+		if(string_equals_ignore_case(nombre_instruccion,"SET")) {
+			tipo_operacion = SET;
+		} else if(string_equals_ignore_case(nombre_instruccion,"ADD")) {
+			tipo_operacion = ADD;
+		} else if(string_equals_ignore_case(nombre_instruccion,"MOV_IN")) {
+			tipo_operacion = MOV_IN;
+		} else if(string_equals_ignore_case(nombre_instruccion,"MOV_OUT")) {
+			tipo_operacion = MOV_OUT;
+		} else if(string_equals_ignore_case(nombre_instruccion,"I/O")) {
+			tipo_operacion = IO;
+		} else if(string_equals_ignore_case(nombre_instruccion,"EXIT")) {
+			tipo_operacion = EXIT;
+		} else {
+			tipo_operacion = -1;
+		}
 	}
-}
-
-	accederMemoria(pid, tabla_segmentos);
 }
 
 //int ins_set(instruccion* instruct){
@@ -417,16 +415,18 @@ int ciclo_instrucciones(t_contexto_ejecucion* contexto,  t_list* instrucciones, 
 	fetch(contexto->program_counter, instrucciones, &instruccion_en_bruto);
 
 	//decodificar
-	decodificar(instruccion_en_bruto, contexto->tabla_segmentos, pid);
+	decodificar(instruccion_en_bruto);
 
-	//ejecutar
 	if (operando_1_NOMBRE != NULL || operando_2_NOMBRE != NULL) {
 		log_info(get_log(),"PID: %d - Ejecutando: %s - %s - %s", pid, nombre_instruccion, operando_1_NOMBRE, operando_2_NOMBRE);
 	}
 	else {
 		log_info(get_log(),"PID: %d - Ejecutando: %s", pid, nombre_instruccion);
 	}
+
+	accederMemoria(pid, contexto->tabla_segmentos);
 	
+	//ejecutar
 	devuelve = ejecutar(pid);
 	
 	//actualizar ciclo
