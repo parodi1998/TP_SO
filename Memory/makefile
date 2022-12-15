@@ -16,6 +16,9 @@ build: makefolder $(OBJ)
 
 valgrind: build
 	valgrind --leak-check=full --show-leak-kinds=all --log-file=valgrind.log ./$(OUTFILE)
+
+helgrind: build
+	valgrind --tool=helgrind --log-file=helgrind.log ./$(OUTFILE)
 debug: CFLAGS := $(CFLAGS) -g
 
 ./obj/%.o: ./src/%.c
