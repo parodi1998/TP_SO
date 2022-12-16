@@ -8,7 +8,7 @@ char* puerto_memoria;
 char* puerto_escucha_dispatch;
 char* puerto_escucha_interrupt;
 char* log_path;
-
+char* IP;
 
 t_log* LOGGER_2;
 
@@ -27,7 +27,7 @@ void iniciar_config_cpu(void){
 	puerto_escucha_dispatch = config_get_string_value(CONFIG,"PUERTO_ESCUCHA_DISPATCH");
 	puerto_escucha_interrupt = config_get_string_value(CONFIG,"PUERTO_ESCUCHA_INTERRUPT");
 	log_path = config_get_string_value(CONFIG,"LOG_PATH");
-
+	IP = config_get_string_value(CONFIG,"IP_CPU");
 
 	LOGGER_2 = log_create(log_path, "cpu", true, LOG_LEVEL_INFO);
 	log_info(LOGGER_2, "Se inició el logger");
@@ -65,4 +65,8 @@ char* get_puerto_escucha_interrupt(){
 }
 char* get_log_path(){
 	return log_path;
+}
+
+char* get_ip(){
+	return IP;
 }

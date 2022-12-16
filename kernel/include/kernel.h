@@ -6,6 +6,7 @@
 #include "conexion.h"
 #include "comunicacion_kernel.h"
 #include "planificacion.h"
+#include <signal.h>
 
 void inicializar_diccionario();
 void inicializar_semaforos();
@@ -16,5 +17,7 @@ void destruir_semaforos();
 
 void inicializar_todo();
 void destruir_todo();
+
+void signalHandle(int signal);
 
 #endif

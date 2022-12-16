@@ -273,8 +273,15 @@ void destruir_todo() {
     destruir_semaforos();
 }
 
+
+int kernel_server_fd = 0;
+
+void signalHandle(int signal) {
+	liberar_conexion(&kernel_server_fd);
+}
+
 int main(int argc, char** argv){
-    
+    signal(SIGINT,signalHandle);
     if(!iniciar_programa()) {
         terminar_programa();
         return EXIT_SUCCESS;
@@ -298,7 +305,6 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    int kernel_server_fd = 0;
     if(!iniciar_kernel(&kernel_server_fd)) {
         log_error(logger,"No se pudo iniciar kernel como servidor");
         terminar_programa();
