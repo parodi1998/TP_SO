@@ -170,8 +170,8 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 		return FAILURE;
 	}
 
-	pthread_mutex_unlock(&mutex_frames);
 	list_destroy(free_frames_MP);
+	pthread_mutex_unlock(&mutex_frames);
 	//creacion de tabla de paginas
 
 	book_frames(pid);
@@ -184,7 +184,6 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 
 	pthread_mutex_lock(&mutex_table_pages);
 	list_add(TABLE_PAGES, new_table);
-	pthread_mutex_unlock(&mutex_table_pages);
 
 	//Crea las pages y las guarda en memoria
 	for (int i = 0; i < number_of_pages_to_create; i++) {
@@ -205,6 +204,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 		log_info(get_logger(),"PID: <%d> - Segmento: <%d> - TAMAÑO: <%d> paginas",pid,segment_ID,number_of_pages_to_create);
 		page->locked = false;
 	}
+	pthread_mutex_unlock(&mutex_table_pages);
 
 	//retornamos el id de la pagina de primer nivel
 	log_info(get_logger(), "Se crea la tabla de paginas ID: %d  al PID: %d, SEGMENTO %d",new_table->ID, pid,segment_ID);
@@ -538,7 +538,6 @@ bool load_page_to_memory(t_page* page) {//RETORNA TRUE SI HUBO PAGE_FAULT, FALSE
 	//Busco frame en donde voy a alojar la pagina que me traigo de SWAP: ya sea un frame libre o bien un frame de pag q reempl.
 	pthread_mutex_lock(&mutex_frames);
 	t_list* process_free_frames = get_free_frames_from_process(page->pid);
-	pthread_mutex_unlock(&mutex_frames);
 
 	if (list_size(process_free_frames) > 0) {
 		t_frame* frame = list_get(process_free_frames, 0);
@@ -554,7 +553,7 @@ bool load_page_to_memory(t_page* page) {//RETORNA TRUE SI HUBO PAGE_FAULT, FALSE
 	}
 	list_destroy(process_free_frames);
 
-
+	pthread_mutex_unlock(&mutex_frames);
 	return pagefault;
 }
 
@@ -594,6 +593,7 @@ void end_memory_module(int signal) {
 	destroy_config();
 	log_info(get_logger(),"ELIMINANDO LOGGER");
 	destroy_logger();
+	exit(EXIT_SUCCESS);
 }
 
 t_frame_swap* get_free_frame_from_swap() {
@@ -622,9 +622,7 @@ t_translation_response* translate_logical_address(uint32_t pid, uint32_t segment
 
 		return response;
 	}
-	log_info(get_logger(),"RETARDO MEMORIA START");
-	usleep(memory_time());
-	log_info(get_logger(),"RETARDO MEMORIA END");
+	pthread_mutex_lock(&mutex_table_pages);
 	t_page* page = list_get(table->pages, index_page);
 	page->used = true;
 	//NO esta en memoria
@@ -644,7 +642,10 @@ t_translation_response* translate_logical_address(uint32_t pid, uint32_t segment
 	}else{
 		log_info(get_logger(),"PID: <%d> - SEGMENT: <%d> - Página: <%d> - Marco: <%d>",pid,segment,index_page,response->frame);
 	}
-
+	pthread_mutex_unlock(&mutex_table_pages);
+	log_info(get_logger(),"RETARDO MEMORIA START");
+	usleep(memory_time());
+	log_info(get_logger(),"RETARDO MEMORIA END");
 	return response;
 }
 
