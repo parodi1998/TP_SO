@@ -1,5 +1,6 @@
 #include "../include/memory_file_management.h"
 #include "../include/memory_configuration_manager.h"
+#include "../include/server.h"
 #include <math.h>
 
 
@@ -147,6 +148,13 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	//verifico si ya se ocuparon la cantidad maxima admitida de procesos en memoria
 	int number_of_pages_to_create = ceil((double) size / (double) page_size_getter());
 
+
+	if(number_of_pages_to_create > entries_per_table_getter()){
+		log_info(get_logger(),"Error: se supero el limite de entradas por tabla permitido para el PID %d, Segmento: %d",pid, segment_ID);
+		return FAILURE;
+	}
+
+
 	log_info(get_logger(),"Se encontro espacio libre para el PID %d, SEGMENTO %d",pid,segment_ID);
 
 	bool is_free_and_unasigned(t_frame* frame) {
@@ -156,7 +164,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	t_list* free_frames_MP = list_filter(FRAMES, (void*) is_free_and_unasigned);
 	if (list_size(free_frames_MP) < frames_per_table_getter()) {
 
-		log_info(get_logger(),"Error: se supero el nivel de multiprogramacion, no hay frames libes en MP para el PID %d, Segmento: %d",pid, segment_ID);
+		log_info(get_logger(),"Error: se supero el nivel de multiprogramacion, no hay frames libres en MP para el PID %d, Segmento: %d",pid, segment_ID);
 		list_destroy(free_frames_MP);
 		pthread_mutex_unlock(&mutex_frames);
 		return FAILURE;
@@ -581,7 +589,7 @@ void end_memory_module(int signal) {
 	log_info(get_logger(),"ELIMINANDO LOGGER");
 	destroy_logger();
 
-
+	liberarConexiones();
 }
 
 t_frame_swap* get_free_frame_from_swap() {

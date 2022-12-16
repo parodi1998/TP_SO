@@ -71,4 +71,5 @@ void* procesar_mensaje_escribir(char* string,int* size, int* op_code);
 void* procesar_mensaje_leer(char* string,int* size, int* op_code);
 void* procesar_traducir_direccion(char* string,int* size, int* op_code);
 void* procesar_swapping(char* string, int* size,int* op_code);
+void liberarConexiones();
 #endif /* SERVER_H_ */

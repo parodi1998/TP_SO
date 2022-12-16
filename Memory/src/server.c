@@ -366,3 +366,9 @@ void* procesar_swapping(char* string, int* size,int* op_code){
 	return (void*)response;
 
 }
+
+
+void liberarConexiones(){
+	close(fd_client_kernel);
+	close(fd_client_cpu);
+}
