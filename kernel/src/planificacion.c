@@ -1,5 +1,9 @@
 #include "../include/planificacion.h"
 
+int32_t timer = 0;
+bool debe_interrumpir_al_cpu = false;
+bool timer_sigue_contando = false;
+
 void meter_proceso_en_new(t_pcb* proceso) {
 
 	pthread_mutex_lock(&mutex_new);
@@ -312,6 +316,9 @@ void hilo_planificador_corto_plazo_execute() {
 		}
 
 		if(proceso->puede_ser_interrumpido) {
+			pthread_mutex_lock(&mutex_debe_ser_interrumpido_cpu);
+			debe_interrumpir_al_cpu = true;
+			pthread_mutex_unlock(&mutex_debe_ser_interrumpido_cpu);
 			sem_post(&sem_comienza_timer_quantum);
 		}
 		
@@ -326,6 +333,14 @@ void hilo_planificador_corto_plazo_execute() {
 			sem_post(&sem_cpu_libre);
 		} else {
 
+			pthread_mutex_lock(&mutex_debe_ser_interrumpido_cpu);
+			debe_interrumpir_al_cpu = false;
+			pthread_mutex_unlock(&mutex_debe_ser_interrumpido_cpu);
+
+			pthread_mutex_lock(&mutex_timer_quantum);
+			timer_sigue_contando = false;
+			pthread_mutex_unlock(&mutex_timer_quantum);
+			
 			liberar_pcb(proceso);
 
 			if(proceso_recibido->debe_ser_finalizado) {
@@ -352,12 +367,31 @@ void hilo_timer_contador_quantum() {
 	while(1) {
 		sem_wait(&sem_comienza_timer_quantum);
 
-		uint32_t quantum_in_seconds = atoi(config_kernel->quantum_RR);
+		uint32_t quantum_in_milis = atoi(config_kernel->quantum_RR);
+		uint32_t quantum_in_micros = quantum_in_milis*1000;
+		
+		pthread_mutex_lock(&mutex_timer_quantum);
+		timer_sigue_contando = true;
+		timer = quantum_in_micros;
+		pthread_mutex_unlock(&mutex_timer_quantum);
 
-		usleep(quantum_in_seconds*1000);
+		while(timer_sigue_contando) {
+			usleep(1000);
+			pthread_mutex_lock(&mutex_timer_quantum);
+			timer -= 1000;
+			pthread_mutex_unlock(&mutex_timer_quantum);
+		
+			if(timer <= 0) {
+				pthread_mutex_lock(&mutex_timer_quantum);
+				timer_sigue_contando = false; 
+				pthread_mutex_unlock(&mutex_timer_quantum);
+			}
+		}
 
-		if(!send_interrumpir_cpu_from_kernel(logger, fd_cpu_interrupt)) {
-			log_error(logger,"No se envio la interrupcion a cpu correctamente");
+		if(!timer_sigue_contando && debe_interrumpir_al_cpu) {
+			if(!send_interrumpir_cpu_from_kernel(logger, fd_cpu_interrupt)) {
+				log_error(logger,"No se envio la interrupcion a cpu correctamente");
+			}
 		}
 	}
 }
