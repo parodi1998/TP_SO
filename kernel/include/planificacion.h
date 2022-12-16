@@ -41,6 +41,9 @@ extern pthread_mutex_t mutex_ready_rr;
 extern pthread_mutex_t mutex_execute;
 extern pthread_mutex_t mutex_exit;
 
+extern pthread_mutex_t mutex_timer_quantum;
+extern pthread_mutex_t mutex_debe_ser_interrumpido_cpu;
+
 // semaforos contadores
 extern sem_t contador_new;
 extern sem_t contador_ready_fifo;

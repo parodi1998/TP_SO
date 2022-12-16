@@ -26,6 +26,9 @@ pthread_mutex_t mutex_ready_rr;
 pthread_mutex_t mutex_execute;
 pthread_mutex_t mutex_exit;
 
+pthread_mutex_t mutex_timer_quantum;
+pthread_mutex_t mutex_debe_ser_interrumpido_cpu;
+
 sem_t contador_new;
 sem_t contador_ready_fifo;
 sem_t contador_ready_rr;
@@ -122,6 +125,9 @@ void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_dictionary_mutex_colas_block, NULL);
 	pthread_mutex_init(&mutex_dictionary_tiempos_io, NULL);
 	pthread_mutex_init(&mutex_dictionary_dato_ingreso_por_teclado, NULL);
+
+	pthread_mutex_init(&mutex_timer_quantum, NULL);
+	pthread_mutex_init(&mutex_debe_ser_interrumpido_cpu, NULL);
 	
     pthread_mutex_init(&mutex_new, NULL);
 	sem_init(&contador_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
@@ -185,6 +191,9 @@ void destruir_semaforos() {
     pthread_mutex_destroy(&mutex_dictionary_mutex_colas_block);
     pthread_mutex_destroy(&mutex_dictionary_tiempos_io);
     pthread_mutex_destroy(&mutex_dictionary_dato_ingreso_por_teclado);
+    
+    pthread_mutex_destroy(&mutex_timer_quantum);
+    pthread_mutex_destroy(&mutex_debe_ser_interrumpido_cpu);
 
     pthread_mutex_destroy(&mutex_new);
     sem_destroy(&contador_new);
