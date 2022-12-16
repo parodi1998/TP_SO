@@ -250,7 +250,7 @@ int32_t finalize_process(uint32_t pid) {
 
 	//elimino los frames libres no asignados
 	clean_free_frames_from_pid(pid);
-
+	pthread_mutex_lock(&mutex_table_pages);
 	for(int i=0;i<list->elements_count;i++){
 		table = list_get(list,i);
 
@@ -283,6 +283,7 @@ int32_t finalize_process(uint32_t pid) {
 
 	}
 	list_destroy(list);
+	pthread_mutex_unlock(&mutex_table_pages);
 	log_info(get_logger(), "Se finalizo el proceso %d con exito", pid);
 
 	return SUCCESS;
@@ -558,16 +559,21 @@ bool load_page_to_memory(t_page* page) {//RETORNA TRUE SI HUBO PAGE_FAULT, FALSE
 }
 
 void end_memory_module(int signal) {
+	liberarConexiones();
+
 	log_info(get_logger(), "FINALIZANDO MODULO DE MEMORIA");
+
+	pthread_mutex_lock(&mutex_memory_block);
 	free(MEMORY_BLOCK);
+	pthread_mutex_unlock(&mutex_memory_block);
 	delete_swap_file(SWAP_FILE);
 
 	void destroy_frames(t_frame* frame_aux) {
 		free(frame_aux);
 	}
-
+	pthread_mutex_lock(&mutex_frames);
 	list_destroy_and_destroy_elements(FRAMES, (void*) destroy_frames);
-
+	pthread_mutex_unlock(&mutex_frames);
 	log_info(get_logger(),"FRAMES ELIMINADOS");
 
 	void destroy_page(t_page* page_aux) {
@@ -578,9 +584,9 @@ void end_memory_module(int signal) {
 		list_destroy_and_destroy_elements(table_aux->pages,(void*) destroy_page);
 		free(table_aux);
 	}
-
+	pthread_mutex_lock(&mutex_table_pages);
 	list_destroy_and_destroy_elements(TABLE_PAGES,(void*) destroy_table_page_second_level);
-
+	pthread_mutex_unlock(&mutex_table_pages);
 	log_info(get_logger(),"TABLAS DE PAGINAS ELIMINADAS");
 
 
@@ -588,8 +594,6 @@ void end_memory_module(int signal) {
 	destroy_config();
 	log_info(get_logger(),"ELIMINANDO LOGGER");
 	destroy_logger();
-
-	liberarConexiones();
 }
 
 t_frame_swap* get_free_frame_from_swap() {
