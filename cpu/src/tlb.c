@@ -139,15 +139,29 @@ void update_fifo_pointer(){
 void finalize_process_tlb(int32_t pid){
 	//eliminar todos los registros pertenecientes a la tlb
 	log_info(get_log(),"TLB - DELETE ALL - PID: %d",pid);
-	bool has_pid(t_tlb_entry* aux){
-		return aux->pid == pid;
+
+	t_tlb_entry* entrada_tlb = NULL;
+	int32_t index_victims_tlb[ENTRADAS_TLB];   
+
+	for(int index = 0; index < ENTRADAS_TLB; index++) {
+		index_victims_tlb[index] = -1;
 	}
 
-	void destroy_tlb_entry(t_tlb_entry* aux){
-		free(aux);
+	for(int index = 0; index < TLB->elements_count; index++) {
+		entrada_tlb = list_get(TLB,index); 
+		if(entrada_tlb->pid == pid) {
+			index_victims_tlb[index] = pid;
+		}
 	}
 
-	list_remove_and_destroy_all_by_condition(TLB,(void*)has_pid,(void*)destroy_tlb_entry);
+	for(int index = 0; index < ENTRADAS_TLB; index++) {
+		if(index_victims_tlb[index] != -1) {
+			entrada_tlb = list_take(TLB, index);
+			free(entrada_tlb);
+			
+		}
+	}
+
 	imprimir_tlb();
 }
 
