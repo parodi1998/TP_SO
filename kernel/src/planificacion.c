@@ -1,5 +1,9 @@
 #include "../include/planificacion.h"
 
+int32_t timer = 0;
+bool debe_interrumpir_al_cpu = false;
+bool timer_sigue_contando = false;
+
 void meter_proceso_en_new(t_pcb* proceso) {
 
 	pthread_mutex_lock(&mutex_new);
@@ -307,39 +311,53 @@ void hilo_planificador_corto_plazo_execute() {
 		sem_wait(&sem_sacar_de_execute);
 
 		if(!send_pcb(logger, fd_cpu_dispatch, proceso)) {
-			log_error(logger,"Hubo un error enviando el proceso al cpu");
-			// deberia finalizar?
-		}
-
-		if(proceso->puede_ser_interrumpido) {
-			sem_post(&sem_comienza_timer_quantum);
-		}
-		
-		t_pcb* proceso_recibido;
-
-		recv(fd_cpu_dispatch, &cod_op, sizeof(op_code), MSG_WAITALL);
-
-		if(!recv_pcb(logger, fd_cpu_dispatch, &proceso_recibido) || cod_op != PCB_KERNEL) {
-            log_error(logger,"Hubo un error al recibir el proceso de cpu, por lo que se procede a finalizar el mismo.");
+			log_error(logger,"Hubo un error al enviando el proceso de cpu, por lo que se procede a finalizar el mismo.");
 			proceso->finaliza_por_error_de_ejecucion = true;
 			meter_proceso_en_exit(proceso);
 			sem_post(&sem_cpu_libre);
 		} else {
 
-			liberar_pcb(proceso);
+			if(proceso->puede_ser_interrumpido) {
+				pthread_mutex_lock(&mutex_debe_ser_interrumpido_cpu);
+				debe_interrumpir_al_cpu = true;
+				pthread_mutex_unlock(&mutex_debe_ser_interrumpido_cpu);
+				sem_post(&sem_comienza_timer_quantum);
+			}
+			
+			t_pcb* proceso_recibido;
 
-			if(proceso_recibido->debe_ser_finalizado) {
-				meter_proceso_en_exit(proceso_recibido);
-				sem_post(&sem_cpu_libre);
-			} else if(proceso_recibido->debe_ser_bloqueado) {
-				if(string_equals_ignore_case(proceso_recibido->dispositivo_bloqueo,"PANTALLA") || string_equals_ignore_case(proceso_recibido->dispositivo_bloqueo,"TECLADO")) {
-					meter_proceso_en_block(proceso_recibido, string_from_format("%d-%s",proceso_recibido->id_proceso, proceso_recibido->dispositivo_bloqueo));
-				} else {
-					meter_proceso_en_block(proceso_recibido, proceso_recibido->dispositivo_bloqueo);
-				}
+			recv(fd_cpu_dispatch, &cod_op, sizeof(op_code), MSG_WAITALL);
+
+			if(!recv_pcb(logger, fd_cpu_dispatch, &proceso_recibido) || cod_op != PCB_KERNEL) {
+				log_error(logger,"Hubo un error al recibir el proceso de cpu, por lo que se procede a finalizar el mismo.");
+				proceso->finaliza_por_error_de_ejecucion = true;
+				meter_proceso_en_exit(proceso);
 				sem_post(&sem_cpu_libre);
 			} else {
-				devolver_proceso_a_ready(proceso_recibido);
+
+				pthread_mutex_lock(&mutex_debe_ser_interrumpido_cpu);
+				debe_interrumpir_al_cpu = false;
+				pthread_mutex_unlock(&mutex_debe_ser_interrumpido_cpu);
+
+				pthread_mutex_lock(&mutex_timer_quantum);
+				timer_sigue_contando = false;
+				pthread_mutex_unlock(&mutex_timer_quantum);
+				
+				liberar_pcb(proceso);
+
+				if(proceso_recibido->debe_ser_finalizado) {
+					meter_proceso_en_exit(proceso_recibido);
+					sem_post(&sem_cpu_libre);
+				} else if(proceso_recibido->debe_ser_bloqueado) {
+					if(string_equals_ignore_case(proceso_recibido->dispositivo_bloqueo,"PANTALLA") || string_equals_ignore_case(proceso_recibido->dispositivo_bloqueo,"TECLADO")) {
+						meter_proceso_en_block(proceso_recibido, string_from_format("%d-%s",proceso_recibido->id_proceso, proceso_recibido->dispositivo_bloqueo));
+					} else {
+						meter_proceso_en_block(proceso_recibido, proceso_recibido->dispositivo_bloqueo);
+					}
+					sem_post(&sem_cpu_libre);
+				} else {
+					devolver_proceso_a_ready(proceso_recibido);
+				}
 			}
 		}
 	}
@@ -352,12 +370,31 @@ void hilo_timer_contador_quantum() {
 	while(1) {
 		sem_wait(&sem_comienza_timer_quantum);
 
-		uint32_t quantum_in_seconds = atoi(config_kernel->quantum_RR);
+		uint32_t quantum_in_milis = atoi(config_kernel->quantum_RR);
+		uint32_t quantum_in_micros = quantum_in_milis*1000;
+		
+		pthread_mutex_lock(&mutex_timer_quantum);
+		timer_sigue_contando = true;
+		timer = quantum_in_micros;
+		pthread_mutex_unlock(&mutex_timer_quantum);
 
-		usleep(quantum_in_seconds*1000);
+		while(timer_sigue_contando) {
+			usleep(1000);
+			pthread_mutex_lock(&mutex_timer_quantum);
+			timer -= 1000;
+			pthread_mutex_unlock(&mutex_timer_quantum);
+		
+			if(timer <= 0) {
+				pthread_mutex_lock(&mutex_timer_quantum);
+				timer_sigue_contando = false; 
+				pthread_mutex_unlock(&mutex_timer_quantum);
+			}
+		}
 
-		if(!send_interrumpir_cpu_from_kernel(logger, fd_cpu_interrupt)) {
-			log_error(logger,"No se envio la interrupcion a cpu correctamente");
+		if(!timer_sigue_contando && debe_interrumpir_al_cpu) {
+			if(!send_interrumpir_cpu_from_kernel(logger, fd_cpu_interrupt)) {
+				log_error(logger,"No se envio la interrupcion a cpu correctamente");
+			}
 		}
 	}
 }

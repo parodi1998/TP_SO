@@ -26,6 +26,9 @@ pthread_mutex_t mutex_ready_rr;
 pthread_mutex_t mutex_execute;
 pthread_mutex_t mutex_exit;
 
+pthread_mutex_t mutex_timer_quantum;
+pthread_mutex_t mutex_debe_ser_interrumpido_cpu;
+
 sem_t contador_new;
 sem_t contador_ready_fifo;
 sem_t contador_ready_rr;
@@ -122,6 +125,9 @@ void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_dictionary_mutex_colas_block, NULL);
 	pthread_mutex_init(&mutex_dictionary_tiempos_io, NULL);
 	pthread_mutex_init(&mutex_dictionary_dato_ingreso_por_teclado, NULL);
+
+	pthread_mutex_init(&mutex_timer_quantum, NULL);
+	pthread_mutex_init(&mutex_debe_ser_interrumpido_cpu, NULL);
 	
     pthread_mutex_init(&mutex_new, NULL);
 	sem_init(&contador_new, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
@@ -185,6 +191,9 @@ void destruir_semaforos() {
     pthread_mutex_destroy(&mutex_dictionary_mutex_colas_block);
     pthread_mutex_destroy(&mutex_dictionary_tiempos_io);
     pthread_mutex_destroy(&mutex_dictionary_dato_ingreso_por_teclado);
+    
+    pthread_mutex_destroy(&mutex_timer_quantum);
+    pthread_mutex_destroy(&mutex_debe_ser_interrumpido_cpu);
 
     pthread_mutex_destroy(&mutex_new);
     sem_destroy(&contador_new);
@@ -273,8 +282,15 @@ void destruir_todo() {
     destruir_semaforos();
 }
 
+
+int kernel_server_fd = 0;
+
+void signalHandle(int signal) {
+	liberar_conexion(&kernel_server_fd);
+}
+
 int main(int argc, char** argv){
-    
+    signal(SIGINT,signalHandle);
     if(!iniciar_programa()) {
         terminar_programa();
         return EXIT_SUCCESS;
@@ -298,7 +314,6 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    int kernel_server_fd = 0;
     if(!iniciar_kernel(&kernel_server_fd)) {
         log_error(logger,"No se pudo iniciar kernel como servidor");
         terminar_programa();

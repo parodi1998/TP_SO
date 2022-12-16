@@ -39,7 +39,7 @@ static bool cargar_config(t_config_kernel* config_kernel) {
         string_append(&config_kernel->algoritmo_planificacion, config_get_string_value(config, "ALGORITMO_PLANIFICACION"));
         string_append(&config_kernel->grado_max_multiprogramacion, config_get_string_value(config, "GRADO_MAX_MULTIPROGRAMACION"));
         string_append(&config_kernel->quantum_RR, config_get_string_value(config, "QUANTUM_RR"));
-        string_append(&config_kernel->ip_escucha, "127.0.0.1");
+        string_append(&config_kernel->ip_escucha, config_get_string_value(config, "IP_KERNEL"));
         config_kernel->dispositivos_IO = array_to_list(config_get_array_value(config, "DISPOSITIVOS_IO"));
         config_kernel->tiempos_IO = array_to_list(config_get_array_value(config, "TIEMPOS_IO"));
         config_destroy(config);
