@@ -25,6 +25,9 @@ extern t_dictionary* mutex_colas_block;
 extern t_dictionary* tiempos_io;
 
 extern t_dictionary* dato_ingreso_por_teclado;
+extern t_dictionary* threads_dinamicos;
+
+extern t_queue* cola_de_keys_de_diccionario;
 
 // mutex
 extern pthread_mutex_t mutex_dictionary_colas;
@@ -40,6 +43,9 @@ extern pthread_mutex_t mutex_ready_fifo;
 extern pthread_mutex_t mutex_ready_rr;
 extern pthread_mutex_t mutex_execute;
 extern pthread_mutex_t mutex_exit;
+
+extern pthread_mutex_t mutex_generador_pcb_id;
+extern pthread_mutex_t mutex_dictionary_threads_dinamicos;;
 
 // semaforos contadores
 extern sem_t contador_new;

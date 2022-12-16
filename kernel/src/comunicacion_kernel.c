@@ -70,7 +70,11 @@ static void procesar_conexion(void* void_args) {
                 recv_segmentos(logger, cliente_fd, &segmentos);
                 break;
             case CONSOLA_KERNEL_INIT_PCB:
-                generador_pcb_id++;
+
+                pthread_mutex_lock(&mutex_generador_pcb_id);
+	            generador_pcb_id++;
+	            pthread_mutex_unlock(&mutex_generador_pcb_id);
+                
                 pcb_proceso = malloc(sizeof(t_pcb));
                 pcb_proceso->id_proceso = generador_pcb_id;
                 pcb_proceso->program_counter = 0;
@@ -96,8 +100,6 @@ static void procesar_conexion(void* void_args) {
                 pcb_proceso->page_fault_segmento = 0;
                 pcb_proceso->page_fault_pagina = 0;
 
-                meter_proceso_en_new(pcb_proceso);
-
                 id_proceso = string_itoa(pcb_proceso->id_proceso);
 
                 pthread_mutex_lock(&mutex_dictionary_dato_ingreso_por_teclado);
@@ -107,14 +109,27 @@ static void procesar_conexion(void* void_args) {
                 crear_colas_de_block_teclado_y_pantalla_por_proceso(string_from_format("%d-PANTALLA",pcb_proceso->id_proceso));
                 crear_colas_de_block_teclado_y_pantalla_por_proceso(string_from_format("%d-TECLADO",pcb_proceso->id_proceso));
 
+                pthread_mutex_lock(&mutex_dictionary_threads_dinamicos);
                 pthread_t* hilo_block_io_teclado = malloc(sizeof(pthread_t));
                 pthread_create(hilo_block_io_teclado, NULL, (void*)hilo_planificador_block_teclado, (void*) string_from_format("%d-TECLADO",pcb_proceso->id_proceso));
 	            pthread_detach(*hilo_block_io_teclado);
+                dictionary_put(threads_dinamicos, string_from_format("%d-PANTALLA",pcb_proceso->id_proceso), hilo_block_io_teclado);
+	            pthread_mutex_unlock(&mutex_dictionary_threads_dinamicos);
 
+                pthread_mutex_lock(&mutex_dictionary_threads_dinamicos);
                 pthread_t* hilo_block_io_pantalla = malloc(sizeof(pthread_t));
                 pthread_create(hilo_block_io_pantalla, NULL, (void*)hilo_planificador_block_pantalla, (void*) string_from_format("%d-PANTALLA",pcb_proceso->id_proceso));
                 pthread_detach(*hilo_block_io_pantalla);
+                dictionary_put(threads_dinamicos, string_from_format("%d-TECLADO",pcb_proceso->id_proceso), hilo_block_io_pantalla);
+	            pthread_mutex_unlock(&mutex_dictionary_threads_dinamicos);
 
+                pthread_mutex_lock(&mutex_dictionary_threads_dinamicos);
+                queue_push(cola_de_keys_de_diccionario, id_proceso);
+                queue_push(cola_de_keys_de_diccionario, string_from_format("%d-PANTALLA",pcb_proceso->id_proceso));
+                queue_push(cola_de_keys_de_diccionario, string_from_format("%d-TECLADO",pcb_proceso->id_proceso));
+	            pthread_mutex_unlock(&mutex_dictionary_threads_dinamicos);
+
+                meter_proceso_en_new(pcb_proceso);
                 break;
             case CONSOLA_EXIT:
                 sem_post(&sem_finalizar_proceso);
@@ -150,8 +165,10 @@ int server_escuchar(t_log* logger, char* server_name, int server_socket) {
         args->log = logger;
         args->fd = cliente_socket;
         args->server_name = server_name;
+        pthread_mutex_lock(&mutex_dictionary_threads_dinamicos);
         pthread_create(&hilo, NULL, (void*) procesar_conexion, (void*) args);
         pthread_detach(hilo);
+        pthread_mutex_unlock(&mutex_dictionary_threads_dinamicos);
         return 1;
     }
     return 0;

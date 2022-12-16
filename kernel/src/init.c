@@ -83,6 +83,7 @@ static void free_config_kernel() {
     free(config_kernel->quantum_RR);
     list_destroy_and_destroy_elements(config_kernel->dispositivos_IO, free);
     list_destroy_and_destroy_elements(config_kernel->tiempos_IO, free);
+    free(config_kernel);
 }
 
 void terminar_programa() {
