@@ -15,7 +15,7 @@ void meter_proceso_en_new(t_pcb* proceso) {
 }
 
 t_pcb* sacar_proceso_de_new() {
-	sem_wait(&contador_new);			// si por casualidad esto se llama y no hay nada en new (no deberia pasar nunca) se bloquea
+	sem_wait(&contador_new);
 
 	pthread_mutex_lock(&mutex_new);
 	pthread_mutex_lock(&mutex_dictionary_colas);
@@ -31,13 +31,17 @@ t_pcb* sacar_proceso_de_new() {
  * Planificador Largo Plazo
  * */
 void hilo_planificador_largo_plazo_new() {
+
+	bool es_apto_para_pasar_a_ready = true;
 	
 	while(1) {
 		
-		sem_wait(&sem_largo_plazo_new);					// espera que le avisen que puede hacer algo
+		sem_wait(&sem_largo_plazo_new);
 		sem_wait(&sem_grado_multiprogramacion);
 		
 		t_pcb* proceso = sacar_proceso_de_new();
+
+		es_apto_para_pasar_a_ready = true;
 
 		for(int index = 0; index < list_size(proceso->tabla_segmentos); index++) {
 
@@ -45,11 +49,21 @@ void hilo_planificador_largo_plazo_new() {
 			char* id_tabla_pagina_string = iniciar_segmento_memoria(fd_memoria, &sem_sincro_cargar_segmentos_en_memoria, logger, proceso->id_proceso, index, segmento->tamanio_segmento);
 			segmento->id_tabla_paginas = atoi(id_tabla_pagina_string);
 			sem_wait(&sem_sincro_cargar_segmentos_en_memoria);
+			if(segmento->id_tabla_paginas == -1) {
+				log_info(logger, "Error: PID: <%d>, Segmento: <%d>, Pagina: <%d>", proceso->id_proceso, segmento->tamanio_segmento, segmento->id_tabla_paginas);
+				es_apto_para_pasar_a_ready = false;
+				break;
+			}
 		}
 
-		meter_proceso_en_ready(proceso);
+		if(es_apto_para_pasar_a_ready) {
+			meter_proceso_en_ready(proceso);
+		} else {
+			log_info(logger, "Al menos uno de los ids de las tablas de pagina fue -1, por lo que se procede a finalizar el proceso PID: <%d>", proceso->id_proceso);
+			proceso->finaliza_por_error_de_ejecucion = true;
+			meter_proceso_en_exit(proceso);
+		}
 	}
-
 }
 
 void meter_proceso_en_exit(t_pcb* proceso) {
@@ -99,7 +113,6 @@ void hilo_planificador_largo_plazo_exit() {
 		}
 
 		recv_finalizar_consola_from_consola(logger, proceso->consola_fd);
-		
 		sem_wait(&sem_finalizar_proceso);
 
 		liberar_pcb(proceso);
@@ -340,7 +353,7 @@ void hilo_timer_contador_quantum() {
 		sem_wait(&sem_comienza_timer_quantum);
 
 		uint32_t quantum_in_seconds = atoi(config_kernel->quantum_RR);
-		
+
 		usleep(quantum_in_seconds*1000);
 
 		if(!send_interrumpir_cpu_from_kernel(logger, fd_cpu_interrupt)) {
