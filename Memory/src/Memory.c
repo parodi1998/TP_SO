@@ -13,13 +13,13 @@
 #include "../include/memory_configuration_manager.h"
 #include "../include/memory_file_management.h"
 #include "../include/server.h"
+#include <signal.h>
 
 int main(void) {
 	initialize_memory_configuration_manager();
 	initialize_memory_file_management();
 	log_info(get_logger(),"INICIANDO SERVIDOR..");
+	signal(SIGINT,end_memory_module);
 	iniciar_servidor_memory();
-	end_memory_module();
-
 	return EXIT_SUCCESS;
 }

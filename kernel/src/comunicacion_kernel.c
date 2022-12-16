@@ -1,4 +1,5 @@
 #include "../include/comunicacion_kernel.h"
+#include "../include/planificacion.h"
 
 static void carga_tabla_segmentos_pcb( t_list** lista_a_cargar, t_list* segmentos) {
     t_list* tabla_segmentos = list_create();
@@ -24,10 +25,21 @@ static void crear_colas_de_block_teclado_y_pantalla_por_proceso(char* key) {
 	sem_init(contador, SEM_NOT_SHARE_BETWEEN_PROCESS, 0); 
 	sem_init(sem_hilo, SEM_NOT_SHARE_BETWEEN_PROCESS, 0);
 
+    pthread_mutex_lock(&mutex_dictionary_colas);
     dictionary_put(colas, key, queue_create());
+	pthread_mutex_unlock(&mutex_dictionary_colas);
+
+    pthread_mutex_lock(&mutex_dictionary_mutex_colas_block);
     dictionary_put(mutex_colas_block ,key, mutex);
+	pthread_mutex_unlock(&mutex_dictionary_mutex_colas_block);
+
+    pthread_mutex_lock(&mutex_dictionary_contador_colas_block);
     dictionary_put(contador_colas_block, key, contador);
+	pthread_mutex_unlock(&mutex_dictionary_contador_colas_block);
+
+    pthread_mutex_lock(&mutex_dictionary_sem_hilos_block);
     dictionary_put(sem_hilos_block, key, sem_hilo);
+	pthread_mutex_unlock(&mutex_dictionary_sem_hilos_block);
 }
 
 static void procesar_conexion(void* void_args) {
@@ -87,7 +99,10 @@ static void procesar_conexion(void* void_args) {
                 meter_proceso_en_new(pcb_proceso);
 
                 id_proceso = string_itoa(pcb_proceso->id_proceso);
+
+                pthread_mutex_lock(&mutex_dictionary_dato_ingreso_por_teclado);
                 dictionary_put(dato_ingreso_por_teclado, id_proceso, string_new());
+	            pthread_mutex_unlock(&mutex_dictionary_dato_ingreso_por_teclado);
 
                 crear_colas_de_block_teclado_y_pantalla_por_proceso(string_from_format("%d-PANTALLA",pcb_proceso->id_proceso));
                 crear_colas_de_block_teclado_y_pantalla_por_proceso(string_from_format("%d-TECLADO",pcb_proceso->id_proceso));
@@ -112,7 +127,9 @@ static void procesar_conexion(void* void_args) {
             case CONSOLA_TECLADO:
                 recv_dato_ingresado_por_teclado_from_consola(logger, cliente_fd, &dato_recibido);
                 log_info(logger,"Dato ingresado por teclado: %s", dato_recibido);
+                pthread_mutex_lock(&mutex_dictionary_dato_ingreso_por_teclado);
                 dictionary_put(dato_ingreso_por_teclado, id_proceso, dato_recibido);
+	            pthread_mutex_unlock(&mutex_dictionary_dato_ingreso_por_teclado);
                 sem_post(&sem_dato_por_teclado_ingresado);
                 break;
             default:

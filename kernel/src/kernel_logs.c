@@ -64,7 +64,8 @@ void log_procesos_en_ready(t_log* logger, t_list* procesos_fifo, t_list* proceso
     char* pids_rr = lista_de_pids(procesos_rr);
     char* pids_fifo = lista_de_pids(procesos_fifo);
     if(string_equals_ignore_case(algoritmo,"FEEDBACK")) {
-		log_info(logger, "Cola Ready <%s>: [%s] [%s]", algoritmo, pids_rr, pids_fifo);
+        log_info(logger, "Cola Ready <%s>: [%s]", algoritmo, pids_rr);
+        log_info(logger, "Cola Ready <%s>: [%s]", algoritmo, pids_fifo);
 	} else if(string_equals_ignore_case(algoritmo,"RR")) {
         log_info(logger, "Cola Ready <%s>: [%s]", algoritmo, pids_rr);
 	} else {

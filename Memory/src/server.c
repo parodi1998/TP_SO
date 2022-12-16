@@ -131,7 +131,7 @@ void process_request_memory(int cod_op, int cliente_fd) {
 		case CONFIG_CPU:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = config_cpu();
-			size =  string_length((char*)response);
+			size =  string_length((char*)response)+1;
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			free(msg);
 			free(response);
@@ -141,21 +141,18 @@ void process_request_memory(int cod_op, int cliente_fd) {
 			response = procesar_mensaje_iniciar_proceso(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			free(msg);
-			free(response);
 			break;
 		case TRADUCIR:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_traducir_direccion(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			free(msg);
-			free(response);
 			break;
 		case ESCRIBIR:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
 			response = procesar_mensaje_escribir(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			free(msg);
-			free(response);
 			break;
 		case LEER:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
@@ -170,7 +167,6 @@ void process_request_memory(int cod_op, int cliente_fd) {
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			devolver_mensaje_memory(response,size, fd_client_cpu,ACTUALIZAR_TLB);
 			free(msg);
-			free(response);
 			break;
 		case SUSPENDER_PROCESO:
 			msg = recibir_mensaje_memory(cliente_fd, &size);
@@ -184,7 +180,6 @@ void process_request_memory(int cod_op, int cliente_fd) {
 			response = procesar_finalizar_proceso(msg,&size,&op_code_response);
 			devolver_mensaje_memory(response,size, cliente_fd,op_code_response);
 			free(msg);
-			free(response);
 			break;
 		}
 }
@@ -342,7 +337,7 @@ void* procesar_traducir_direccion(char* string,int* size, int* op_code){
 	char* response_string = string_from_format("%d|%d",response->page_fault,response->frame);
 
 	free(response);
-	*size = sizeof(response_string);
+	*size = string_length(response_string);
 
 	free(array[0]);
 	free(array[1]);
@@ -361,7 +356,7 @@ void* procesar_swapping(char* string, int* size,int* op_code){
 	uint32_t segment = (volatile uint32_t) atoi( array[1]);
 	uint32_t page_number = (volatile uint32_t) atoi( array[2]);
 	char* response = swap_page(pid, segment,page_number);
-	*size = string_length(response);
+	*size = string_length(response)+1;
 	*op_code = OK;
 
 	free(array[0]);
@@ -370,4 +365,10 @@ void* procesar_swapping(char* string, int* size,int* op_code){
 	free(array);
 	return (void*)response;
 
+}
+
+
+void liberarConexiones(){
+	close(fd_client_kernel);
+	close(fd_client_cpu);
 }

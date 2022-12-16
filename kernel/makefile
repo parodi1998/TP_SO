@@ -17,6 +17,9 @@ build: makefolder makeshared $(OBJ)
 
 valgrind: build
 	valgrind --leak-check=full --show-leak-kinds=all --log-file=valgrind.log ./$(OUTFILE)
+
+helgrind: build
+	valgrind --tool=helgrind --log-file=helgrind.log ./$(OUTFILE)
 debug: CFLAGS := $(CFLAGS) -g
 debug: makeshared_debug build
 

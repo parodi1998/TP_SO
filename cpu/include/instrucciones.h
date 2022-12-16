@@ -99,7 +99,7 @@ void limpiarParametros(void);
 int decodificaOperando(operando*);
 void accederMemoria(int, t_list*);
 int* operandoBusca(char*);
-void decodificar(char*, t_list*, int);
+void decodificar(char*);
 int ejecutar(int );
 int ins_set(void);
 int ins_add(void);
