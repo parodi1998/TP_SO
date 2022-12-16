@@ -2,6 +2,7 @@
 #include "../include/memory_configuration_manager.h"
 #include <math.h>
 
+
 //VARIABLES GLOBALES
 void* MEMORY_BLOCK;
 char* PATH_SWAP_BASE;
@@ -60,7 +61,7 @@ void save_content_in_swap_file(uint32_t address, uint32_t size,uint32_t logical_
 	pthread_mutex_lock(&mutex_swap);
 
 	memcpy(MEMORY_BLOCK_SECONDARY + logical_address, MEMORY_BLOCK + address,size);
-	msync(MEMORY_BLOCK_SECONDARY, size, MS_SYNC);
+	msync(MEMORY_BLOCK_SECONDARY, swap_size_getter(), MS_SYNC);
 	pthread_mutex_unlock(&mutex_swap);
 	log_info(get_logger(),"RETARDO SWAP START");
 	usleep(swap_time());
@@ -78,7 +79,6 @@ void create_swap_file() {
 		MAP_SHARED | MAP_FILE, SWAP_FILE, 0);
 		ftruncate(SWAP_FILE, size);
 		msync(MEMORY_BLOCK_SECONDARY, size, MS_SYNC);
-		close(SWAP_FILE);
 		log_info(get_logger(), "SWAP FILE CREATED");
 	}
 }
@@ -88,7 +88,6 @@ void load_file_into_memory(uint32_t address, uint32_t size,
 	pthread_mutex_lock(&mutex_swap);
 
 	memcpy(MEMORY_BLOCK + address, MEMORY_BLOCK_SECONDARY + logical_address,size);
-	msync(MEMORY_BLOCK_SECONDARY, size, MS_SYNC);
 	pthread_mutex_unlock(&mutex_swap);
 	log_info(get_logger(),"RETARDO SWAP START");
 	usleep(swap_time());
@@ -159,6 +158,7 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 
 		log_info(get_logger(),"Error: se supero el nivel de multiprogramacion, no hay frames libes en MP para el PID %d, Segmento: %d",pid, segment_ID);
 		list_destroy(free_frames_MP);
+		pthread_mutex_unlock(&mutex_frames);
 		return FAILURE;
 	}
 
@@ -178,9 +178,6 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 	list_add(TABLE_PAGES, new_table);
 	pthread_mutex_unlock(&mutex_table_pages);
 
-	int buffer_size = number_of_pages_to_create * page_size_getter();
-	void* buffer_process = malloc(buffer_size);
-
 	//Crea las pages y las guarda en memoria
 	for (int i = 0; i < number_of_pages_to_create; i++) {
 
@@ -198,10 +195,8 @@ int32_t initialize_process(uint32_t pid, uint32_t segment_ID, uint32_t size) {
 		list_add(new_table->pages, page);
 		log_info(get_logger(), "Se creo la pagina %d con frame %d para el PID %d", i,page->frame, pid);
 		log_info(get_logger(),"PID: <%d> - Segmento: <%d> - TAMAÑO: <%d> paginas",pid,segment_ID,number_of_pages_to_create);
-		memcpy(MEMORY_BLOCK + page->frame * page_size_getter(),buffer_process + i * page_size_getter(), page_size_getter());
 		page->locked = false;
 	}
-	free(buffer_process);
 
 	//retornamos el id de la pagina de primer nivel
 	log_info(get_logger(), "Se crea la tabla de paginas ID: %d  al PID: %d, SEGMENTO %d",new_table->ID, pid,segment_ID);
@@ -319,6 +314,7 @@ void clean_free_frames_from_pid(uint32_t pid){
 
 void delete_swap_file(uint32_t pid) {
 	char* path = swap_path();
+	close(SWAP_FILE);
 	pthread_mutex_lock(&mutex_swap);
 	log_info(get_logger(), "Eliminando el archivo swap %s", path);
 	remove(path);
@@ -553,7 +549,7 @@ bool load_page_to_memory(t_page* page) {//RETORNA TRUE SI HUBO PAGE_FAULT, FALSE
 	return pagefault;
 }
 
-void end_memory_module() {
+void end_memory_module(int signal) {
 	log_info(get_logger(), "FINALIZANDO MODULO DE MEMORIA");
 	free(MEMORY_BLOCK);
 	delete_swap_file(SWAP_FILE);
@@ -722,3 +718,8 @@ char* swap_page(uint32_t pid, uint32_t segment, uint32_t page_number){
 char* config_cpu(){
 	return string_from_format("%d|%d",entries_per_table_getter(),page_size_getter());
 }
+
+
+
+
+

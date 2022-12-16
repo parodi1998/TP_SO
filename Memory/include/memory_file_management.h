@@ -83,7 +83,7 @@ void delete_swap_file(uint32_t pid);
 int32_t finalize_process(uint32_t pid);
 void create_swap_file();
 
-void end_memory_module();
+void end_memory_module(int signal);
 t_translation_response* translate_logical_address(uint32_t pid ,uint32_t segment,uint32_t page,uint32_t is_writting);
 t_frame_swap* get_free_frame_from_swap();
 
