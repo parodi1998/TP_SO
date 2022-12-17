@@ -282,20 +282,13 @@ void destruir_todo() {
     destruir_semaforos();
 }
 
-
-int kernel_server_fd = 0;
-
-void signalHandle(int signal) {
-	liberar_conexion(&kernel_server_fd);
-}
-
 int main(int argc, char** argv){
-    signal(SIGINT,signalHandle);
+
     if(!iniciar_programa()) {
         terminar_programa();
         return EXIT_SUCCESS;
     }
-
+    int kernel_server_fd = 0;
     if(!generar_conexion_kernel_a_memoria(logger, config_kernel->ip_memoria, config_kernel->puerto_memoria, &fd_memoria)) {
         log_error(logger,"No se pudo generar la conexion con el modulo memoria");
         terminar_programa();
